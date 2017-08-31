@@ -1,0 +1,11 @@
+{
+  "lambda": {
+    "role": "topiaserver-executor",
+    "name": "topiaserver",
+    "region": "us-west-2"
+  },
+  "api": {
+    "id": "q3f8hfweci",
+    "module": "app"
+  }
+}
