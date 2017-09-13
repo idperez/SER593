@@ -2,14 +2,9 @@
   "name": "topia-backend",
   "version": "0.0.0",
   "description": "",
-  "keywords": [
-    "example",
-    "express",
-    "passport"
-  ],
   "author": "",
   "license": "Unlicensed",
-  "homepage": "",
+  "homepage": "topia.life",
   "repository": {
     "type": "git",
     "url": "https://github.com/idperez/SER593"
