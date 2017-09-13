@@ -19,16 +19,17 @@
     "express-session": "^1.11.3",
     "morgan": "^1.6.1",
     "passport": "^0.2.2",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "request": "^2.81.0"
   },
   "devDependencies": {
     "apidoc": "^0.17.6"
   },
   "apidoc": {
     "title": "API documentation for topia.",
-    "url" : "",
-    "template" : {
-		"withCompare" : false
-	}
+    "url": "",
+    "template": {
+      "withCompare": false
+    }
   }
 }

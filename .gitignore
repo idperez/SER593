@@ -1,8 +1,10 @@
 node_modules/
-BackendServer/node_modules/
-# Elastic Beanstalk Files
-.elasticbeanstalk/*
-!.elasticbeanstalk/*.cfg.yml
-!.elasticbeanstalk/*.global.yml
-BackendServer/.idea/
 .idea/
+
+# Backend
+BackendServer/node_modules/
+BackendServer/.idea/
+BackendServer/.elasticbeanstalk/*
+BackendServer/.elasticbeanstalk/*.cfg.yml
+BackendServer/.elasticbeanstalk/*.global.yml
+BackendServer/keys
