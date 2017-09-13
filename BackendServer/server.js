@@ -40,6 +40,9 @@ app.get( '/', ( req, res ) => {
     }
 );
 
+// For development use
+app.use('/apidocs', express.static('apiDocs'));
+
 app.use( require( 'morgan' )( 'combined' ) );
 app.use( cookie_parser() );
 app.use( body_parser.urlencoded( { extended: true } ));

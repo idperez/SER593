@@ -1,7 +1,7 @@
 {
   "name": "topia-backend",
   "version": "0.0.0",
-  "description": "",
+  "description": "Backend for topia application, SER-593.",
   "author": "",
   "license": "Unlicensed",
   "homepage": "topia.life",
@@ -20,5 +20,15 @@
     "morgan": "^1.6.1",
     "passport": "^0.2.2",
     "passport-local": "^1.0.0"
+  },
+  "devDependencies": {
+    "apidoc": "^0.17.6"
+  },
+  "apidoc": {
+    "title": "API documentation for topia.",
+    "url" : "",
+    "template" : {
+		"withCompare" : false
+	}
   }
 }
