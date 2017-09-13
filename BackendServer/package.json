@@ -8,14 +8,11 @@
     "passport"
   ],
   "author": "",
-  "license": "Unlicense",
-  "homepage": "https://github.com/passport/express-4.x-local-example",
+  "license": "Unlicensed",
+  "homepage": "",
   "repository": {
     "type": "git",
-    "url": "git://github.com/passport/express-4.x-local-example.git"
-  },
-  "bugs": {
-    "url": "https://github.com/passport/express-4.x-local-example/issues"
+    "url": "https://github.com/idperez/SER593"
   },
   "dependencies": {
     "aws-sdk": "^2.112.0",
