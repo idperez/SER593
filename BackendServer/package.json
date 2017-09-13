@@ -1,13 +1,13 @@
 {
-  "name": "express-4.x-local-example",
+  "name": "topia-backend",
   "version": "0.0.0",
-  "description": "Express 4.x app using Passport for authentication with username and password.",
+  "description": "",
   "keywords": [
     "example",
     "express",
     "passport"
   ],
-  "author": "Jared Hanson",
+  "author": "",
   "license": "Unlicense",
   "homepage": "https://github.com/passport/express-4.x-local-example",
   "repository": {

@@ -1,11 +1,11 @@
-var AWS = require( 'aws-sdk' );
+let AWS = require( 'aws-sdk' );
 AWS.config.update( { region:'us-west-2' } );
 
-var ddb = new AWS.DynamoDB( { apiVersion: '2012-08-10' } );
+let ddb = new AWS.DynamoDB( { apiVersion: '2012-08-10' } );
 const TABLE_NAME = 'topia_profiles';
 
-exports.findByUsername = function( username, cb ) {
-    process.nextTick( function() {
+exports.findByUsername = ( username, cb ) => {
+    process.nextTick( () => {
         ddb.getItem( {
             TableName: TABLE_NAME,
             Key:{
@@ -13,11 +13,11 @@ exports.findByUsername = function( username, cb ) {
                     S: username
                 }
             }
-        }, function( err, data ) {
+        }, ( err, data ) => {
             if ( err ) {
                 return cb( err, null );
             } else if ( data.Item ){
-                var record = {
+                let record = {
                     username: data.Item.username.S,
                     password: data.Item.pw.S
                 };
@@ -29,8 +29,8 @@ exports.findByUsername = function( username, cb ) {
     });
 };
 
-exports.addNewUser = function( user, cb ) {
-    process.nextTick( function() {
+exports.addNewUser = ( user, cb ) => {
+    process.nextTick( () => {
         ddb.putItem( {
             TableName: TABLE_NAME,
             Item:{
@@ -41,7 +41,7 @@ exports.addNewUser = function( user, cb ) {
                     S: user.password
                 }
             }
-        }, function( err, data ) {
+        }, ( err, data ) => {
             if ( err ) {
                 return cb( err );
             } else {

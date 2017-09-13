@@ -1,21 +1,21 @@
-var express = require( 'express' );
-var passport = require( 'passport' );
-var router = express.Router();
-var db = require( '../db' );
+let express = require( 'express' );
+let passport = require( 'passport' );
+let router = express.Router();
+let db = require( '../db' );
 
 router.post( '/register',
     function( req, res ) {
-        db.users.findByUsername( req.body.username, function ( err, user ) {
+        db.users.findByUsername( req.body.username, ( err, user ) => {
             if ( err ) {
                 res.send( err );
             } else if ( user ) {
                 res.send( "Username already taken." );
             } else {
-                var userInfo = {
+                let userInfo = {
                     username: req.body.username,
                     password: req.body.password
                 };
-                db.users.addNewUser( userInfo, function( err, data ){
+                db.users.addNewUser( userInfo, ( err, data ) => {
                     if ( err ) {
                         res.send( "Error: " + err );
                     } else {
@@ -24,24 +24,27 @@ router.post( '/register',
                 });
             }
         });
-    });
+    }
+);
 
 
 router.get( '/loginfail',
-    function( req, res ) {
+    ( req, res ) => {
         res.send( "Login failed." );
-    });
+    }
+);
 
 router.post( '/login',
     passport.authenticate( 'local', { failureRedirect: '/auth/loginfail' } ),
-    function( req, res ) {
+    ( req, res ) => {
         res.send( "Logged in." );
-    });
+    }
+);
 
-router.get( '/logout',
-    function( req, res ){
+router.get( '/logout', ( req, res ) => {
         req.logout();
         res.redirect( '/' );
-    });
+    }
+);
 
 module.exports = router;
