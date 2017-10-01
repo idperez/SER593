@@ -1,0 +1,2 @@
+Command:
+apidoc -f ".*\\.js$" -e node_modules/ -o apiDocs/

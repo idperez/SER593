@@ -1,25 +1,48 @@
-let express = require( 'express' );
-let passport = require( 'passport' );
-let router = express.Router();
-let db = require( '../db' );
+const express = require( 'express' );
+const passport = require( 'passport' );
+const router = express.Router();
+const db = require( '../db' );
+const response = require('../responses/responses.js');
 
+/**
+ * @api {post} /auth/register Register
+ * @apiName Register
+ * @apiGroup Authentication
+ *
+ * @apiParam {String} username
+ * @apiParam {String} password
+ *
+ * @apiError MissingInformation Username or password is missing
+ * @apiError UsernameTaken There is already an account with the supplied username.
+ * @apiErrorExample {json} Error-Response:
+ *     {
+ *       "err": "UsernameTaken",
+ *       "msg": ""
+ *     }
+ */
 router.post( '/register',
     function( req, res ) {
-        db.users.findByUsername( req.body.username, ( err, user ) => {
+        let username = req.body.username;
+        if( !username ){
+            res.send( response.errorMessage( "MissingInformation" )  )
+        }
+        db.users.authByUsername( username, ( err, user ) => {
             if ( err ) {
-                res.send( err );
+                res.send( { "err": err.message } );
             } else if ( user ) {
-                res.send( "Username already taken." );
+                res.send( response.errorMessage( "UsernameTaken" ) );
+            } else if ( !( username && req.body.password ) ){
+                res.send( response.errorMessage( "MissingInformation" ) );
             } else {
                 let userInfo = {
-                    username: req.body.username,
+                    username: username,
                     password: req.body.password
                 };
                 db.users.addNewUser( userInfo, ( err, data ) => {
                     if ( err ) {
-                        res.send( "Error: " + err );
+                        res.send( response.errorMessage( err ) );
                     } else {
-                        res.send( "Username added." )
+                        res.send( response.empty )
                     }
                 });
             }
@@ -27,20 +50,40 @@ router.post( '/register',
     }
 );
 
-
-router.get( '/loginfail',
-    ( req, res ) => {
-        res.send( "Login failed." );
-    }
-);
-
+/**
+ * @api {post} /auth/login Login
+ * @apiName Login
+ * @apiGroup Authentication
+ *
+ * @apiParam {String} username
+ * @apiParam {String} password
+ *
+ * @apiError InvalidLogin Username or password were incorrect.
+ * @apiErrorExample {json} Error-Response:
+ *     {
+ *       "err": "InvalidLogin",
+ *       "msg": ""
+ *     }
+ */
 router.post( '/login',
     passport.authenticate( 'local', { failureRedirect: '/auth/loginfail' } ),
     ( req, res ) => {
-        res.send( "Logged in." );
+        res.send( response.empty );
     }
 );
 
+router.get( '/loginfail',
+    ( req, res ) => {
+        res.send( response.errorMessage( "InvalidLogin" ) );
+    }
+);
+
+
+/**
+ * @api {get} /auth/logout/ Logout
+ * @apiName Logout
+ * @apiGroup Authentication
+ */
 router.get( '/logout', ( req, res ) => {
         req.logout();
         res.redirect( '/' );
