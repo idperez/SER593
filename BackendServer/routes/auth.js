@@ -1,5 +1,4 @@
 const express = require( 'express' );
-const passport = require( 'passport' );
 const router = express.Router();
 const db = require( '../db' );
 const response = require('../responses/responses.js');
@@ -66,7 +65,6 @@ router.post( '/register',
  *     }
  */
 router.post( '/login',
-    passport.authenticate( 'local', { failureRedirect: '/auth/loginfail' } ),
     ( req, res ) => {
         res.send( response.empty );
     }

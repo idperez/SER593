@@ -1,66 +1,84 @@
 const AWS = require( 'aws-sdk' );
 AWS.config.update( { region:'us-west-2' } );
 const ddb = new AWS.DynamoDB( { apiVersion: '2012-08-10' } );
-const TABLE_NAME = 'topia_profiles';
 const USER_KEYS = require( './userProfileKeys' ).profile;
+const INDEX_SUFFIX = "-index";
+const TABLE_NAME = 'topia_profiles';
+const PRIMARY_KEY = "username";
 
 // Get user profile from database
 exports.getUserProfile = ( username ) => {
+    return exports.getUserProfileByPrimaryKey( PRIMARY_KEY, username );
+};
+
+// Query table by a specific key
+// primKey must at least be a tables secondary key.
+exports.getUserProfileByPrimaryKey = ( primKey, value ) => {
     return new Promise( ( resolve, reject ) =>{
+        if( primKey && value ) {
+            let params = {
+                TableName: TABLE_NAME,
+                ExpressionAttributeValues: {
+                    ":v1": {
+                        S: value.toString()
+                    }
+                },
+                KeyConditionExpression: primKey.toString() + " = :v1",
+            };
 
-        let params = {
-            TableName: TABLE_NAME,
-            Key: {
-                "username": {
-                    S: username
-                }
+            if( PRIMARY_KEY !== primKey.toString()){
+                params.IndexName = primKey + INDEX_SUFFIX;
             }
-        };
-        ddb.getItem( params, ( err, data ) => {
-            if ( err ) {
-                reject( err );
-            } else if ( data.Item ){
-                let profile = data.Item;
-                let resultProfile = {};
-                // All db items are represented as a string and nested in a sub-object
-                // with the value type. This pulls out the values, converts from string
-                // if needed, and puts them in a clean profile object.
-                for( let key in profile ){
-                    if( profile.hasOwnProperty( key ) ){
-                        let profProperty = profile[key];
 
-                        // String
-                        if( profProperty.hasOwnProperty( 'S' ) ){
-                            resultProfile[key] = profProperty.S;
-                        // Number (Int or float)
-                        } else if( profProperty.hasOwnProperty( 'N' ) ){
-                            resultProfile[key] = parseFloat( profProperty.N );
-                        // Buffer type
-                        } else if( profProperty.hasOwnProperty( 'B' ) ) {
-                            resultProfile[key] = profProperty.B;
-                        // String array
-                        } else if( profProperty.hasOwnProperty( 'SS' ) ) {
-                            resultProfile[key] = profProperty.SS;
-                        // Number array
-                        } else if( profProperty.hasOwnProperty( 'NS' ) ) {
-                            resultProfile[key] = profProperty.NS.map( Number );
-                        // Object
-                        } else if( profProperty.hasOwnProperty( 'M' ) ) {
-                            resultProfile[key] = profProperty.M;
-                        // Generic list
-                        } else if( profProperty.hasOwnProperty( 'L' ) ) {
-                            resultProfile[key] = profProperty.L;
-                        // Bool
-                        } else if( profProperty.hasOwnProperty( 'BOOL' ) ){
-                            resultProfile[key] = profProperty.BOOL;
+            ddb.query( params, ( err, data ) => {
+                if( err ) {
+                    reject( err );
+                } else if( data.Items[ 0 ] ) {
+                    let profile = data.Items[ 0 ];
+                    let resultProfile = {};
+
+                    // All db items are represented as a string and nested in a sub-object
+                    // with the value type. This pulls out the values, converts from string
+                    // if needed, and puts them in a clean profile object.
+                    for( let key in profile ) {
+                        if( profile.hasOwnProperty( key ) ) {
+                            let profProperty = profile[ key ];
+
+                            // String
+                            if( profProperty.hasOwnProperty( 'S' ) ) {
+                                resultProfile[ key ] = profProperty.S;
+                                // Number (Int or float)
+                            } else if( profProperty.hasOwnProperty( 'N' ) ) {
+                                resultProfile[ key ] = parseFloat( profProperty.N );
+                                // Buffer type
+                            } else if( profProperty.hasOwnProperty( 'B' ) ) {
+                                resultProfile[ key ] = profProperty.B;
+                                // String array
+                            } else if( profProperty.hasOwnProperty( 'SS' ) ) {
+                                resultProfile[ key ] = profProperty.SS;
+                                // Number array
+                            } else if( profProperty.hasOwnProperty( 'NS' ) ) {
+                                resultProfile[ key ] = profProperty.NS.map( Number );
+                                // Object
+                            } else if( profProperty.hasOwnProperty( 'M' ) ) {
+                                resultProfile[ key ] = profProperty.M;
+                                // Generic list
+                            } else if( profProperty.hasOwnProperty( 'L' ) ) {
+                                resultProfile[ key ] = profProperty.L;
+                                // Bool
+                            } else if( profProperty.hasOwnProperty( 'BOOL' ) ) {
+                                resultProfile[ key ] = profProperty.BOOL;
+                            }
                         }
                     }
+                    resolve( resultProfile );
+                } else {
+                    reject( 'NoResultsFound' );
                 }
-                resolve( resultProfile );
-            } else {
-                reject( 'NoResultsFound' );
-            }
-        });
+            } );
+        } else {
+            reject( "MissingParams" )
+        }
     });
 };
 

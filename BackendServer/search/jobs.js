@@ -119,12 +119,12 @@ exports.getJobsByCoord = ( username, lat, long, maxResults, radius ) => {
 function getJobsList( username, city, state, zip, maxResults, radius ){
     return new Promise( ( resolve, reject ) => {
         DB_USERS.getUserProfile( username ).then( profile => {
-            let jobAge = profile[ "prefs.jobs.postedDate" ] ?
-                profile[ "prefs.jobs.postedDate" ] : reject( "NoJobDate" );
-            let jobTypes = profile[ "prefs.jobs.types" ] ?
-                profile[ "prefs.jobs.types" ] : reject( "NoJobTypes" );
-            let jobTitles = profile[ "prefs.jobs.titles" ] ?
-                profile[ "prefs.jobs.titles" ] : [""]; // Empty string to get all results
+            let jobAge = profile[ "prefs_jobs_postedDate" ] ?
+                profile[ "prefs_jobs_postedDate" ] : reject( "NoJobDate" );
+            let jobTypes = profile[ "prefs_jobs_types" ] ?
+                profile[ "prefs_jobs_types" ] : reject( "NoJobTypes" );
+            let jobTitles = profile[ "prefs_jobs_titles" ] ?
+                profile[ "prefs_jobs_titles" ] : [""]; // Empty string to get all results
             let typePromises = [];
 
             maxResults /= jobTypes.length;
