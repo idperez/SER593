@@ -1,10 +1,21 @@
 const AWS = require( 'aws-sdk' );
 AWS.config.update( { region:'us-west-2' } );
 const ddb = new AWS.DynamoDB( { apiVersion: '2012-08-10' } );
-const USER_KEYS = require( './userProfileKeys' ).profile;
+const consts = require( "../constants" );
 const INDEX_SUFFIX = "-index";
 const TABLE_NAME = 'topia_profiles';
-const PRIMARY_KEY = "username";
+const PRIMARY_KEY = consts.PROF_KEYS.USERNAME;
+
+exports.hasUser = ( username ) => {
+    return new Promise( ( resolve, reject ) => {
+        exports.getUserProfile( username ).then( data => {
+            if( data.Item )
+            resolve(  );
+        }).catch( err => {
+            reject( err );
+        });
+    });
+};
 
 // Get user profile from database
 exports.getUserProfile = ( username ) => {
@@ -34,6 +45,9 @@ exports.getUserProfileByPrimaryKey = ( primKey, value ) => {
                 if( err ) {
                     reject( err );
                 } else if( data.Items[ 0 ] ) {
+                    if( data.Items.length > 1 ){
+                        reject( "MultipleProfilesFound" );
+                    }
                     let profile = data.Items[ 0 ];
                     let resultProfile = {};
 
@@ -88,7 +102,7 @@ exports.addUserItem = ( username, key, value ) => {
         let param = {
                 TableName: TABLE_NAME,
                 Key:{
-                    "username": {
+                    [PRIMARY_KEY]: {
                         S: username
                     }
                 },
@@ -133,49 +147,63 @@ exports.addUserItem = ( username, key, value ) => {
             } else {
                 resolve( data );
             }
-        })
+        });
     });
 };
 
-exports.authByUsername = ( username, cb ) => {
-    process.nextTick( () => {
-        ddb.getItem( {
+// Sets user item to null
+exports.removeUserItem = ( username, key ) => {
+    return new Promise( ( resolve, reject ) => {
+        let param = {
             TableName: TABLE_NAME,
             Key:{
-                "username": {
+                [PRIMARY_KEY]: {
                     S: username
                 }
-            }
-        }, ( err, data ) => {
-            if ( err ) {
-                return cb( err, null );
-            } else if ( data.Item ){
-                let record = {
-                    username: data.Item.username.S,
-                    password: data.Item.pw.S
-                };
-                return cb( null, record );
+            },
+            ExpressionAttributeNames:{
+                "#K": key
+            },
+            UpdateExpression: "REMOVE #K",
+        };
+        ddb.updateItem( param, ( err, data ) => {
+            if( err ) {
+                reject( err );
             } else {
-                return cb( null, null ); // If not found, return nothing.
+                resolve( data );
             }
         });
     });
 };
 
-exports.addNewUser = ( user, cb ) => {
-    process.nextTick( () => {
+exports.addNewUser = ( username, password, email ) => {
+    return new Promise( (resolve, reject) => {
         let params = {
             TableName: TABLE_NAME,
-            Item: USER_KEYS
+            Item: {
+                [consts.PROF_KEYS.USERNAME]:{
+                    "S": username
+                },
+                [consts.PROF_KEYS.PASSWORD]:{
+                    "S": password
+                },
+                [consts.PROF_KEYS.EMAIL]:{
+                    "S": email
+                }
+            },
+            ConditionExpression: "attribute_not_exists(" + consts.PROF_KEYS.USERNAME + ")"
         };
-        params['Item']['username']['S'] = user.username;
-        params['Item']['pw']['S'] = user.password;
 
         ddb.putItem( params, ( err, data ) => {
             if ( err ) {
-                return cb( err );
+                // This error means that the same username was found
+                if( err.code === "ConditionalCheckFailedException" ){
+                    reject( "UsernameTaken" );
+                } else {
+                    reject( err );
+                }
             } else {
-                return cb( null, data );
+                resolve( data );
             }
         });
     });

@@ -1,7 +1,8 @@
 const express = require( 'express' );
 const router = express.Router();
-const db = require( '../db' );
 const response = require('../responses/responses.js');
+const auth = require( '../auth/passGrant' );
+const consts = require( "../constants" );
 
 /**
  * @api {post} /auth/register Register
@@ -10,41 +11,33 @@ const response = require('../responses/responses.js');
  *
  * @apiParam {String} username
  * @apiParam {String} password
+ * @apiParam {String} email
  *
  * @apiError MissingInformation Username or password is missing
  * @apiError UsernameTaken There is already an account with the supplied username.
+ * @apiError ErrorGettingProfile Cannot find profile associated with username during authentication.
  * @apiErrorExample {json} Error-Response:
  *     {
  *       "err": "UsernameTaken",
  *       "msg": ""
  *     }
+ *
+ * @apiSuccess {json} token Access token assigned to user.
+ * @apiSuccessExample {json} Success-Response:
+ *     {
+ *       "token": "QZ3jhbfdof84GFBlSe"
+ *     }
+ *
  */
-router.post( '/register',
-    function( req, res ) {
-        let username = req.body.username;
-        if( !username ){
-            res.send( response.errorMessage( "MissingInformation" )  )
-        }
-        db.users.authByUsername( username, ( err, user ) => {
-            if ( err ) {
-                res.send( { "err": err.message } );
-            } else if ( user ) {
-                res.send( response.errorMessage( "UsernameTaken" ) );
-            } else if ( !( username && req.body.password ) ){
-                res.send( response.errorMessage( "MissingInformation" ) );
-            } else {
-                let userInfo = {
-                    username: username,
-                    password: req.body.password
-                };
-                db.users.addNewUser( userInfo, ( err, data ) => {
-                    if ( err ) {
-                        res.send( response.errorMessage( err ) );
-                    } else {
-                        res.send( response.empty )
-                    }
-                });
-            }
+router.post( '/register', ( req, res ) => {
+        auth.register(
+            req.body[consts.PROF_KEYS.USERNAME],
+            req.body[consts.PROF_KEYS.PASSWORD],
+            req.body[consts.PROF_KEYS.EMAIL]
+        ).then( accessToken => {
+            res.send(  { token: accessToken } );
+        }).catch( err => {
+            res.send( response.errorMessage( err ) );
         });
     }
 );
@@ -57,34 +50,61 @@ router.post( '/register',
  * @apiParam {String} username
  * @apiParam {String} password
  *
- * @apiError InvalidLogin Username or password were incorrect.
+ * @apiError ErrorGettingProfile Cannot find profile associated with username during authentication.
+ * @apiError PasswordMismatch Password was incorrect.
  * @apiErrorExample {json} Error-Response:
  *     {
- *       "err": "InvalidLogin",
+ *       "err": "PasswordMismatch",
+ *       "msg": ""
+ *     }
+ *
+ * @apiSuccess {json} token Access token assigned to user.
+ * @apiSuccessExample {json} Success-Response:
+ *     {
+ *       "token": "QZ3jhbfdof84GFBlSe"
+ *     }
+ *
+ */
+router.post( '/login', ( req, res ) => {
+        auth.authenticate(
+            req.body[consts.PROF_KEYS.USERNAME],
+            req.body[consts.PROF_KEYS.PASSWORD]
+        ).then( accessToken => {
+            res.send( { token: accessToken } );
+        }).catch( err => {
+            res.send( response.errorMessage(err) );
+        });
+    }
+);
+
+/**
+ * @api {post} /auth/logout/ Logout
+ * @apiName Logout
+ * @apiGroup Authentication
+ *
+ * @apiHeader {String} authorization Bearer token
+ * @apiHeaderExample {json} Header-Example:
+ *      {
+ *          authorization: Bearer QZ3jhbfdof84GFBlSe
+ *      }
+ *
+ * @apiParam {String} username
+ *
+ * @apiError TokenNotFound Bearer token not found in header.
+ * @apiError TokenMismatch Bearer token does not match.
+ * @apiError TokenExpired Bearer token is expired.
+ * @apiErrorExample {json} Error-Response:
+ *     {
+ *       "err": "TokenNotFound",
  *       "msg": ""
  *     }
  */
-router.post( '/login',
-    ( req, res ) => {
-        res.send( response.empty );
-    }
-);
-
-router.get( '/loginfail',
-    ( req, res ) => {
-        res.send( response.errorMessage( "InvalidLogin" ) );
-    }
-);
-
-
-/**
- * @api {get} /auth/logout/ Logout
- * @apiName Logout
- * @apiGroup Authentication
- */
-router.get( '/logout', ( req, res ) => {
-        req.logout();
-        res.redirect( '/' );
+router.post( '/logout', ( req, res ) => {
+        auth.revokeToken( req.body[consts.PROF_KEYS.USERNAME] ).then( ( data ) => {
+            res.send( data );
+        }).catch( err => {
+            res.send( response.errorMessage( err ) );
+        });
     }
 );
 

@@ -31,15 +31,41 @@ define({ "api": [
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "InvalidLogin",
-            "description": "<p>Username or password were incorrect.</p>"
+            "field": "ErrorGettingProfile",
+            "description": "<p>Cannot find profile associated with username during authentication.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "PasswordMismatch",
+            "description": "<p>Password was incorrect.</p>"
           }
         ]
       },
       "examples": [
         {
           "title": "Error-Response:",
-          "content": "{\n  \"err\": \"InvalidLogin\",\n  \"msg\": \"\"\n}",
+          "content": "{\n  \"err\": \"PasswordMismatch\",\n  \"msg\": \"\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "json",
+            "optional": false,
+            "field": "token",
+            "description": "<p>Access token assigned to user.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n  \"token\": \"QZ3jhbfdof84GFBlSe\"\n}",
           "type": "json"
         }
       ]
@@ -49,11 +75,75 @@ define({ "api": [
     "groupTitle": "Authentication"
   },
   {
-    "type": "get",
+    "type": "post",
     "url": "/auth/logout/",
     "title": "Logout",
     "name": "Logout",
     "group": "Authentication",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "authorization",
+            "description": "<p>Bearer token</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n    authorization: Bearer QZ3jhbfdof84GFBlSe\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenNotFound",
+            "description": "<p>Bearer token not found in header.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenMismatch",
+            "description": "<p>Bearer token does not match.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenExpired",
+            "description": "<p>Bearer token is expired.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "{\n  \"err\": \"TokenNotFound\",\n  \"msg\": \"\"\n}",
+          "type": "json"
+        }
+      ]
+    },
     "version": "0.0.0",
     "filename": "./routes/auth.js",
     "groupTitle": "Authentication"
@@ -80,6 +170,13 @@ define({ "api": [
             "optional": false,
             "field": "password",
             "description": ""
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "email",
+            "description": ""
           }
         ]
       }
@@ -98,6 +195,12 @@ define({ "api": [
             "optional": false,
             "field": "UsernameTaken",
             "description": "<p>There is already an account with the supplied username.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ErrorGettingProfile",
+            "description": "<p>Cannot find profile associated with username during authentication.</p>"
           }
         ]
       },
@@ -105,6 +208,26 @@ define({ "api": [
         {
           "title": "Error-Response:",
           "content": "{\n  \"err\": \"UsernameTaken\",\n  \"msg\": \"\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "json",
+            "optional": false,
+            "field": "token",
+            "description": "<p>Access token assigned to user.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n  \"token\": \"QZ3jhbfdof84GFBlSe\"\n}",
           "type": "json"
         }
       ]
@@ -120,6 +243,26 @@ define({ "api": [
     "name": "JobsByCoordinates",
     "group": "Jobs",
     "description": "<p>Get jobs by supplied coordinates and user preferences.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "authorization",
+            "description": "<p>Bearer token</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n    authorization: Bearer QZ3jhbfdof84GFBlSe\n}",
+          "type": "json"
+        }
+      ]
+    },
     "parameter": {
       "fields": {
         "Parameter": [
@@ -196,6 +339,24 @@ define({ "api": [
             "optional": false,
             "field": "NoJobTypes",
             "description": "<p>No job types were found on db for this user.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenNotFound",
+            "description": "<p>Bearer token not found in header.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenMismatch",
+            "description": "<p>Bearer token does not match.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenExpired",
+            "description": "<p>Bearer token is expired.</p>"
           }
         ]
       },
@@ -218,6 +379,26 @@ define({ "api": [
     "name": "JobsByKey",
     "group": "Jobs",
     "description": "<p>Get job(s) by key</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "authorization",
+            "description": "<p>Bearer token</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n    authorization: Bearer QZ3jhbfdof84GFBlSe\n}",
+          "type": "json"
+        }
+      ]
+    },
     "parameter": {
       "fields": {
         "Parameter": [
@@ -248,6 +429,24 @@ define({ "api": [
             "optional": false,
             "field": "NoJobsKeysFound",
             "description": "<p>lat/long missing from query.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenNotFound",
+            "description": "<p>Bearer token not found in header.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenMismatch",
+            "description": "<p>Bearer token does not match.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenExpired",
+            "description": "<p>Bearer token is expired.</p>"
           }
         ]
       },
@@ -270,6 +469,26 @@ define({ "api": [
     "name": "JobsByLocation",
     "group": "Jobs",
     "description": "<p>Get jobs by supplied city and state and user preferences.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "authorization",
+            "description": "<p>Bearer token</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n    authorization: Bearer QZ3jhbfdof84GFBlSe\n}",
+          "type": "json"
+        }
+      ]
+    },
     "parameter": {
       "fields": {
         "Parameter": [
@@ -340,6 +559,24 @@ define({ "api": [
             "optional": false,
             "field": "NoJobTypes",
             "description": "<p>No job types were found on db for this user.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenNotFound",
+            "description": "<p>Bearer token not found in header.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenMismatch",
+            "description": "<p>Bearer token does not match.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenExpired",
+            "description": "<p>Bearer token is expired.</p>"
           }
         ]
       },
@@ -362,6 +599,26 @@ define({ "api": [
     "name": "JobsByZip",
     "group": "Jobs",
     "description": "<p>Get jobs by supplied zip code and user preferences.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "authorization",
+            "description": "<p>Bearer token</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n    authorization: Bearer QZ3jhbfdof84GFBlSe\n}",
+          "type": "json"
+        }
+      ]
+    },
     "parameter": {
       "fields": {
         "Parameter": [
@@ -425,6 +682,24 @@ define({ "api": [
             "optional": false,
             "field": "NoJobTypes",
             "description": "<p>No job types were found on db for this user.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenNotFound",
+            "description": "<p>Bearer token not found in header.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenMismatch",
+            "description": "<p>Bearer token does not match.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenExpired",
+            "description": "<p>Bearer token is expired.</p>"
           }
         ]
       },
@@ -447,6 +722,26 @@ define({ "api": [
     "name": "AddJobPref",
     "group": "Users",
     "description": "<p>Add or update job preference on users profile.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "authorization",
+            "description": "<p>Bearer token</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n    authorization: Bearer QZ3jhbfdof84GFBlSe\n}",
+          "type": "json"
+        }
+      ]
+    },
     "parameter": {
       "fields": {
         "Parameter": [
@@ -482,6 +777,24 @@ define({ "api": [
             "optional": false,
             "field": "UserNotFound",
             "description": "<p>User information is not in the database.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenNotFound",
+            "description": "<p>Bearer token not found in header.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenMismatch",
+            "description": "<p>Bearer token does not match.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenExpired",
+            "description": "<p>Bearer token is expired.</p>"
           }
         ]
       },
@@ -504,6 +817,26 @@ define({ "api": [
     "name": "Profile",
     "group": "Users",
     "description": "<p>Get users profile from database.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "authorization",
+            "description": "<p>Bearer token</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n    authorization: Bearer QZ3jhbfdof84GFBlSe\n}",
+          "type": "json"
+        }
+      ]
+    },
     "parameter": {
       "fields": {
         "Parameter": [
@@ -525,6 +858,24 @@ define({ "api": [
             "optional": false,
             "field": "UserNotFound",
             "description": "<p>User information is not in the database.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenNotFound",
+            "description": "<p>Bearer token not found in header.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenMismatch",
+            "description": "<p>Bearer token does not match.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenExpired",
+            "description": "<p>Bearer token is expired.</p>"
           }
         ]
       },

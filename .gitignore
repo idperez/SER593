@@ -7,4 +7,4 @@ BackendServer/.idea/
 BackendServer/.elasticbeanstalk/*
 BackendServer/.elasticbeanstalk/*.cfg.yml
 BackendServer/.elasticbeanstalk/*.global.yml
-BackendServer/keys
+BackendServer/keys/
