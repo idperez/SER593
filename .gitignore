@@ -1,10 +1,50 @@
-node_modules/
-.idea/
+# OSX
+#
+.DS_Store
 
-# Backend
+# Xcode
+#
+build/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata
+*.xccheckout
+*.moved-aside
+DerivedData
+*.hmap
+*.ipa
+*.xcuserstate
+project.xcworkspace
+
+# Android/IJ
+#
+.idea
+.gradle
+local.properties
+
+# node.js
+#
+node_modules/
+npm-debug.log
+# BUCK
+buck-out/
+\.buckd/
+android/app/libs
+android/keystores/debug.keystore
+
 BackendServer/node_modules/
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
 BackendServer/.idea/
-BackendServer/.elasticbeanstalk/*
-BackendServer/.elasticbeanstalk/*.cfg.yml
-BackendServer/.elasticbeanstalk/*.global.yml
-BackendServer/keys/
+app/components/preferences/
+ios/build/Logs/Build/85140BB3-D2AD-4196-A9CF-6827DC411A0E.xcactivitylog
+ios/build/Logs/Build/CEC74561-2070-4964-98A5-FF0EA7D4B736.xcactivitylog
+ios/build/ModuleCache/1RIC7OOKCAIYP/
