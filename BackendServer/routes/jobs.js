@@ -2,12 +2,19 @@ const express = require( 'express' );
 const router = express.Router();
 const jobSearch = require("../search/jobs.js");
 const response = require('../responses/responses.js');
+const consts = require( "../constants" );
 
 /**
  * @api {get} /search/jobs/location JobsByLocation
  * @apiName JobsByLocation
  * @apiGroup Jobs
  * @apiDescription Get jobs by supplied city and state and user preferences.
+ *
+ * @apiHeader {String} authorization Bearer token
+ * @apiHeaderExample {json} Header-Example:
+ *      {
+ *          authorization: Bearer QZ3jhbfdof84GFBlSe
+ *      }
  *
  * @apiParam {String} username User profile to get job information from.
  * @apiParam {String} city City to search.
@@ -46,6 +53,9 @@ const response = require('../responses/responses.js');
  * @apiError MissingLocation City or state missing from query.
  * @apiError NoJobDate No max job age was found on db for this user.
  * @apiError NoJobTypes No job types were found on db for this user.
+ * @apiError TokenNotFound Bearer token not found in header.
+ * @apiError TokenMismatch Bearer token does not match.
+ * @apiError TokenExpired Bearer token is expired.
  * @apiErrorExample {json} Error-Response:
  *     {
  *       "err": "MissingLocation"
@@ -53,8 +63,13 @@ const response = require('../responses/responses.js');
  */
 router.get( '/location',
     ( req, res ) => {
-        jobSearch.getJobsByCityState( req.query.username, req.query.city,
-            req.query.state, req.query.limit, req.query.radius ).then( jobResults => {
+        jobSearch.getJobsByCityState(
+            req.query[consts.PROF_KEYS.USERNAME],
+            req.query.city,
+            req.query.state,
+            req.query.limit,
+            req.query.radius
+        ).then( jobResults => {
             res.send( jobResults );
         }).catch( err => {
             res.send( response.errorMessage( err ) );
@@ -68,6 +83,12 @@ router.get( '/location',
  * @apiName JobsByZip
  * @apiGroup Jobs
  * @apiDescription Get jobs by supplied zip code and user preferences.
+ *
+ * @apiHeader {String} authorization Bearer token
+ * @apiHeaderExample {json} Header-Example:
+ *      {
+ *          authorization: Bearer QZ3jhbfdof84GFBlSe
+ *      }
  *
  * @apiParam {String} username User profile to get job information from.
  * @apiParam {String} zip Zip code.
@@ -105,6 +126,9 @@ router.get( '/location',
  * @apiError MissingLocation zip code missing from query.
  * @apiError NoJobDate No max job age was found on db for this user.
  * @apiError NoJobTypes No job types were found on db for this user.
+ * @apiError TokenNotFound Bearer token not found in header.
+ * @apiError TokenMismatch Bearer token does not match.
+ * @apiError TokenExpired Bearer token is expired.
  * @apiErrorExample {json} Error-Response:
  *     {
  *       "err": "MissingLocation",
@@ -113,8 +137,12 @@ router.get( '/location',
  */
 router.get( '/zip',
     ( req, res ) => {
-        jobSearch.getJobsByZip( req.query.username, req.query.zip,
-            req.query.limit, req.query.radius ).then( jobResults => {
+        jobSearch.getJobsByZip(
+            req.query[consts.PROF_KEYS.USERNAME],
+            req.query.zip,
+            req.query.limit,
+            req.query.radius
+        ).then( jobResults => {
             res.send( jobResults );
         }).catch( err => {
             res.send( response.errorMessage( err ) );
@@ -127,6 +155,12 @@ router.get( '/zip',
  * @apiName JobsByCoordinates
  * @apiGroup Jobs
  * @apiDescription Get jobs by supplied coordinates and user preferences.
+ *
+ * @apiHeader {String} authorization Bearer token
+ * @apiHeaderExample {json} Header-Example:
+ *      {
+ *          authorization: Bearer QZ3jhbfdof84GFBlSe
+ *      }
  *
  * @apiParam {String} username User profile to get job information from.
  * @apiParam {String} lat Latitude
@@ -166,6 +200,9 @@ router.get( '/zip',
  * @apiError MissingLocation lat/long missing from query.
  * @apiError NoJobDate No max job age was found on db for this user.
  * @apiError NoJobTypes No job types were found on db for this user.
+ * @apiError TokenNotFound Bearer token not found in header.
+ * @apiError TokenMismatch Bearer token does not match.
+ * @apiError TokenExpired Bearer token is expired.
  * @apiErrorExample {json} Error-Response:
  *     {
  *       "err": "MissingLocation",
@@ -174,8 +211,13 @@ router.get( '/zip',
  */
 router.get( '/coords',
     ( req, res ) => {
-        jobSearch.getJobsByCoord( req.query.username, req.query.lat,
-            req.query.long, req.query.limit, req.query.radius ).then( jobResults => {
+        jobSearch.getJobsByCoord(
+            req.query[consts.PROF_KEYS.USERNAME],
+            req.query.lat,
+            req.query.long,
+            req.query.limit,
+            req.query.radius
+        ).then( jobResults => {
             res.send( jobResults );
         }).catch( err => {
             res.send( response.errorMessage( err ) );
@@ -188,6 +230,12 @@ router.get( '/coords',
  * @apiName JobsByKey
  * @apiGroup Jobs
  * @apiDescription Get job(s) by key
+ *
+ * @apiHeader {String} authorization Bearer token
+ * @apiHeaderExample {json} Header-Example:
+ *      {
+ *          authorization: Bearer QZ3jhbfdof84GFBlSe
+ *      }
  *
  * @apiParam {String} jobkeys Comma separated list of job keys
  * @apiSuccessExample {json} Success-Response:
@@ -219,6 +267,9 @@ router.get( '/coords',
  *      ...
  * ]
  * @apiError NoJobsKeysFound lat/long missing from query.
+ * @apiError TokenNotFound Bearer token not found in header.
+ * @apiError TokenMismatch Bearer token does not match.
+ * @apiError TokenExpired Bearer token is expired.
  * @apiErrorExample {json} Error-Response:
  *     {
  *       "err": "NoJobsKeysFound",

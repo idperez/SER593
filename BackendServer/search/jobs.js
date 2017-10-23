@@ -5,6 +5,7 @@ const request = require( 'request' );
 const qs = require( 'querystring' );
 const DB_USERS = require( '../db/users' );
 const utils = require('../util');
+const consts = require( "../constants" );
 
 const INDEED_ENDPOINT = 'http://api.indeed.com/ads/apisearch';
 const INDEED_JOB_KEY_API = 'http://api.indeed.com/ads/apigetjobs';
@@ -79,7 +80,7 @@ exports.getJobsByCoord = ( username, lat, long, maxResults, radius ) => {
         radius = radius * MILE_TO_KM;
 
         let baseQuery = {
-            username: keys.ZIP_USERNAME,
+            [consts.PROF_KEYS.USERNAME]: keys.ZIP_USERNAME,
             lat: lat,
             lng: long,
             radius: radius > MAX_ZIP_RADIUS_KM ? MAX_ZIP_RADIUS_KM : radius,
@@ -119,12 +120,12 @@ exports.getJobsByCoord = ( username, lat, long, maxResults, radius ) => {
 function getJobsList( username, city, state, zip, maxResults, radius ){
     return new Promise( ( resolve, reject ) => {
         DB_USERS.getUserProfile( username ).then( profile => {
-            let jobAge = profile[ "prefs.jobs.postedDate" ] ?
-                profile[ "prefs.jobs.postedDate" ] : reject( "NoJobDate" );
-            let jobTypes = profile[ "prefs.jobs.types" ] ?
-                profile[ "prefs.jobs.types" ] : reject( "NoJobTypes" );
-            let jobTitles = profile[ "prefs.jobs.titles" ] ?
-                profile[ "prefs.jobs.titles" ] : [""]; // Empty string to get all results
+            let jobAge = profile[ consts.PROF_KEYS.PREFS_JOBS_DATE ] ?
+                profile[ consts.PROF_KEYS.PREFS_JOBS_DATE ] : reject( "NoJobDate" );
+            let jobTypes = profile[ consts.PROF_KEYS.PREFS_JOBS_TYPES ] ?
+                profile[ consts.PROF_KEYS.PREFS_JOBS_TYPES ] : reject( "NoJobTypes" );
+            let jobTitles = profile[ consts.PROF_KEYS.PREFS_JOBS_TITLES ] ?
+                profile[ consts.PROF_KEYS.PREFS_JOBS_TITLES ] : [""]; // Empty string to get all results
             let typePromises = [];
 
             maxResults /= jobTypes.length;
