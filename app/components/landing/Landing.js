@@ -44,7 +44,7 @@ export default class Landing extends Component {
                         </CardItem>
                         <CardItem>
                             <Body>
-                                <Button full style={styles.explore}>
+                                <Button full style={styles.explore} onPress={Actions.explore}>
                                     <Text style={styles.buttonText}>Explore</Text>
                                 </Button>
                             </Body>

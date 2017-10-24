@@ -15,6 +15,8 @@ import Login from './login/Login';
 
 import Register from './register/Register';
 
+import MapDemo from './map/MapDemo';
+
 export default class App extends Component {
 
     render() {
@@ -27,6 +29,13 @@ export default class App extends Component {
                             component={Landing}
                             hideNavBar
                             initial={true}
+                        />
+                        <Scene
+                            key="explore"
+                            component={MapDemo}
+                            title={<Image source={require('./../images/logo/topia-sm.png')} style={styles.image} />}
+                            navBarButtonColor='#ffffff'
+                            navigationBarStyle={{ backgroundColor: '#9B59B6' }}
                         />
                         <Scene
                             key="login"
