@@ -16,9 +16,11 @@ import {
     Header,
     Text,
     Form,
+    Icon,
     Item,
     Input,
     Label,
+    Left,
     Thumbnail,
     Grid,
     Col
@@ -29,11 +31,6 @@ export default class Login extends Component {
     render() {
         return (
             <Container>
-                <Header style={styles.header}>
-                    <Body>
-                        <Image source={require('./../../images/logo/topia-sm.png')} style={styles.HeaderImage} />
-                    </Body>
-                </Header>
                 <Content>
                     <Card style={{flex: 0}}>
                         <CardItem>
@@ -100,7 +97,7 @@ const styles = StyleSheet.create({
     },
     linkedInButton: {
         backgroundColor: '#0077B5',
-        marginTop: 5,
+        marginTop: 4,
         marginLeft: 2
     },
     loginButton: {

@@ -17,6 +17,8 @@ import {
     Text
 } from 'native-base';
 
+import { Actions } from 'react-native-router-flux';
+
 export default class Landing extends Component {
 
     render() {
@@ -51,10 +53,10 @@ export default class Landing extends Component {
                 </Content>
                 <Footer>
                     <FooterTab>
-                        <Button full style={styles.login}>
+                        <Button full style={styles.login} onPress={Actions.login}>
                             <Text style={styles.buttonText}>Log In</Text>
                         </Button>
-                        <Button full style={styles.register}>
+                        <Button full style={styles.register} onPress={Actions.register}>
                             <Text style={styles.buttonText}>Sign Up</Text>
                         </Button>
                     </FooterTab>
