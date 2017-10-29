@@ -238,6 +238,198 @@ define({ "api": [
   },
   {
     "type": "get",
+    "url": "/search/jobs/companyinfo",
+    "title": "CompanyInfo",
+    "name": "Company",
+    "group": "Jobs",
+    "description": "<p>Get company information for a job.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "authorization",
+            "description": "<p>Bearer token</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n    authorization: Bearer QZ3jhbfdof84GFBlSe\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "companyname",
+            "description": "<p>Name of company to get information on.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "\n{\n   \"id\": 3520,\n   \"name\": \"Mazda\",\n   \"website\": \"www.mazda.com\",\n   \"isEEP\": false,\n   \"exactMatch\": true,\n   \"industry\": \"Transportation Equipment Manufacturing\",\n   \"numberOfRatings\": 45,\n   \"squareLogo\": \"https://media.glassdoor.com/sqll/3520/mazda-squarelogo.png\",\n   \"overallRating\": \"3.5\",\n   \"ratingDescription\": \"Satisfied\",\n   \"cultureAndValuesRating\": \"3.2\",\n   \"seniorLeadershipRating\": \"3.0\",\n   \"compensationAndBenefitsRating\": \"3.2\",\n   \"careerOpportunitiesRating\": \"2.9\",\n   \"workLifeBalanceRating\": \"3.3\",\n   \"recommendToFriendRating\": 55,\n   \"sectorId\": 10015,\n   \"sectorName\": \"Manufacturing\",\n   \"industryId\": 200075,\n   \"industryName\": \"Transportation Equipment Manufacturing\",\n   \"ceo\": {\n       \"name\": \"Masamichi Kogai\",\n       \"title\": \"President and CEO\",\n       \"numberOfRatings\": 8,\n       \"pctApprove\": 53,\n       \"pctDisapprove\": 47,\n       \"image\": {\n           \"src\": \"https://media.glassdoor.com/people/sqll/3520/mazda-masamichi-kogai.png\",\n           \"height\": 200,\n           \"width\": 200\n       }\n   }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NoCompanyName",
+            "description": "<p>Company name missing from query.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "CompanyNotFound",
+            "description": "<p>No company information was found for the given company name.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenNotFound",
+            "description": "<p>Bearer token not found in header.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenMismatch",
+            "description": "<p>Bearer token does not match.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenExpired",
+            "description": "<p>Bearer token is expired.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "{\n  \"err\": \"CompanyNotFound\",\n  \"msg\": \"\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "./routes/jobs.js",
+    "groupTitle": "Jobs"
+  },
+  {
+    "type": "get",
+    "url": "/search/jobs/bykey",
+    "title": "JobByKey",
+    "name": "JobByKey",
+    "group": "Jobs",
+    "description": "<p>Get job by key</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "authorization",
+            "description": "<p>Bearer token</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n    authorization: Bearer QZ3jhbfdof84GFBlSe\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "jobkey",
+            "description": "<p>Indeed job key</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "\n{\n  \"jobtitle\": \"Graduate SubSystems Engineer\",\n  \"company\": \"ARM\",\n  \"city\": \"Austin\",\n  \"state\": \"TX\",\n  \"country\": \"US\",\n  \"language\": \"en\",\n  \"formattedLocation\": \"Austin, TX\",\n  \"source\": \"ARM\",\n  \"date\": \"Wed, 20 Sep 2017 02:04:17 GMT\",\n  \"snippet\": \"Bachelors or Masters degree in Electrical/Computer Engineering or Computer Science with a 3.5+ GPA. Be motivated to continuously develop skills and accept a variety of responsibilities as part of contributing to the design center’s success. We employ leading-edge modeling, design and verification technologies to design low-power high-performance products....\",\n  \"url\": \"http://www.indeed.com/rc/clk?jk=455ba8b70208e25b&atk=\",\n  \"onmousedown\": \"indeed_clk(this,'');\",\n  \"latitude\": 30.266483,\n  \"longitude\": -97.74176,\n  \"jobkey\": \"455ba8b70208e25b\",\n  \"sponsored\": false,\n  \"expired\": false,\n  \"indeedApply\": false,\n  \"formattedLocationFull\": \"Austin, TX\",\n  \"formattedRelativeTime\": \"10 days ago\",\n  \"stations\": \"\",\n  \"recommendations\": []\n},",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NoJobsKeysFound",
+            "description": "<p>jobkey not found in query.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NoJobsFound",
+            "description": "<p>No jobs found with the given key.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenNotFound",
+            "description": "<p>Bearer token not found in header.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenMismatch",
+            "description": "<p>Bearer token does not match.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenExpired",
+            "description": "<p>Bearer token is expired.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "{\n  \"err\": \"NoJobKeyFound\",\n  \"msg\": \"\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "./routes/jobs.js",
+    "groupTitle": "Jobs"
+  },
+  {
+    "type": "get",
     "url": "/search/jobs/coords",
     "title": "JobsByCoordinates",
     "name": "JobsByCoordinates",
@@ -299,7 +491,7 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "radius",
-            "description": "<p>Radius in miles.</p>"
+            "description": "<p>Radius in miles (Optional: default is 25).</p>"
           }
         ]
       }
@@ -374,96 +566,6 @@ define({ "api": [
   },
   {
     "type": "get",
-    "url": "/search/jobs/bykey",
-    "title": "JobsByKey",
-    "name": "JobsByKey",
-    "group": "Jobs",
-    "description": "<p>Get job(s) by key</p>",
-    "header": {
-      "fields": {
-        "Header": [
-          {
-            "group": "Header",
-            "type": "String",
-            "optional": false,
-            "field": "authorization",
-            "description": "<p>Bearer token</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Header-Example:",
-          "content": "{\n    authorization: Bearer QZ3jhbfdof84GFBlSe\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "jobkeys",
-            "description": "<p>Comma separated list of job keys</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "[\n     {\n       \"jobtitle\": \"Graduate SubSystems Engineer\",\n       \"company\": \"ARM\",\n       \"city\": \"Austin\",\n       \"state\": \"TX\",\n       \"country\": \"US\",\n       \"language\": \"en\",\n       \"formattedLocation\": \"Austin, TX\",\n       \"source\": \"ARM\",\n       \"date\": \"Wed, 20 Sep 2017 02:04:17 GMT\",\n       \"snippet\": \"Bachelors or Masters degree in Electrical/Computer Engineering or Computer Science with a 3.5+ GPA. Be motivated to continuously develop skills and accept a variety of responsibilities as part of contributing to the design center’s success. We employ leading-edge modeling, design and verification technologies to design low-power high-performance products....\",\n       \"url\": \"http://www.indeed.com/rc/clk?jk=455ba8b70208e25b&atk=\",\n       \"onmousedown\": \"indeed_clk(this,'');\",\n       \"latitude\": 30.266483,\n       \"longitude\": -97.74176,\n       \"jobkey\": \"455ba8b70208e25b\",\n       \"sponsored\": false,\n       \"expired\": false,\n       \"indeedApply\": false,\n       \"formattedLocationFull\": \"Austin, TX\",\n       \"formattedRelativeTime\": \"10 days ago\",\n       \"stations\": \"\",\n       \"recommendations\": []\n     },\n     ...\n]",
-          "type": "json"
-        }
-      ]
-    },
-    "error": {
-      "fields": {
-        "Error 4xx": [
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "NoJobsKeysFound",
-            "description": "<p>lat/long missing from query.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "TokenNotFound",
-            "description": "<p>Bearer token not found in header.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "TokenMismatch",
-            "description": "<p>Bearer token does not match.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "TokenExpired",
-            "description": "<p>Bearer token is expired.</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Error-Response:",
-          "content": "{\n  \"err\": \"NoJobsKeysFound\",\n  \"msg\": \"\"\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "version": "0.0.0",
-    "filename": "./routes/jobs.js",
-    "groupTitle": "Jobs"
-  },
-  {
-    "type": "get",
     "url": "/search/jobs/location",
     "title": "JobsByLocation",
     "name": "JobsByLocation",
@@ -525,7 +627,7 @@ define({ "api": [
             "type": "Number",
             "optional": false,
             "field": "radius",
-            "description": "<p>from city center to get results.</p>"
+            "description": "<p>from city center to get results (Optional: default is 25).</p>"
           }
         ]
       }
@@ -648,7 +750,7 @@ define({ "api": [
             "type": "Number",
             "optional": false,
             "field": "radius",
-            "description": "<p>Radius in miles.</p>"
+            "description": "<p>Radius in miles (Optional: default is 25).</p>"
           }
         ]
       }
@@ -717,11 +819,11 @@ define({ "api": [
   },
   {
     "type": "post",
-    "url": "/profile/addjobpref",
-    "title": "AddJobPref",
-    "name": "AddJobPref",
+    "url": "/users/modify",
+    "title": "Modify",
+    "name": "Modify",
     "group": "Users",
-    "description": "<p>Add or update job preference on users profile.</p>",
+    "description": "<p>Modify a preference on users profile.</p> <p>MODES:</p> <p>modify: Modifies an existing non-list value.</p> <p>remove: Removes a key/value pair. If used on an list, the entire list is removed.</p> <p>listappend: Appends a value to an existing list.</p> <p>listremove: Removes a value from an existing list.</p>",
     "header": {
       "fields": {
         "Header": [
@@ -764,10 +866,24 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "value",
-            "description": "<p>Value to assign to the key.</p>"
+            "description": "<p>Value to assign to the key. (Required for modes: modify, listappend, listremove)</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "mode",
+            "description": "<p>Specify what operation to run. Options: modify, remove, listappend, listremove</p>"
           }
         ]
-      }
+      },
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "{\n  \"username\": \"bob\",\n  \"key\": \"prefs_jobs_types\",\n  \"value\": \"fulltime\",\n  \"mode\": \"listappend\"\n}",
+          "type": "json"
+        }
+      ]
     },
     "error": {
       "fields": {
@@ -812,7 +928,7 @@ define({ "api": [
   },
   {
     "type": "get",
-    "url": "/profile",
+    "url": "/users/profile",
     "title": "Profile",
     "name": "Profile",
     "group": "Users",
@@ -883,6 +999,194 @@ define({ "api": [
         {
           "title": "Error-Response:",
           "content": "{\n  \"err\": {\n     \"type\": \"UserNotFound\",\n     \"msg\": \"Explanation of failure.\"\n  }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "./routes/profiles.js",
+    "groupTitle": "Users"
+  },
+  {
+    "type": "post",
+    "url": "/users/removejob",
+    "title": "RemoveJob",
+    "name": "RemoveJob",
+    "group": "Users",
+    "description": "<p>Remove a saved job from the users profile.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "authorization",
+            "description": "<p>Bearer token</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n    authorization: Bearer QZ3jhbfdof84GFBlSe\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>Users login username.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "jobkey",
+            "description": "<p>Indeed job key.</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "SavedJobNotFound",
+            "description": "<p>Job is not saved on users profile.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenNotFound",
+            "description": "<p>Bearer token not found in header.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenMismatch",
+            "description": "<p>Bearer token does not match.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenExpired",
+            "description": "<p>Bearer token is expired.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "{\n  \"err\": {\n     \"type\": \"TokenNotFound\",\n     \"msg\": \"\"\n  }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "./routes/profiles.js",
+    "groupTitle": "Users"
+  },
+  {
+    "type": "post",
+    "url": "/users/savejob",
+    "title": "SaveJob",
+    "name": "SaveJob",
+    "group": "Users",
+    "description": "<p>Add a saved job to the users profile.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "authorization",
+            "description": "<p>Bearer token</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n    authorization: Bearer QZ3jhbfdof84GFBlSe\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>Users login username.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "jobkey",
+            "description": "<p>Indeed job key.</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "JobAlreadySaved",
+            "description": "<p>Job is already saved on the users profile.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NoJobsKeysFound",
+            "description": "<p>jobkey not found in query.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NoJobsFound",
+            "description": "<p>No jobs found with the given key(s).</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenNotFound",
+            "description": "<p>Bearer token not found in header.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenMismatch",
+            "description": "<p>Bearer token does not match.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenExpired",
+            "description": "<p>Bearer token is expired.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "{\n  \"err\": {\n     \"type\": \"TokenNotFound\",\n     \"msg\": \"\"\n  }\n}",
           "type": "json"
         }
       ]

@@ -47,6 +47,6 @@ app.use( except(
 app.use( '/auth', auth );
 app.use( '/test', test ); // For development use
 app.use( '/search/jobs', jobs );
-app.use( '/profile', profiles );
+app.use( '/users', profiles );
 
 app.listen( port );
