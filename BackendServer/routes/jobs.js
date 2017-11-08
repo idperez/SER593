@@ -1,6 +1,7 @@
 const express = require( 'express' );
 const router = express.Router();
 const jobSearch = require("../search/jobs.js");
+const companySearch = require("../search/companies.js");
 const response = require('../responses/responses.js');
 const consts = require( "../constants" );
 
@@ -20,7 +21,7 @@ const consts = require( "../constants" );
  * @apiParam {String} city City to search.
  * @apiParam {String} state State to search. (2 letter abbreviation)
  * @apiParam {Number} limit Max number of results.
- * @apiParam {Number} radius from city center to get results.
+ * @apiParam {Number} radius from city center to get results (Optional: default is 25).
  *
  * @apiSuccessExample {json} Success-Response:
  *  [
@@ -93,7 +94,7 @@ router.get( '/location',
  * @apiParam {String} username User profile to get job information from.
  * @apiParam {String} zip Zip code.
  * @apiParam {Number} limit Max number of results.
- * @apiParam {Number} radius Radius in miles.
+ * @apiParam {Number} radius Radius in miles (Optional: default is 25).
  *
  * @apiSuccessExample {json} Success-Response:
  *  [
@@ -166,7 +167,7 @@ router.get( '/zip',
  * @apiParam {String} lat Latitude
  * @apiParam {String} long Longitude
  * @apiParam {Number} limit Max number of results.
- * @apiParam {String} radius Radius in miles.
+ * @apiParam {String} radius Radius in miles (Optional: default is 25).
  *
  * @apiSuccessExample {json} Success-Response:
  *  [
@@ -226,10 +227,10 @@ router.get( '/coords',
 );
 
 /**
- * @api {get} /search/jobs/bykey JobsByKey
- * @apiName JobsByKey
+ * @api {get} /search/jobs/bykey JobByKey
+ * @apiName JobByKey
  * @apiGroup Jobs
- * @apiDescription Get job(s) by key
+ * @apiDescription Get job by key
  *
  * @apiHeader {String} authorization Bearer token
  * @apiHeaderExample {json} Header-Example:
@@ -237,9 +238,9 @@ router.get( '/coords',
  *          authorization: Bearer QZ3jhbfdof84GFBlSe
  *      }
  *
- * @apiParam {String} jobkeys Comma separated list of job keys
+ * @apiParam {String} jobkey Indeed job key
  * @apiSuccessExample {json} Success-Response:
- * [
+ *
  *      {
  *        "jobtitle": "Graduate SubSystems Engineer",
  *        "company": "ARM",
@@ -264,15 +265,16 @@ router.get( '/coords',
  *        "stations": "",
  *        "recommendations": []
  *      },
- *      ...
- * ]
- * @apiError NoJobsKeysFound lat/long missing from query.
+ *
+ *
+ * @apiError NoJobsKeysFound jobkey not found in query.
+ * @apiError NoJobsFound No jobs found with the given key.
  * @apiError TokenNotFound Bearer token not found in header.
  * @apiError TokenMismatch Bearer token does not match.
  * @apiError TokenExpired Bearer token is expired.
  * @apiErrorExample {json} Error-Response:
  *     {
- *       "err": "NoJobsKeysFound",
+ *       "err": "NoJobKeyFound",
  *       "msg": ""
  *     }
  */
@@ -280,6 +282,78 @@ router.get( '/bykey',
     ( req, res ) => {
         jobSearch.getJobByKey( req.query.jobkeys ).then( jobResults => {
             res.send( jobResults );
+        }).catch( err => {
+            res.send( response.errorMessage( err ) );
+        });
+    }
+);
+
+
+/**
+ * @api {get} /search/jobs/companyinfo CompanyInfo
+ * @apiName Company
+ * @apiGroup Jobs
+ * @apiDescription Get company information for a job.
+ *
+ * @apiHeader {String} authorization Bearer token
+ * @apiHeaderExample {json} Header-Example:
+ *      {
+ *          authorization: Bearer QZ3jhbfdof84GFBlSe
+ *      }
+ *
+ * @apiParam {String} companyname Name of company to get information on.
+ * @apiSuccessExample {json} Success-Response:
+ *
+ *{
+ *    "id": 3520,
+ *    "name": "Mazda",
+ *    "website": "www.mazda.com",
+ *    "isEEP": false,
+ *    "exactMatch": true,
+ *    "industry": "Transportation Equipment Manufacturing",
+ *    "numberOfRatings": 45,
+ *    "squareLogo": "https://media.glassdoor.com/sqll/3520/mazda-squarelogo.png",
+ *    "overallRating": "3.5",
+ *    "ratingDescription": "Satisfied",
+ *    "cultureAndValuesRating": "3.2",
+ *    "seniorLeadershipRating": "3.0",
+ *    "compensationAndBenefitsRating": "3.2",
+ *    "careerOpportunitiesRating": "2.9",
+ *    "workLifeBalanceRating": "3.3",
+ *    "recommendToFriendRating": 55,
+ *    "sectorId": 10015,
+ *    "sectorName": "Manufacturing",
+ *    "industryId": 200075,
+ *    "industryName": "Transportation Equipment Manufacturing",
+ *    "ceo": {
+ *        "name": "Masamichi Kogai",
+ *        "title": "President and CEO",
+ *        "numberOfRatings": 8,
+ *        "pctApprove": 53,
+ *        "pctDisapprove": 47,
+ *        "image": {
+ *            "src": "https://media.glassdoor.com/people/sqll/3520/mazda-masamichi-kogai.png",
+ *            "height": 200,
+ *            "width": 200
+ *        }
+ *    }
+ *}
+ *
+ * @apiError NoCompanyName Company name missing from query.
+ * @apiError CompanyNotFound No company information was found for the given company name.
+ * @apiError TokenNotFound Bearer token not found in header.
+ * @apiError TokenMismatch Bearer token does not match.
+ * @apiError TokenExpired Bearer token is expired.
+ * @apiErrorExample {json} Error-Response:
+ *     {
+ *       "err": "CompanyNotFound",
+ *       "msg": ""
+ *     }
+ */
+router.get( '/companyinfo',
+    ( req, res ) => {
+        companySearch.getCompanyInfo( req.query.companyname ).then( compResults => {
+            res.send( compResults );
         }).catch( err => {
             res.send( response.errorMessage( err ) );
         });

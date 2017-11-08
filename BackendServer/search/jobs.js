@@ -21,16 +21,16 @@ const MAX_ZIPS = 1;
 const RESULTS_PER_PAGE = 25;  // 25 is the max per page.
 const DEFAULT_JOB_AGE = 60;   // In days
 
-exports.getJobByKey = ( jobKeys ) => {
+exports.getJobByKey = ( jobKey ) => {
     return new Promise( ( resolve, reject ) => {
-        if( !jobKeys ){
-            reject( 'NoJobsKeysFound' );
+        if( !jobKey ){
+            reject( 'NoJobKeyFound' );
         }
         let jobQuery = {
             publisher: keys.INDEED_KEY, // API Key
             v: INDEED_VERSION,          // API version
             format: 'json',
-            jobkeys: jobKeys
+            jobkeys: jobKey
         };
 
         let query = qs.stringify( jobQuery );
@@ -39,7 +39,12 @@ exports.getJobByKey = ( jobKeys ) => {
             if( err ) {
                 reject( err );
             } else {
-                resolve( JSON.parse( innerBody ).results );
+                let jobs = JSON.parse( innerBody ).results;
+                if( !utils.isArray( jobs ) || utils.emptyArray( jobs ) ){
+                    reject( 'JobNotFound' );
+                } else {
+                    resolve( jobs[0] );
+                }
             }
         } );
 
