@@ -10,6 +10,7 @@
 		"native-base": "^2.3.2",
 		"react": "16.0.0-alpha.12",
 		"react-native": "0.48.3",
+		"react-native-animatable": "^1.2.4",
 		"react-native-elements": "^0.17.0",
 		"react-native-maps": "^0.17.1",
 		"react-native-parallax-scroll": "^1.0.3",
