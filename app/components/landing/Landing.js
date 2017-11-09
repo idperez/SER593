@@ -24,11 +24,6 @@ export default class Landing extends Component {
     render() {
         return (
             <Container>
-                <Header style={styles.header}>
-                    <Body>
-                        <Image source={require('./../../images/logo/topia-sm.png')} style={styles.image} />
-                    </Body>
-                </Header>
                 <Content>
                     <Card style={styles.card}>
                         <CardItem>

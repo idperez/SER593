@@ -27,29 +27,36 @@ export default class App extends Component {
                         <Scene
                             key="landing"
                             component={Landing}
-                            hideNavBar
-                            initial={true}
+                            title={<Image source={require('./../images/logo/topia-sm.png')} style={styles.image} />}
+                            navigationBarStyle={{ backgroundColor: '#9B59B6' }}
+                            initial
                         />
                         <Scene
                             key="explore"
                             component={MapDemo}
                             title={<Image source={require('./../images/logo/topia-sm.png')} style={styles.image} />}
                             navBarButtonColor='#ffffff'
+                            backButtonBarStyle={{ color: '#9B59B6' }}
                             navigationBarStyle={{ backgroundColor: '#9B59B6' }}
-                        />
-                        <Scene
-                            key="login"
-                            component={Login}
-                            title={<Image source={require('./../images/logo/topia-sm.png')} style={styles.image} />}
-                            navBarButtonColor='#ffffff'
-                            navigationBarStyle={{ backgroundColor: '#9B59B6' }}
+                            backTitle=" "
                         />
                         <Scene
                             key="register"
                             component={Register}
                             title={<Image source={require('./../images/logo/topia-sm.png')} style={styles.image} />}
                             navBarButtonColor='#ffffff'
+                            backButtonBarStyle={{ color: '#9B59B6' }}
                             navigationBarStyle={{ backgroundColor: '#9B59B6' }}
+                            backTitle=" "
+                        />
+                        <Scene
+                            key="login"
+                            component={Login}
+                            title={<Image source={require('./../images/logo/topia-sm.png')} style={styles.image} />}
+                            navBarButtonColor='#ffffff'
+                            backButtonBarStyle={{ color: '#9B59B6' }}
+                            navigationBarStyle={{ backgroundColor: '#9B59B6' }}
+                            backTitle=" "
                         />
                     </Scene>
                 </Router>
