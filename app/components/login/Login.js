@@ -26,7 +26,34 @@ import {
     Col
 } from 'native-base';
 
+import login from './../../../lib/login/login';
+
 export default class Login extends Component {
+
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            email: "",
+            password: ""
+        };
+    }
+
+    setEmail(email) {
+        this.setState({email});
+    }
+
+    setPassword(password) {
+        this.setState({password});
+    }
+
+    login() {
+        login.loginUser(this.state.email, this.state.password).then(results => {
+            alert(JSON.stringify(results));
+        }).catch(err => {
+            throw err;
+        })
+    }
 
     render() {
         return (
@@ -45,14 +72,22 @@ export default class Login extends Component {
                     <Form>
                         <Item floatingLabel>
                             <Label>Email</Label>
-                            <Input/>
+                            <Input
+                                onChangeText={(email) => this.setEmail(email)}
+                                keyboardType={'email-address'}
+                                autoCapitalize = 'none'
+                            />
                         </Item>
                         <Item floatingLabel last>
                             <Label>Password</Label>
-                            <Input/>
+                            <Input
+                                onChangeText={(password) => this.setPassword(password)}
+                                secureTextEntry={true}
+                                autoCapitalize = 'none'
+                            />
                         </Item>
                     </Form>
-                    <Button full style={styles.loginButton}>
+                    <Button full style={styles.loginButton} onPress={() => this.login()}>
                         <Text style={styles.buttonText}>Log In</Text>
                     </Button>
                     <Grid>
