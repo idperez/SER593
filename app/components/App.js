@@ -17,6 +17,8 @@ import Register from './register/Register';
 
 import MapDemo from './map/MapDemo';
 
+import MapSearchBox from './map/MapSearchBox';
+
 export default class App extends Component {
 
     render() {

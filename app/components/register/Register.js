@@ -25,7 +25,13 @@ import {
     Col
 } from 'native-base';
 
+import SuccessDialogue from './SuccessDialogue';
+
 export default class Register extends Component {
+
+    registerUser() {
+        this.refs.child.showScaleAnimationDialog();
+    }
 
     render() {
         return (
@@ -60,7 +66,7 @@ export default class Register extends Component {
                             <Input/>
                         </Item>
                     </Form>
-                    <Button full style={styles.registerButton}>
+                    <Button full style={styles.registerButton} onPress={() => { this.registerUser() }}>
                         <Text style={styles.buttonText}>Sign Up</Text>
                     </Button>
                     <Grid>
@@ -83,6 +89,7 @@ export default class Register extends Component {
                         </Button>
                     </FooterTab>
                 </Footer>
+                <SuccessDialogue ref='child' />
             </Container>
         );
     }

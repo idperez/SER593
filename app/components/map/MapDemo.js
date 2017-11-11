@@ -7,6 +7,8 @@ import {
 
 import MapView from 'react-native-maps';
 
+import MapSearchBox from './MapSearchBox';
+
 export default class MapDemo extends Component {
 
     render() {
@@ -19,6 +21,7 @@ export default class MapDemo extends Component {
                         latitudeDelta: 0.0922,
                         longitudeDelta: 0.0421,
                     }}>
+                    <MapSearchBox/>
                     <MapView.Marker
                         coordinate={{
                             latitude: 37.78825,

@@ -17,9 +17,19 @@ import {
     Text
 } from 'native-base';
 
+import jobs from './../../../lib/jobs/jobs';
+
 import { Actions } from 'react-native-router-flux';
 
 export default class Landing extends Component {
+
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            jobs: {}
+        };
+    }
 
     render() {
         return (
