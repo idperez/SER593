@@ -27,17 +27,55 @@ import {
 
 import SuccessDialogue from './SuccessDialogue';
 
+import register from './../../../lib/register/register';
+
 export default class Register extends Component {
 
-    registerUser() {
-        this.refs.child.showScaleAnimationDialog();
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            first: "",
+            last: "",
+            email: "",
+            password: ""
+        };
+    }
+
+    register() {
+        register.registerUser(
+            this.state.first,
+            this.state.last,
+            this.state.email,
+            this.state.password
+        ).then(result => {
+            alert(JSON.stringify(result));
+        }).catch(err => {
+            throw err;
+        });
+    }
+
+    setFirstName(first) {
+        this.setState({first});
+    }
+
+    setLastName(last) {
+        this.setState({last});
+    }
+
+    setEmail(email) {
+        this.setState({email});
+    }
+
+    setPassword(password) {
+        this.setState({password})
     }
 
     render() {
         return (
             <Container>
                 <Content>
-                    <Card style={{flex: 0}}>
+                    <Card>
                         <CardItem>
                             <Body>
                                 <Body>
@@ -51,22 +89,34 @@ export default class Register extends Component {
                     <Form>
                         <Item floatingLabel>
                             <Label>First Name</Label>
-                            <Input/>
+                            <Input
+                                onChangeText={(first) => this.setFirstName(first)}
+                            />
                         </Item>
                         <Item floatingLabel>
                             <Label>Last Name</Label>
-                            <Input/>
+                            <Input
+                                onChangeText={(last) => this.setLastName(last)}
+                            />
                         </Item>
                         <Item floatingLabel>
                             <Label>Email</Label>
-                            <Input/>
+                            <Input
+                                onChangeText={(email) => this.setEmail(email)}
+                                keyboardType={'email-address'}
+                                autoCapitalize = 'none'
+                            />
                         </Item>
                         <Item floatingLabel last>
                             <Label>Password</Label>
-                            <Input/>
+                            <Input
+                                onChangeText={(password) => this.setPassword(password)}
+                                secureTextEntry={true}
+                                autoCapitalize = 'none'
+                            />
                         </Item>
                     </Form>
-                    <Button full style={styles.registerButton} onPress={() => { this.registerUser() }}>
+                    <Button full style={styles.registerButton} onPress={() => this.register()}>
                         <Text style={styles.buttonText}>Sign Up</Text>
                     </Button>
                     <Grid>
@@ -89,7 +139,6 @@ export default class Register extends Component {
                         </Button>
                     </FooterTab>
                 </Footer>
-                <SuccessDialogue ref='child' />
             </Container>
         );
     }

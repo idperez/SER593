@@ -17,49 +17,6 @@ import { createAnimatableComponent, View } from 'react-native-animatable';
 
 const scaleAnimation = new ScaleAnimation();
 
-const styles = StyleSheet.create({
-    container: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        position: "absolute"
-    },
-    dialogContentView: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: 20
-    },
-    buttonText: {
-        color: 'white'
-    },
-    preferences: {
-        backgroundColor: '#9B59B6'
-    },
-    explore: {
-        backgroundColor: '#674172'
-    },
-    toggle: {
-        width: 120,
-        backgroundColor: '#333',
-        borderRadius: 3,
-        padding: 5,
-        fontSize: 14,
-        alignSelf: 'center',
-        textAlign: 'center',
-        margin: 10,
-        color: 'rgba(255, 255, 255, 1)',
-    },
-    toggledOn: {
-        color: 'rgba(255, 33, 33, 1)',
-        fontSize: 16,
-        transform: [{
-            rotate: '8deg',
-        }, {
-            translateY: -20,
-        }],
-    }
-});
-
 export default class Success extends Component {
 
     constructor(props) {
@@ -112,3 +69,46 @@ export default class Success extends Component {
         );
     }
 }
+
+const styles = StyleSheet.create({
+    container: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: "absolute"
+    },
+    dialogContentView: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 20
+    },
+    buttonText: {
+        color: 'white'
+    },
+    preferences: {
+        backgroundColor: '#9B59B6'
+    },
+    explore: {
+        backgroundColor: '#674172'
+    },
+    toggle: {
+        width: 120,
+        backgroundColor: '#333',
+        borderRadius: 3,
+        padding: 5,
+        fontSize: 14,
+        alignSelf: 'center',
+        textAlign: 'center',
+        margin: 10,
+        color: 'rgba(255, 255, 255, 1)',
+    },
+    toggledOn: {
+        color: 'rgba(255, 33, 33, 1)',
+        fontSize: 16,
+        transform: [{
+            rotate: '8deg',
+        }, {
+            translateY: -20,
+        }],
+    }
+});
