@@ -76,7 +76,7 @@ exports.register = ( username, password, email ) => {
 
 exports.revokeToken = ( username ) => {
     return new Promise( ( resolve, reject ) => {
-        users.addUserItem( username, consts.PROF_KEYS.ACCESS_EXPR, 0 ).then( data => {
+        users.modifyUserItem( username, consts.PROF_KEYS.ACCESS_EXPR, 0, consts.MODIFIY_PREFS_MODES.MODIFY ).then( data => {
             resolve( data );
         }).catch( err => {
             reject( err );
@@ -89,8 +89,8 @@ let saveToken = ( username, token ) => {
     return new Promise( ( resolve, reject ) => {
         // TODO - clean up to make it one single call to database
         let promises = [
-            users.addUserItem( username, consts.PROF_KEYS.ACCESS_TOKEN, token.token ),
-            users.addUserItem( username, consts.PROF_KEYS.ACCESS_EXPR, token.expr )
+            users.modifyUserItem( username, consts.PROF_KEYS.ACCESS_TOKEN, token.token, consts.MODIFIY_PREFS_MODES.MODIFY ),
+            users.modifyUserItem( username, consts.PROF_KEYS.ACCESS_EXPR, token.expr, consts.MODIFIY_PREFS_MODES.MODIFY )
         ];
         Promise.all( promises ).then( () => {
             resolve();
