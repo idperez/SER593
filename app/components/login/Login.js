@@ -26,6 +26,8 @@ import {
     Col
 } from 'native-base';
 
+import BadLoginDialogue from './../dialogues/login/BadLoginDialogue';
+
 import login from './../../../lib/login/login';
 
 export default class Login extends Component {
@@ -48,11 +50,20 @@ export default class Login extends Component {
     }
 
     login() {
-        login.loginUser(this.state.email, this.state.password).then(results => {
-            alert(JSON.stringify(results));
+        login.loginUser(
+            this.state.email,
+            this.state.password
+        ).then(result => {
+            this.handleLogin(result)
         }).catch(err => {
             throw err;
         })
+    }
+
+    handleLogin(result) {
+        if(result.err.type === "ErrorGettingProfile") {
+            this.refs.badLogin.showBadLoginDialogue();
+        }
     }
 
     render() {
@@ -110,6 +121,7 @@ export default class Login extends Component {
                         </Button>
                     </FooterTab>
                 </Footer>
+                <BadLoginDialogue ref='badLogin'/>
             </Container>
         );
     }
