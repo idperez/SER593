@@ -94,10 +94,12 @@ exports.getUserProfileByPrimaryKey = ( primKey, value ) => {
                     // Check expiration time stamp for the users saved jobs.
                     // This runs after the response, so the current call for the user profile
                     // will not get the updated jobs.
-                    checkAndUpdateSavedJobs(
-                        resultProfile[consts.PROF_KEYS.USERNAME],
-                        JSON.parse( JSON.stringify( resultProfile[consts.PROF_KEYS.PREFS_JOBS_SAVED] ) )
-                    );
+                    if( resultProfile[consts.PROF_KEYS.PREFS_JOBS_SAVED] ) {
+                        checkAndUpdateSavedJobs(
+                            resultProfile[ consts.PROF_KEYS.USERNAME ],
+                            JSON.parse( JSON.stringify( resultProfile[ consts.PROF_KEYS.PREFS_JOBS_SAVED ] ) )
+                        );
+                    }
 
                 } else {
                     reject( 'NoResultsFound' );
