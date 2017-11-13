@@ -25,7 +25,9 @@ import {
     Col
 } from 'native-base';
 
-import SuccessDialogue from './SuccessDialogue';
+import SuccessRegisterDialogue from '../dialogues/register/SuccessRegisterDialogue';
+
+import TakenUsernameDialogue from '../dialogues/register/TakenUsernameDialogue';
 
 import register from './../../../lib/register/register';
 
@@ -49,10 +51,18 @@ export default class Register extends Component {
             this.state.email,
             this.state.password
         ).then(result => {
-            alert(JSON.stringify(result));
+            this.handleRegistration(result);
         }).catch(err => {
             throw err;
         });
+    }
+
+    handleRegistration(result) {
+        if(result.err.type == "UsernameTaken") {
+            this.refs.taken.takenUsernameDialogue();
+        } else {
+            this.refs.success.showSuccessfulRegistrationDialog();
+        }
     }
 
     setFirstName(first) {
@@ -139,6 +149,8 @@ export default class Register extends Component {
                         </Button>
                     </FooterTab>
                 </Footer>
+                <SuccessRegisterDialogue ref='success'/>
+                <TakenUsernameDialogue ref='taken'/>
             </Container>
         );
     }

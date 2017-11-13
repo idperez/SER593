@@ -17,19 +17,21 @@ import { createAnimatableComponent, View } from 'react-native-animatable';
 
 const scaleAnimation = new ScaleAnimation();
 
-export default class Success extends Component {
+export default class SuccessRegisterDialogue extends Component {
 
     constructor(props) {
         super(props);
 
         this.state = {
-            toggledOn: <View><Text>loading</Text></View>,
+            toggledOn: <View>
+                <Text>loading</Text>
+            </View>,
         };
 
-        this.showScaleAnimationDialog = this.showScaleAnimationDialog.bind(this);
+        this.showSuccessfulRegistrationDialog = this.showSuccessfulRegistrationDialog.bind(this);
     }
 
-    showScaleAnimationDialog() {
+    showSuccessfulRegistrationDialog() {
         this.scaleAnimationDialog.show();
         this.setState({toggledOn: <View animation="tada" style={{flex: 1}}>
             <Button full style={styles.preferences}>
