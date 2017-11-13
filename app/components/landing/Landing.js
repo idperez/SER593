@@ -17,8 +17,6 @@ import {
     Text
 } from 'native-base';
 
-import jobs from './../../../lib/jobs/jobs';
-
 import { Actions } from 'react-native-router-flux';
 
 export default class Landing extends Component {
@@ -45,7 +43,7 @@ export default class Landing extends Component {
                             </Body>
                         </CardItem>
                         <CardItem cardBody>
-                            <Image source={{uri: 'https://cdn.pixabay.com/photo/2017/01/31/17/27/architecture-2025743_1280.png'}} style={{height: 200, width: null, flex: 1}}/>
+                            <Image source={require('./../../images/icons/landing/hero.png')} style={{height: 200, width: null, flex: 1}}/>
                         </CardItem>
                         <CardItem>
                             <Body>

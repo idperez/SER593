@@ -89,7 +89,7 @@ export default class Register extends Component {
                         <CardItem>
                             <Body>
                                 <Body>
-                                    <Thumbnail source={{uri: 'https://cdn.pixabay.com/photo/2017/05/15/23/48/survey-2316468_1280.png'}} />
+                                    <Thumbnail source={require('./../../images/icons/register/register.png')} />
                                     <Text>Sign Up!</Text>
                                     <Text note>almost there</Text>
                                 </Body>

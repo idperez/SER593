@@ -70,11 +70,11 @@ export default class Login extends Component {
         return (
             <Container>
                 <Content>
-                    <Card style={{flex: 0}}>
+                    <Card>
                         <CardItem>
                             <Body>
                                 <Body>
-                                    <Thumbnail source={{uri: 'https://cdn.pixabay.com/photo/2017/01/31/08/25/boy-2023213_1280.png'}} />
+                                    <Thumbnail source={require('./../../images/icons/login/header.png')} />
                                     <Text>Welcome Back!</Text>
                                 </Body>
                             </Body>
