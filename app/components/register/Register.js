@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import {
     Image,
-    StyleSheet
+    StyleSheet,
+    View
 } from 'react-native';
 
 import {
@@ -25,6 +26,8 @@ import {
     Col
 } from 'native-base';
 
+import { Actions } from 'react-native-router-flux';
+
 import SuccessRegisterDialogue from '../dialogues/register/SuccessRegisterDialogue';
 
 import TakenUsernameDialogue from '../dialogues/register/TakenUsernameDialogue';
@@ -40,8 +43,19 @@ export default class Register extends Component {
             first: "",
             last: "",
             email: "",
-            password: ""
+            password: "",
+            showLogin: <View/>
         };
+
+        if(this.props.showLogin == undefined) {
+             this.state.showLogin =  <Footer>
+                             <FooterTab>
+                                 <Button full style={styles.loginButton} onPress={() => Actions.login({showRegister : false})}>
+                                     <Text style={styles.buttonText}>Have Account? Log In</Text>
+                                 </Button>
+                             </FooterTab>
+                         </Footer>
+        }
     }
 
     register() {
@@ -142,13 +156,7 @@ export default class Register extends Component {
                         </Col>
                     </Grid>
                 </Content>
-                <Footer>
-                    <FooterTab>
-                        <Button full style={styles.loginButton}>
-                            <Text style={styles.buttonText}>Have Account? Log In</Text>
-                        </Button>
-                    </FooterTab>
-                </Footer>
+                {this.state.showLogin}
                 <SuccessRegisterDialogue ref='success'/>
                 <TakenUsernameDialogue ref='taken'/>
             </Container>
