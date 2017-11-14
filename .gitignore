@@ -48,3 +48,6 @@ app/components/preferences/
 ios/build/Logs/Build/85140BB3-D2AD-4196-A9CF-6827DC411A0E.xcactivitylog
 ios/build/Logs/Build/CEC74561-2070-4964-98A5-FF0EA7D4B736.xcactivitylog
 ios/build/ModuleCache/1RIC7OOKCAIYP/
+
+# API keys
+BackendServer/keys/
