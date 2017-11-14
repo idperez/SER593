@@ -18,6 +18,7 @@
     "express": "^4.13.3",
     "express-bearer-token": "^2.1.0",
     "express-session": "^1.11.3",
+    "fast-html-parser": "^1.0.1",
     "morgan": "^1.6.1",
     "password-hash": "^1.2.2",
     "rand-token": "^0.3.0",
