@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import {
     Image,
-    StyleSheet
+    StyleSheet,
+    View
 } from 'react-native';
 
 import {
@@ -26,6 +27,8 @@ import {
     Col
 } from 'native-base';
 
+import { Actions } from 'react-native-router-flux';
+
 import BadLoginDialogue from './../dialogues/login/BadLoginDialogue';
 
 import login from './../../../lib/login/login';
@@ -37,8 +40,19 @@ export default class Login extends Component {
 
         this.state = {
             email: "",
-            password: ""
+            password: "",
+            showRegister: <View/>
         };
+
+        if(this.props.showRegister == undefined) {
+            this.state.showRegister = <Footer>
+                <FooterTab>
+                    <Button full style={styles.registerButton} onPress={() => Actions.register({showLogin: false})}>
+                        <Text style={styles.buttonText}>No Account? Sign Up</Text>
+                    </Button>
+                </FooterTab>
+            </Footer>
+        }
     }
 
     setEmail(email) {
@@ -114,13 +128,7 @@ export default class Login extends Component {
                         </Col>
                     </Grid>
                 </Content>
-                <Footer>
-                    <FooterTab>
-                        <Button full style={styles.registerButton}>
-                            <Text style={styles.buttonText}>No Account? Sign Up</Text>
-                        </Button>
-                    </FooterTab>
-                </Footer>
+                {this.state.showRegister}
                 <BadLoginDialogue ref='badLogin'/>
             </Container>
         );

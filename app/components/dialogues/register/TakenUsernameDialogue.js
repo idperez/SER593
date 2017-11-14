@@ -35,6 +35,10 @@ export default class TakenUsernameDialogue extends Component {
         this.scaleAnimationDialog.show();
     }
 
+    tryAnother() {
+        this.scaleAnimationDialog.dismiss();
+    }
+
     render() {
         return (
             <View style={styles.container}>
@@ -53,13 +57,8 @@ export default class TakenUsernameDialogue extends Component {
                     <Footer>
                         <FooterTab>
                             <View style={{flex: 1}}>
-                                <Button full style={styles.tryAnother}>
+                                <Button full style={styles.tryAnother} onPress={() => this.tryAnother()}>
                                     <Text style={styles.buttonText}>Try Another</Text>
-                                </Button>
-                            </View>
-                            <View style={{flex: 1}}>
-                                <Button full style={styles.login}>
-                                    <Text style={styles.buttonText}>Log In</Text>
                                 </Button>
                             </View>
                         </FooterTab>

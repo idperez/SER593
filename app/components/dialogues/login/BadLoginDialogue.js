@@ -13,6 +13,8 @@ import {
     Icon
 } from 'native-base';
 
+import { Actions } from 'react-native-router-flux';
+
 import { createAnimatableComponent, View } from 'react-native-animatable';
 
 const scaleAnimation = new ScaleAnimation();
@@ -35,6 +37,10 @@ export default class BadLoginDialogue extends Component {
         this.scaleAnimationDialog.show();
     }
 
+    hideBadLoginDialogue() {
+        this.scaleAnimationDialog.dismiss();
+    }
+
     render() {
         return (
             <View style={styles.container}>
@@ -53,12 +59,12 @@ export default class BadLoginDialogue extends Component {
                     <Footer>
                         <FooterTab>
                             <View style={{flex: 1}}>
-                                <Button full style={styles.tryAgain}>
+                                <Button full style={styles.tryAgain} onPress={() => this.hideBadLoginDialogue()}>
                                     <Text style={styles.buttonText}>Try Again</Text>
                                 </Button>
                             </View>
                             <View style={{flex: 1}}>
-                                <Button full style={styles.register}>
+                                <Button full style={styles.register} onPress={() => Actions.register({showLogin: false})}>
                                     <Text style={styles.buttonText}>Create Account</Text>
                                 </Button>
                             </View>
