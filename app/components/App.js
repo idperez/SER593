@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 
 import {
     Image,
-    StyleSheet
+    StyleSheet,
+    Text
 } from 'react-native';
 
 import { Router, Scene } from 'react-native-router-flux';
@@ -17,9 +18,21 @@ import Register from './register/Register';
 
 import MapDemo from './map/MapDemo';
 
-import Preferences from './preferences/Preferences';
+import Home from './Home/Explore/Home';
 
-import MapSearchBox from './map/MapSearchBox';
+import Saves from './Home/Saves/Saves';
+
+import Preferences from './Home/Preferences/Preferences';
+
+import Other from './Home/Other/Other';
+
+class TabIcon extends React.Component {
+    render(){
+        return (
+            <Text style={{color: this.props.selected ? 'red' :'black'}}>{this.props.title}</Text>
+        );
+    }
+}
 
 export default class App extends Component {
 
@@ -62,6 +75,45 @@ export default class App extends Component {
                             navigationBarStyle={{ backgroundColor: '#9B59B6' }}
                             backTitle=" "
                         />
+                        <Scene
+                            key="home"
+                            component={Home}
+                            title={<Image source={require('./../images/logo/topia-sm.png')} style={styles.image} />}
+                            navBarButtonColor='#ffffff'
+                            backButtonBarStyle={{ color: '#9B59B6' }}
+                            navigationBarStyle={{ backgroundColor: '#9B59B6' }}
+                            backTitle=" "
+                        />
+                        <Scene key="tabbar" tabs={true}>
+                            <Scene key="Explore" title="Explore" hideNavBar={true}>
+                                <Scene
+                                    key="exp"
+                                    component={Home}
+                                    icon={TabIcon}
+                                />
+                            </Scene>
+                            <Scene key="Saves" title="Saves" hideNavBar={true}>
+                                <Scene
+                                    key="save"
+                                    component={Saves}
+                                    icon={TabIcon}
+                                />
+                            </Scene>
+                            <Scene key="Preferences" title="Preferences" hideNavBar={true}>
+                                <Scene
+                                    key="pref"
+                                    component={Preferences}
+                                    icon={TabIcon}
+                                />
+                            </Scene>
+                            <Scene key="Other" title="Other" hideNavBar={true}>
+                                <Scene
+                                    key="other"
+                                    component={Other}
+                                    icon={TabIcon}
+                                />
+                            </Scene>
+                        </Scene>
                     </Scene>
                 </Router>
             </SplashContainer>
