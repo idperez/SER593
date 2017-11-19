@@ -12,8 +12,10 @@ import {
     Container,
     Content,
     Footer,
+    Left,
+    Right,
+    Title,
     FooterTab,
-    Header,
     Text
 } from 'native-base';
 
@@ -23,10 +25,6 @@ export default class Landing extends Component {
 
     constructor(props) {
         super(props);
-
-        this.state = {
-            jobs: {}
-        };
     }
 
     render() {
@@ -90,5 +88,11 @@ const styles = StyleSheet.create({
     },
     register: {
         backgroundColor: '#674172'
+    },
+    headerImage: {
+        marginTop: -5,
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: 50
     }
 });

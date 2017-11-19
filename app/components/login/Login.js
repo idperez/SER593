@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {
+    AsyncStorage,
     Image,
     StyleSheet,
     View
@@ -75,9 +76,12 @@ export default class Login extends Component {
     }
 
     handleLogin(result) {
-        if(result.err.type === "ErrorGettingProfile") {
+       if(result.err) {
             this.refs.badLogin.showBadLoginDialogue();
-        }
+       } else {
+           AsyncStorage.setItem('token', result.token);
+           Actions.tabbar();
+       }
     }
 
     render() {

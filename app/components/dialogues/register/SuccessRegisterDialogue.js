@@ -15,6 +15,8 @@ import {
 
 import { createAnimatableComponent, View } from 'react-native-animatable';
 
+import { Actions } from 'react-native-router-flux';
+
 const scaleAnimation = new ScaleAnimation();
 
 export default class SuccessRegisterDialogue extends Component {
@@ -34,10 +36,14 @@ export default class SuccessRegisterDialogue extends Component {
     showSuccessfulRegistrationDialog() {
         this.scaleAnimationDialog.show();
         this.setState({toggledOn: <View animation="tada" style={{flex: 1}}>
-            <Button full style={styles.preferences}>
+            <Button full style={styles.preferences} onPress={() => Actions.pref()}>
                 <Text style={styles.buttonText}>Preferences</Text>
             </Button>
         </View>});
+    }
+
+    dismissSuccessfulRegistrationDialog() {
+        this.scaleAnimationDialog.dismiss();
     }
 
     render() {
@@ -60,7 +66,7 @@ export default class SuccessRegisterDialogue extends Component {
                         <FooterTab>
                             {this.state.toggledOn}
                             <View style={{flex: 1}}>
-                                <Button full style={styles.explore}>
+                                <Button full style={styles.explore} onPress={() => this.dismissSuccessfulRegistrationDialog()}>
                                     <Text style={styles.buttonText}>Explore</Text>
                                 </Button>
                             </View>

@@ -28,8 +28,6 @@ import {
 
 import { Actions } from 'react-native-router-flux';
 
-import SuccessRegisterDialogue from '../dialogues/register/SuccessRegisterDialogue';
-
 import TakenUsernameDialogue from '../dialogues/register/TakenUsernameDialogue';
 
 import register from './../../../lib/register/register';
@@ -72,10 +70,10 @@ export default class Register extends Component {
     }
 
     handleRegistration(result) {
-        if(result.err.type == "UsernameTaken") {
+        if(result.err) {
             this.refs.taken.takenUsernameDialogue();
         } else {
-            this.refs.success.showSuccessfulRegistrationDialog();
+            Actions.tabbar({firstTime: true});
         }
     }
 
@@ -157,7 +155,6 @@ export default class Register extends Component {
                     </Grid>
                 </Content>
                 {this.state.showLogin}
-                <SuccessRegisterDialogue ref='success'/>
                 <TakenUsernameDialogue ref='taken'/>
             </Container>
         );
