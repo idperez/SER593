@@ -29,7 +29,15 @@ router.get('/pop', (req, res) => {
 });
 
 router.get('/cityjobs', (req, res) => {
-    city.grabJobCountForCities( req.query.username ).then( data => {
+    city.getCityStats( req.query.username ).then( ( data ) => {
+        res.send( data );
+    }).catch(err => {
+        res.send( err );
+    });
+});
+
+router.get('/ratings', (req, res) => {
+    city.updateCityRatings( req.query.username ).then( data => {
         res.send( data );
     }).catch(err => {
         res.send( err );

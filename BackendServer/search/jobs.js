@@ -213,7 +213,7 @@ function getJobsList( username, city, state, zip, maxResults, radius, numJobs = 
                     for( let i = 0; i < totalResults.length; i++ ){
                         sumOfResults += totalResults[i];
                     }
-                    resolve( { [city]: sumOfResults } );
+                    resolve( { city: city, state: state, jobNum:sumOfResults } );
                 } else {
                     resolve( [].concat.apply( [], totalResults ) );
                 }
