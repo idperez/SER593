@@ -951,6 +951,125 @@
     "groupTitle": "Users"
   },
   {
+    "type": "post",
+    "url": "/users/modifymulti",
+    "title": "Modify Multiple",
+    "name": "ModifyMultiple",
+    "group": "Users",
+    "description": "<p>Modify multiple preferences on users profile.</p> <p>This allows passing in an object containing some keys from a users profile. All keys within the object will overwrite the matching profile key on the database.</p> <p>To remove a key from the database, include it in the object and set it's value to null.</p> <p>NOTE: Entire arrays must be included with this method, as whatever is on the database will be overwritten. See /modify to append or remove from an array value.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "authorization",
+            "description": "<p>Bearer token</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n    authorization: Bearer QZ3jhbfdof84GFBlSe\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>Users login username.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "prefs",
+            "description": "<p>Object to overwrite user preferences.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "{\n    \"username\": \"dev\",\n    \"prefs\": {\n       \"prefs_jobs_titles\": [\"Software Engineer\", \"Developer\", \"Java\"],\n        \"prefs_jobs_postedDate\": 60\n    }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "UserNotFound",
+            "description": "<p>User information is not in the database.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "InvalidKey",
+            "description": "<p>Invalid key given.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "InvalidMode",
+            "description": "<p>Invalid mode given.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "MissingValue",
+            "description": "<p>No value given.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ModeError",
+            "description": "<p>Internal error.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenNotFound",
+            "description": "<p>Bearer token not found in header.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenMismatch",
+            "description": "<p>Bearer token does not match.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenExpired",
+            "description": "<p>Bearer token is expired.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "{\n  \"err\": {\n     \"type\": \"UserNotFound\",\n     \"msg\": \"Explanation of failure.\"\n  }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "./routes/profiles.js",
+    "groupTitle": "Users"
+  },
+  {
     "type": "get",
     "url": "/users/profile",
     "title": "Profile",

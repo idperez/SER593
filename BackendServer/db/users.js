@@ -181,6 +181,40 @@ exports.modifyUserItem = ( username, key, value, mode ) => {
     return promise;
 };
 
+// Allows modifying entire user preferences based on a passed in preference object
+// Any keys that match will be updated, if a value is null, that key will be removed from the DB
+exports.modifyUserPreferences = ( username, prefObj ) => {
+    return new Promise( ( resolve, reject ) => {
+
+        let promises = [];
+
+        // Get every key from the obj and update it on the DB
+        for( let key in prefObj ){
+            if( prefObj.hasOwnProperty( key ) ){
+                let mode = consts.MODIFIY_PREFS_MODES.MODIFY;
+
+                // If it's null, remove it from DB
+                if( prefObj[key] === null ){
+                    mode = consts.MODIFIY_PREFS_MODES.REMOVE;
+                }
+
+                promises.push(
+                    exports.modifyUserItem(
+                        username,
+                        key,
+                        prefObj[ key ],
+                        mode
+                    )
+                );
+            }
+        }
+
+        Promise.all( promises ).then( changes => {
+            resolve( changes[changes.length - 1] ); // resolve the last change
+        }).catch( err => reject( err ) );
+    });
+};
+
 exports.addSavedJob = ( username, jobKey ) => {
     return new Promise( ( resolve, reject ) => {
        getSavedJob( username, jobKey ).then( job => {
