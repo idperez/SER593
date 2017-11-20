@@ -897,6 +897,30 @@ define({ "api": [
           {
             "group": "Error 4xx",
             "optional": false,
+            "field": "InvalidKey",
+            "description": "<p>Invalid key given.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "InvalidMode",
+            "description": "<p>Invalid mode given.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "MissingValue",
+            "description": "<p>No value given.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ModeError",
+            "description": "<p>Internal error.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
             "field": "TokenNotFound",
             "description": "<p>Bearer token not found in header.</p>"
           },
@@ -1180,6 +1204,105 @@ define({ "api": [
             "optional": false,
             "field": "TokenExpired",
             "description": "<p>Bearer token is expired.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "{\n  \"err\": {\n     \"type\": \"TokenNotFound\",\n     \"msg\": \"\"\n  }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "./routes/profiles.js",
+    "groupTitle": "Users"
+  },
+  {
+    "type": "post",
+    "url": "/users/updateratings",
+    "title": "UpdateRatings",
+    "name": "UpdateRatings",
+    "group": "Users",
+    "description": "<p>Allows front-end to update city match ratings.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "authorization",
+            "description": "<p>Bearer token</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n    authorization: Bearer QZ3jhbfdof84GFBlSe\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>Users login username.</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenNotFound",
+            "description": "<p>Bearer token not found in header.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenMismatch",
+            "description": "<p>Bearer token does not match.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenExpired",
+            "description": "<p>Bearer token is expired.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NoCitiesInObject",
+            "description": "<p>Internal error.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "RatioError",
+            "description": "<p>Internal error.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "MissingCityData",
+            "description": "<p>Internal error.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ErrorSettingRatio",
+            "description": "<p>Internal error.</p>"
           }
         ]
       },

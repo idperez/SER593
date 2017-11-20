@@ -3,6 +3,7 @@ const router = express.Router();
 const DB_PROFILES = require( '../db/users.js' );
 const response = require('../responses/responses.js');
 const consts = require( "../constants" );
+const cityData = require( "../search/cityData" );
 
 
 /**
@@ -78,6 +79,10 @@ router.get( '/profile',
  *     }
  *
  * @apiError UserNotFound User information is not in the database.
+ * @apiError InvalidKey Invalid key given.
+ * @apiError InvalidMode Invalid mode given.
+ * @apiError MissingValue No value given.
+ * @apiError ModeError Internal error.
  * @apiError TokenNotFound Bearer token not found in header.
  * @apiError TokenMismatch Bearer token does not match.
  * @apiError TokenExpired Bearer token is expired.
@@ -179,6 +184,46 @@ router.post( '/removejob',
     ( req, res ) => {
 
         DB_PROFILES.removeSavedJob( req.body.username, req.body.jobkey ).then( success => {
+            res.send( success );
+        }).catch( err => {
+            res.send( response.errorMessage( err ) );
+        });
+    }
+);
+
+/**
+ * @api {post} /users/updateratings UpdateRatings
+ * @apiName UpdateRatings
+ * @apiGroup Users
+ * @apiDescription Allows front-end to update city match ratings.
+ *
+ * @apiHeader {String} authorization Bearer token
+ * @apiHeaderExample {json} Header-Example:
+ *      {
+ *          authorization: Bearer QZ3jhbfdof84GFBlSe
+ *      }
+ *
+ * @apiParam {String} username Users login username.
+ *
+ * @apiError TokenNotFound Bearer token not found in header.
+ * @apiError TokenMismatch Bearer token does not match.
+ * @apiError TokenExpired Bearer token is expired.
+ * @apiError NoCitiesInObject Internal error.
+ * @apiError RatioError Internal error.
+ * @apiError MissingCityData Internal error.
+ * @apiError ErrorSettingRatio Internal error.
+ * @apiErrorExample {json} Error-Response:
+ *     {
+ *       "err": {
+ *          "type": "TokenNotFound",
+ *          "msg": ""
+ *       }
+ *     }
+ */
+router.post( '/updateratings',
+    ( req, res ) => {
+
+        cityData.updateCityRatings( req.body.username ).then( success => {
             res.send( success );
         }).catch( err => {
             res.send( response.errorMessage( err ) );
