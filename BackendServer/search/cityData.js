@@ -2,7 +2,8 @@ let jobSearch = require( './jobs.js' );
 const keys = require( '../keys/apiKeys' );
 const POPULATION_ENDPOINT = "https://api.census.gov/data/2016/pep/population";
 const request = require( 'request' );
-const util = require( '../util' );
+const DB_USERS = require( '../db/users' );
+const consts = require( "../constants" );
 const qs = require( 'querystring' );
 const CITY_NAME_POS = 1;     // Position of city name string in the population array
 const CITY_POP_POS = 0;      // Position of the city population in the population array
@@ -49,7 +50,26 @@ exports.updateCityRatings = ( username ) => {
                 }
             }
 
-            resolve( ratings );
+            let ratingsStr = "";
+
+            try {
+                ratingsStr = JSON.stringify( ratings );
+
+                // Update users profile with the new ratings
+                DB_USERS.modifyUserItem(
+                    username,
+                    consts.PROF_KEYS.CITY_MATCH,
+                    ratingsStr,
+                    consts.MODIFIY_PREFS_MODES.MODIFY
+                ).then( data => {
+                    resolve( data );
+                }).catch( err => {
+                    reject( err );
+                });
+
+            } catch (e) {
+                reject(e);
+            }
 
         }).catch( err => {
             reject( err );
