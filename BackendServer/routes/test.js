@@ -2,6 +2,7 @@
 const express = require( 'express' );
 const router = express.Router();
 const users = require( "../db/users" );
+const city = require("../search/cityData");
 
 router.get('/getuserprofilebyprimarykey', ( req, res ) => {
     users.getUserProfileByPrimaryKey( req.query.primkey, req.query.value ).then( user => {

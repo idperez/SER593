@@ -51,12 +51,12 @@ exports.getJobByKey = ( jobKey ) => {
     });
 };
 
-exports.getJobsByCityState = ( username, city, state, maxResults, radius ) => {
+exports.getJobsByCityState = ( username, city, state, maxResults, radius, numJobs = false ) => {
     return new Promise( ( resolve, reject ) => {
         if( !city || !state ){
             reject( 'MissingLocation' );
         } else {
-            getJobsList( username, city, state, null, maxResults, radius ).then( jobList => {
+            getJobsList( username, city, state, null, maxResults, radius, numJobs ).then( jobList => {
                 resolve( jobList );
             }).catch( err => {
                 reject( err );
@@ -122,11 +122,11 @@ exports.getJobsByCoord = ( username, lat, long, maxResults, radius ) => {
 };
 
 // Helper to get jobs by city/state or zip, which is required by indeed.
-function getJobsList( username, city, state, zip, maxResults, radius ){
+function getJobsList( username, city, state, zip, maxResults, radius, numJobs = false ){
     return new Promise( ( resolve, reject ) => {
         DB_USERS.getUserProfile( username ).then( profile => {
             let jobAge = profile[ consts.PROF_KEYS.PREFS_JOBS_DATE ] ?
-                profile[ consts.PROF_KEYS.PREFS_JOBS_DATE ] : reject( "NoJobDate" );
+                profile[ consts.PROF_KEYS.PREFS_JOBS_DATE ] : DEFAULT_JOB_AGE;
             let jobTypes = profile[ consts.PROF_KEYS.PREFS_JOBS_TYPES ] ?
                 profile[ consts.PROF_KEYS.PREFS_JOBS_TYPES ] : reject( "NoJobTypes" );
             let jobTitles = profile[ consts.PROF_KEYS.PREFS_JOBS_TITLES ] ?
@@ -155,7 +155,7 @@ function getJobsList( username, city, state, zip, maxResults, radius ){
                         radius: radius ? radius : DEFAULT_RADIUS,
                         // Database values
                         jt: jobType,                                // Job type
-                        fromage: jobAge ? jobAge : DEFAULT_JOB_AGE, // Max number of days back job was posted
+                        fromage: jobAge, // Max number of days back job was posted
                         q: jobTitles.join( "," )                    // Keywords
 
                     };
@@ -175,26 +175,32 @@ function getJobsList( username, city, state, zip, maxResults, radius ){
                             reject( err );
                         } else {
                             let numOfResults = JSON.parse( body ).totalResults;
-                            let promises = [];
-                            for( let i = 0; i < numOfResults && i < maxResults; i += RESULTS_PER_PAGE ) {
-                                promises.push( new Promise( ( jobResolve, jobReject ) => {
-                                    request( INDEED_ENDPOINT + '?start=' + i + '&' + query, function( err, innerResponse, innerBody ) {
-                                            if( err ) {
-                                                jobReject( err );
-                                            } else {
-                                                jobResolve( JSON.parse( innerBody ).results );
-                                            }
-                                        } );
-                                    } )
-                                );
+
+                            // If number of jobs is requested, end here.
+                            if( numJobs ){
+                                typeResolve( numOfResults );
+                            } else {
+                                let promises = [];
+                                for( let i = 0; i < numOfResults && i < maxResults; i += RESULTS_PER_PAGE ) {
+                                    promises.push( new Promise( ( jobResolve, jobReject ) => {
+                                            request( INDEED_ENDPOINT + '?start=' + i + '&' + query, function( err, innerResponse, innerBody ) {
+                                                if( err ) {
+                                                    jobReject( err );
+                                                } else {
+                                                    jobResolve( JSON.parse( innerBody ).results );
+                                                }
+                                            } );
+                                        } )
+                                    );
+                                }
+                                // Pages
+                                Promise.all( promises ).then( totalResults => {
+                                    // Flatten results before sending
+                                    typeResolve( [].concat.apply( [], totalResults ) );
+                                } ).catch( err => {
+                                    typeReject( err );
+                                } );
                             }
-                            // Pages
-                            Promise.all( promises ).then( totalResults => {
-                                // Flatten results before sending
-                                typeResolve( [].concat.apply( [], totalResults ) );
-                            } ).catch( err => {
-                                typeReject( err );
-                            } );
                         }
                     } );
                 } ) );
@@ -202,7 +208,15 @@ function getJobsList( username, city, state, zip, maxResults, radius ){
             // Job types
             Promise.all( typePromises ).then( totalResults => {
                 // Flatten results before sending
-                resolve( [].concat.apply( [], totalResults ) );
+                if( numJobs ) {
+                    let sumOfResults = 0;
+                    for( let i = 0; i < totalResults.length; i++ ){
+                        sumOfResults += totalResults[i];
+                    }
+                    resolve( { city: city, state: state, jobNum:sumOfResults } );
+                } else {
+                    resolve( [].concat.apply( [], totalResults ) );
+                }
             }).catch( err => {
                 reject( err );
             });
@@ -211,3 +225,4 @@ function getJobsList( username, city, state, zip, maxResults, radius ){
         });
     });
 }
+
