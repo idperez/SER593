@@ -126,7 +126,7 @@ function getJobsList( username, city, state, zip, maxResults, radius, numJobs = 
     return new Promise( ( resolve, reject ) => {
         DB_USERS.getUserProfile( username ).then( profile => {
             let jobAge = profile[ consts.PROF_KEYS.PREFS_JOBS_DATE ] ?
-                profile[ consts.PROF_KEYS.PREFS_JOBS_DATE ] : reject( "NoJobDate" );
+                profile[ consts.PROF_KEYS.PREFS_JOBS_DATE ] : DEFAULT_JOB_AGE;
             let jobTypes = profile[ consts.PROF_KEYS.PREFS_JOBS_TYPES ] ?
                 profile[ consts.PROF_KEYS.PREFS_JOBS_TYPES ] : reject( "NoJobTypes" );
             let jobTitles = profile[ consts.PROF_KEYS.PREFS_JOBS_TITLES ] ?
@@ -155,7 +155,7 @@ function getJobsList( username, city, state, zip, maxResults, radius, numJobs = 
                         radius: radius ? radius : DEFAULT_RADIUS,
                         // Database values
                         jt: jobType,                                // Job type
-                        fromage: jobAge ? jobAge : DEFAULT_JOB_AGE, // Max number of days back job was posted
+                        fromage: jobAge, // Max number of days back job was posted
                         q: jobTitles.join( "," )                    // Keywords
 
                     };
