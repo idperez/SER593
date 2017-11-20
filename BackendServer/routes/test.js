@@ -20,29 +20,5 @@ router.get('/getuserprofile', ( req, res ) => {
     })
 });
 
-router.get('/pop', (req, res) => {
-    city.grabCityPopulations().then( data => {
-        res.send( data );
-    }).catch(err => {
-        res.send( err );
-    });
-});
-
-router.get('/cityjobs', (req, res) => {
-    city.getCityStats( req.query.username ).then( ( data ) => {
-        res.send( data );
-    }).catch(err => {
-        res.send( err );
-    });
-});
-
-router.get('/ratings', (req, res) => {
-    city.updateCityRatings( req.query.username ).then( data => {
-        res.send( data );
-    }).catch(err => {
-        res.send( err );
-    });
-});
-
 
 module.exports = router;

@@ -7,7 +7,8 @@ const jobSearch = require( "../search/jobs" );
 const INDEX_SUFFIX = "-index";
 const TABLE_NAME = 'topia_profiles';
 const PRIMARY_KEY = consts.PROF_KEYS.USERNAME;
-const JOB_UPDATE_TIME = 86400000; // Time to recheck saved jobs - 24 hours in ms
+const DEFAULT_UPDATE_TIME = 86400000; // Time to recheck saved jobs - 24 hours in ms
+const cityData = require( "../search/cityData" );
 
 // Get user profile from database
 exports.getUserProfile = ( username ) => {
@@ -91,15 +92,10 @@ exports.getUserProfileByPrimaryKey = ( primKey, value ) => {
                     // As stated below, resolve before the saved job update
                     resolve( resultProfile );
 
-                    // Check expiration time stamp for the users saved jobs.
+                    // Check expiration time stamp for the users profile.
                     // This runs after the response, so the current call for the user profile
-                    // will not get the updated jobs.
-                    if( resultProfile[consts.PROF_KEYS.PREFS_JOBS_SAVED] ) {
-                        checkAndUpdateSavedJobs(
-                            resultProfile[ consts.PROF_KEYS.USERNAME ],
-                            JSON.parse( JSON.stringify( resultProfile[ consts.PROF_KEYS.PREFS_JOBS_SAVED ] ) )
-                        );
-                    }
+                    // will not have to wait for the updates.
+                    timelyUpdates( resultProfile, DEFAULT_UPDATE_TIME );
 
                 } else {
                     reject( 'NoResultsFound' );
@@ -211,6 +207,7 @@ exports.modifyUserPreferences = ( username, prefObj ) => {
 
         Promise.all( promises ).then( changes => {
             resolve( changes[changes.length - 1] ); // resolve the last change
+            updatesOnProfileChange( username );
         }).catch( err => reject( err ) );
     });
 };
@@ -436,59 +433,92 @@ let getSavedJob = ( username, jobKey ) => {
 
 // Check the time stamp for when the job was last updated, if stamp expired, update it.
 let checkAndUpdateSavedJobs = ( username, savedJobs ) => {
-    let currentTime = Date.now();
     let promises = [];
 
     if( savedJobs && util.isArray( savedJobs ) ) { // If there are even any saved jobs
         for( let i = savedJobs.length - 1; i >= 0; i-- ) {
             if( savedJobs[i] && typeof savedJobs[i] === 'object'  ) {
-                let lastChecked = savedJobs[i][consts.JOB_PROPS.LAST_CHECKED ];
-                // Compare times and make sure it's not also expired
-                if( !savedJobs[i].expired &&
-                    ( !lastChecked || ( lastChecked + JOB_UPDATE_TIME ) <= currentTime ) ) {
-                    // Update the job from indeed
-                    promises.push(
-                        new Promise( ( resolveUpdate, rejectUpdate ) => {
-                            jobSearch.getJobByKey( savedJobs[i]["jobkey"] ).then( updatedJob => {
-                                let resJob = Object.assign( {}, savedJobs[i], updatedJob );
-                                resJob[consts.JOB_PROPS.LAST_CHECKED] = currentTime;
-                                resolveUpdate( resJob );
-                            } ).catch( err => {
-                                rejectUpdate( err );
-                            } );
-                        } )
-                    );
-                    // Remove this job from the pool
-                    savedJobs.splice( i, 1 );
-                }
+                // Update the job from indeed
+                promises.push(
+                    new Promise( ( resolveUpdate, rejectUpdate ) => {
+                        jobSearch.getJobByKey( savedJobs[i]["jobkey"] ).then( updatedJob => {
+                            resolveUpdate( updatedJob );
+                        } ).catch( err => {
+                            rejectUpdate( err );
+                        } );
+                    } )
+                );
             } else {
-                console.log( 'InvalidSavedJobFormat' );
+                console.log( 'InvalidSavedJobFormat: ' + savedJobs[i].toString() );
             }
         }
 
         Promise.all( promises ).then( updatedJobs => {
             // Success, update savedJobs on the DB
-            let usersSavedJobs = savedJobs.concat( updatedJobs );
             // Stringify all the jobs for storage on DB again.
-            for(let i = 0; i < usersSavedJobs.length; i++){
-                usersSavedJobs[i] = JSON.stringify( usersSavedJobs[i] );
+            for(let i = 0; i < updatedJobs.length; i++){
+                updatedJobs[i] = JSON.stringify( updatedJobs[i] );
             }
             // Store on the DB
             addUserItem(
                 username,
                 consts.PROF_KEYS.PREFS_JOBS_SAVED,
-                usersSavedJobs
+                updatedJobs
             ).then( data => {
-                if( !util.emptyArray( updatedJobs ) ) {
-                    let updatedStr = "";
-                    for( let i = 0; i < updatedJobs.length; i++ ) {
-                        updatedStr += updatedJobs[ i ].jobkey + " ";
-                    }
-                    console.log( username + "'s jobs updated: " + updatedStr );
-                }
-            }).catch( err => { console.log( err ); } );
+                console.log( "Updating " + username + " saved jobs successful." )
+            }).catch( err => {
+                console.log( "Error updating " + username + " saved jobs on DB: " + err );
+            } );
         } ).catch( err => {
-            console.log( err.toString() );
+            console.log( "Error updating " + username + " saved jobs: " + err );
         } )
+    } else {
+        console.log( username + " has no saved jobs." );
     }
+};
+
+let timelyUpdates = ( profileObj, timeGap ) => {
+    let lastUpdated = profileObj[consts.PROF_KEYS.LAST_UPDATED];
+    let currentTime = Date.now();
+
+    if( !lastUpdated || ( lastUpdated + timeGap ) <= currentTime ){
+        let username = profileObj[consts.PROF_KEYS.USERNAME];
+
+        // START UPDATES
+
+        // City ratings
+        updateCityRatings( username );
+        // Saved jobs
+        checkAndUpdateSavedJobs( username, profileObj[consts.PROF_KEYS.PREFS_JOBS_SAVED] );
+
+        // END UPDATES
+
+        // Update time stamp
+        exports.modifyUserItem(
+            username,
+            consts.PROF_KEYS.LAST_UPDATED,
+            currentTime,
+            consts.MODIFIY_PREFS_MODES.MODIFY
+        ).then( data => {
+            console.log( username + " time stamp updated." );
+        }).catch( err => {
+            console.log( "Error updating " + username + " time stamp: " + err );
+        });
+    }
+};
+
+// Any updates that need to happen on a profile/preference change go here.
+let updatesOnProfileChange = ( username ) => {
+    updateCityRatings( username );
+};
+
+// Update users city ratings
+let updateCityRatings = ( username ) => {
+    // Update city ratings
+    cityData.updateCityRatings( username ).then( data => {
+        console.log( "Updating " + username + " city ratings successful." );
+    }).catch( err => {
+        console.log( "Error updating " + username + " city ratings: " + err );
+    });
+
 };

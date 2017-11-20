@@ -127,6 +127,7 @@ router.post( '/modify',
  * NOTE: Entire arrays must be included with this method, as whatever is on the database will
  * be overwritten. See /modify to append or remove from an array value.
  *
+ * NOTE: Any timely profile updates will be updated at this point, since there was a profile change.
  *
  * @apiHeader {String} authorization Bearer token
  * @apiHeaderExample {json} Header-Example:
