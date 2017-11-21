@@ -5,6 +5,11 @@ import { StyleSheet, View } from 'react-native';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 export default class MapSearchBox extends Component {
+
+    handleSearch(lat, long) {
+        this.props.citySearched(lat, long);
+    }
+
     render() {
         return (
             <View style={styles.searchBox}>
@@ -14,8 +19,10 @@ export default class MapSearchBox extends Component {
                     autoFocus={false}
                     fetchDetails={true}
                     onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
-                        alert(JSON.stringify(data));
-                        console.log(details);
+                        this.handleSearch(
+                            details.geometry.location.lat,
+                            details.geometry.location.lng
+                        );
                     }}
                     getDefaultValue={() => {
                         return ''; // text input default value

@@ -43,9 +43,10 @@ export default class App extends Component {
                     <Scene key="root">
                         <Scene
                             key="landing"
-                            component={Landing}
+                            component={Home}
                             title={<Image source={require('./../images/logo/topia-sm.png')} style={styles.image} />}
                             navigationBarStyle={{ backgroundColor: '#9B59B6' }}
+                            hideNavBar={true}
                             initial
                         />
                         <Scene
