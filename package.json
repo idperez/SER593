@@ -4,10 +4,12 @@
 	"private": true,
 	"scripts": {
 		"start": "node node_modules/react-native/local-cli/cli.js start",
-		"test": "jest"
+		"test": "jest",
+		"react-devtools": "react-devtools"
 	},
 	"dependencies": {
 		"native-base": "^2.3.2",
+		"prop-types": "^15.6.0",
 		"react": "16.0.0-alpha.12",
 		"react-native": "0.48.3",
 		"react-native-animatable": "^1.2.4",
@@ -20,6 +22,7 @@
 		"react-native-router-flux": "^4.0.0-beta.22",
 		"react-native-searchbar": "^1.13.0",
 		"react-native-slider": "^0.11.0",
+		"react-native-snap-carousel": "^3.4.0",
 		"react-native-textinput-effects": "^0.4.1",
 		"react-native-vector-icons": "^4.4.0"
 	},
@@ -27,6 +30,7 @@
 		"babel-jest": "21.0.2",
 		"babel-preset-react-native": "4.0.0",
 		"jest": "21.1.0",
+		"react-devtools": "^3.0.0",
 		"react-test-renderer": "16.0.0-alpha.12"
 	},
 	"jest": {
