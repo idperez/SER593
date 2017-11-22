@@ -17,7 +17,6 @@ const consts = require( "../constants" );
  *          authorization: Bearer QZ3jhbfdof84GFBlSe
  *      }
  *
- * @apiParam {String} username User profile to get job information from.
  * @apiParam {String} city City to search.
  * @apiParam {String} state State to search. (2 letter abbreviation)
  * @apiParam {Number} limit Max number of results.
@@ -65,7 +64,7 @@ const consts = require( "../constants" );
 router.get( '/location',
     ( req, res ) => {
         jobSearch.getJobsByCityState(
-            req.query[consts.PROF_KEYS.USERNAME],
+            res.locals.user,
             req.query.city,
             req.query.state,
             req.query.limit,
@@ -91,7 +90,6 @@ router.get( '/location',
  *          authorization: Bearer QZ3jhbfdof84GFBlSe
  *      }
  *
- * @apiParam {String} username User profile to get job information from.
  * @apiParam {String} zip Zip code.
  * @apiParam {Number} limit Max number of results.
  * @apiParam {Number} radius Radius in miles (Optional: default is 25).
@@ -139,7 +137,7 @@ router.get( '/location',
 router.get( '/zip',
     ( req, res ) => {
         jobSearch.getJobsByZip(
-            req.query[consts.PROF_KEYS.USERNAME],
+            res.locals.user,
             req.query.zip,
             req.query.limit,
             req.query.radius
@@ -163,7 +161,6 @@ router.get( '/zip',
  *          authorization: Bearer QZ3jhbfdof84GFBlSe
  *      }
  *
- * @apiParam {String} username User profile to get job information from.
  * @apiParam {String} lat Latitude
  * @apiParam {String} long Longitude
  * @apiParam {Number} limit Max number of results.
@@ -213,7 +210,7 @@ router.get( '/zip',
 router.get( '/coords',
     ( req, res ) => {
         jobSearch.getJobsByCoord(
-            req.query[consts.PROF_KEYS.USERNAME],
+            res.locals.user,
             req.query.lat,
             req.query.long,
             req.query.limit,

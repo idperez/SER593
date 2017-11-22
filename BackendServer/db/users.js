@@ -11,6 +11,7 @@ const DEFAULT_UPDATE_TIME = 86400000; // Time to recheck saved jobs - 24 hours i
 const cityData = require( "../search/cityData" );
 
 // Get user profile from database
+// Authorize should be the only caller
 exports.getUserProfile = ( username ) => {
     return exports.getUserProfileByPrimaryKey( PRIMARY_KEY, username );
 };
@@ -141,7 +142,7 @@ exports.addNewUser = ( username, password, email ) => {
 };
 
 // Modify an existing user profile key
-exports.modifyUserItem = ( username, key, value, mode ) => {
+exports.modifyUserItem = ( userObj, key, value, mode ) => {
     let promise;
 
     // Check parameters
@@ -158,16 +159,16 @@ exports.modifyUserItem = ( username, key, value, mode ) => {
 
         switch( mode ){
             case consts.MODIFIY_PREFS_MODES.MODIFY:
-                promise = addUserItem( username, key, value );
+                promise = addUserItem( userObj[consts.PROF_KEYS.USERNAME], key, value );
                 break;
             case consts.MODIFIY_PREFS_MODES.REMOVE:
-                promise = removeUserItem( username, key );
+                promise = removeUserItem( userObj[consts.PROF_KEYS.USERNAME], key );
                 break;
             case consts.MODIFIY_PREFS_MODES.LIST_APPEND:
-                promise = appendListItem( username, key, value );
+                promise = appendListItem( userObj[consts.PROF_KEYS.USERNAME], key, value );
                 break;
             case consts.MODIFIY_PREFS_MODES.LIST_REMOVE:
-                promise = removeListItem( username, key, value );
+                promise = removeListItem( userObj[consts.PROF_KEYS.USERNAME], key, value );
                 break;
             default:
                 promise = Promise.reject( 'ModeError' );
@@ -179,7 +180,7 @@ exports.modifyUserItem = ( username, key, value, mode ) => {
 
 // Allows modifying entire user preferences based on a passed in preference object
 // Any keys that match will be updated, if a value is null, that key will be removed from the DB
-exports.modifyUserPreferences = ( username, prefObj ) => {
+exports.modifyUserPreferences = ( userObj, prefObj ) => {
     return new Promise( ( resolve, reject ) => {
 
         let promises = [];
@@ -196,7 +197,7 @@ exports.modifyUserPreferences = ( username, prefObj ) => {
 
                 promises.push(
                     exports.modifyUserItem(
-                        username,
+                        userObj,
                         key,
                         prefObj[ key ],
                         mode
@@ -207,66 +208,60 @@ exports.modifyUserPreferences = ( username, prefObj ) => {
 
         Promise.all( promises ).then( changes => {
             resolve( changes[changes.length - 1] ); // resolve the last change
-            updatesOnProfileChange( username );
+            updatesOnProfileChange( userObj );
         }).catch( err => reject( err ) );
     });
 };
 
-exports.addSavedJob = ( username, jobKey ) => {
+exports.addSavedJob = ( userObj, jobKey ) => {
     return new Promise( ( resolve, reject ) => {
-       getSavedJob( username, jobKey ).then( job => {
-           if( job !== null ){
-               reject( 'JobAlreadySaved' )
-           } else {
-               // Hit indeed for job info
-               jobSearch.getJobByKey( jobKey ).then( job => {
-                   // Save the job
-                   if( !job ){
-                       reject( 'JobNotFound' )
-                   } else {
-                       let jobObj = job;
-                       // Set the timestamp for when it was last accessed.
-                       jobObj[consts.JOB_PROPS.LAST_CHECKED] = Date.now();
+       let job = getSavedJob( userObj, jobKey );
+       if( job !== null ){
+           reject( 'JobAlreadySaved' )
+       } else {
+           // Hit indeed for job info
+           jobSearch.getJobByKey( jobKey ).then( job => {
+               // Save the job
+               if( !job ){
+                   reject( 'JobNotFound' )
+               } else {
+                   let jobObj = job;
+                   // Set the timestamp for when it was last accessed.
+                   jobObj[consts.JOB_PROPS.LAST_CHECKED] = Date.now();
 
-                       appendListItem(
-                           username,
-                           consts.PROF_KEYS.PREFS_JOBS_SAVED,
-                           JSON.stringify( jobObj )
-                       ).then( data => {
-                           resolve( data );
-                       }).catch( err => {
-                           reject( err );
-                       });
-                   }
-               }).catch( err => {
-                   reject( err );
-               });
-           }
-        }).catch( err => {
-            reject( err );
-        });
+                   appendListItem(
+                       userObj[consts.PROF_KEYS.USERNAME],
+                       consts.PROF_KEYS.PREFS_JOBS_SAVED,
+                       JSON.stringify( jobObj )
+                   ).then( data => {
+                       resolve( data );
+                   }).catch( err => {
+                       reject( err );
+                   });
+               }
+           }).catch( err => {
+               reject( err );
+           });
+       }
     });
 };
 
-exports.removeSavedJob = ( username, jobKey ) => {
+exports.removeSavedJob = ( userObj, jobKey ) => {
     return new Promise( ( resolve, reject ) => {
-        getSavedJob( username, jobKey ).then( job => {
-            if( job === null ){
-                reject( 'SavedJobNotFound' );
-            } else {
-                removeListItem(
-                    username,
-                    consts.PROF_KEYS.PREFS_JOBS_SAVED,
-                    JSON.stringify( job )
-                ).then( data => {
-                    resolve( data );
-                }).catch( err => {
-                    reject( err );
-                });
-            }
-        }).catch( err => {
-            reject( err )
-        });
+        let job = getSavedJob( userObj, jobKey );
+        if( job === null ){
+            reject( 'SavedJobNotFound' );
+        } else {
+            removeListItem(
+                userObj[consts.PROF_KEYS.USERNAME],
+                consts.PROF_KEYS.PREFS_JOBS_SAVED,
+                JSON.stringify( job )
+            ).then( data => {
+                resolve( data );
+            }).catch( err => {
+                reject( err );
+            });
+        }
     });
 };
 
@@ -412,23 +407,16 @@ let removeUserItem = ( username, key ) => {
 
 // Get saved job from the DB
 // Job is null if it's not found on users profile
-let getSavedJob = ( username, jobKey ) => {
-    return new Promise( ( resolve, reject ) => {
-        exports.getUserProfile( username ).then( profile => {
-            let job = null;
-            let list = profile[consts.PROF_KEYS.PREFS_JOBS_SAVED];
-            if( list ) {
-                list.forEach( foundJob => {
-                    if( foundJob[ "jobkey" ] === jobKey ) {
-                        job = foundJob;
-                    }
-                } );
+let getSavedJob = ( userObj, jobKey ) => {
+    let job = null;
+    let list = userObj[consts.PROF_KEYS.PREFS_JOBS_SAVED];
+    if( list ) {
+        list.forEach( foundJob => {
+            if( foundJob[ "jobkey" ] === jobKey ) {
+                job = foundJob;
             }
-            resolve( job );
-        }).catch( err => {
-            reject( err );
-        });
-    });
+        } );
+    }
 };
 
 // Check the time stamp for when the job was last updated, if stamp expired, update it.
@@ -477,19 +465,19 @@ let checkAndUpdateSavedJobs = ( username, savedJobs ) => {
     }
 };
 
-let timelyUpdates = ( profileObj, timeGap ) => {
-    let lastUpdated = profileObj[consts.PROF_KEYS.LAST_UPDATED];
+let timelyUpdates = ( userObj, timeGap ) => {
+    let lastUpdated = userObj[consts.PROF_KEYS.LAST_UPDATED];
     let currentTime = Date.now();
 
     if( !lastUpdated || ( lastUpdated + timeGap ) <= currentTime ){
-        let username = profileObj[consts.PROF_KEYS.USERNAME];
+        let username = userObj[consts.PROF_KEYS.USERNAME];
 
         // START UPDATES
 
         // City ratings
-        updateCityRatings( username );
+        updateCityRatings( userObj );
         // Saved jobs
-        checkAndUpdateSavedJobs( username, profileObj[consts.PROF_KEYS.PREFS_JOBS_SAVED] );
+        checkAndUpdateSavedJobs( username, userObj[consts.PROF_KEYS.PREFS_JOBS_SAVED] );
 
         // END UPDATES
 
@@ -508,14 +496,15 @@ let timelyUpdates = ( profileObj, timeGap ) => {
 };
 
 // Any updates that need to happen on a profile/preference change go here.
-let updatesOnProfileChange = ( username ) => {
-    updateCityRatings( username );
+let updatesOnProfileChange = ( userObj ) => {
+    updateCityRatings( userObj );
 };
 
 // Update users city ratings
-let updateCityRatings = ( username ) => {
+let updateCityRatings = ( userObj ) => {
     // Update city ratings
-    cityData.updateCityRatings( username ).then( data => {
+    let username = userObj[consts.PROF_KEYS.USERNAME];
+    cityData.updateCityRatings( userObj ).then( data => {
         console.log( "Updating " + username + " city ratings successful." );
     }).catch( err => {
         console.log( "Error updating " + username + " city ratings: " + err );
