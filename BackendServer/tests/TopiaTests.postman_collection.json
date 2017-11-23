@@ -1,0 +1,69 @@
+{
+	"info": {
+		"name": "TopiaTests",
+		"_postman_id": "f655eba4-8797-fc29-8e90-d768c8d43883",
+		"description": "API tests that Jenkins will run.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "CompanyInformation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Correct company information returned\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.name).to.eql(\"ViaSat\");",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "topiadev",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/search/jobs/companyinfo?companyname=viasat",
+					"host": [
+						"topia-env-development",
+						"us-west-2",
+						"elasticbeanstalk",
+						"com"
+					],
+					"path": [
+						"search",
+						"jobs",
+						"companyinfo"
+					],
+					"query": [
+						{
+							"key": "companyname",
+							"value": "viasat",
+							"equals": true
+						}
+					]
+				},
+				"description": "/search/jobs/companyinfo endpoint"
+			},
+			"response": []
+		}
+	]
+}
