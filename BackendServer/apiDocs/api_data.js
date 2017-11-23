@@ -353,7 +353,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "String",
             "optional": false,
-            "field": "jobkey",
+            "field": "jobkeys",
             "description": "<p>Indeed job key</p>"
           }
         ]
@@ -375,7 +375,7 @@ define({ "api": [
             "group": "Error 4xx",
             "optional": false,
             "field": "NoJobsKeysFound",
-            "description": "<p>jobkey not found in query.</p>"
+            "description": "<p>jobkeys not found in query.</p>"
           },
           {
             "group": "Error 4xx",
@@ -868,6 +868,12 @@ define({ "api": [
           {
             "group": "Error 4xx",
             "optional": false,
+            "field": "ElemNotFound",
+            "description": "<p>Element not found in list.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
             "field": "MissingValue",
             "description": "<p>No value given.</p>"
           },
@@ -906,7 +912,7 @@ define({ "api": [
       ]
     },
     "version": "0.0.0",
-    "filename": "./routes/profiles.js",
+    "filename": "./routes/users.js",
     "groupTitle": "Users"
   },
   {
@@ -941,7 +947,7 @@ define({ "api": [
         "Parameter": [
           {
             "group": "Parameter",
-            "type": "String",
+            "type": "Object",
             "optional": false,
             "field": "prefs",
             "description": "<p>Object to overwrite user preferences.</p>"
@@ -1018,7 +1024,7 @@ define({ "api": [
       ]
     },
     "version": "0.0.0",
-    "filename": "./routes/profiles.js",
+    "filename": "./routes/users.js",
     "groupTitle": "Users"
   },
   {
@@ -1086,7 +1092,7 @@ define({ "api": [
       ]
     },
     "version": "0.0.0",
-    "filename": "./routes/profiles.js",
+    "filename": "./routes/users.js",
     "groupTitle": "Users"
   },
   {
@@ -1167,7 +1173,7 @@ define({ "api": [
       ]
     },
     "version": "0.0.0",
-    "filename": "./routes/profiles.js",
+    "filename": "./routes/users.js",
     "groupTitle": "Users"
   },
   {
@@ -1260,7 +1266,7 @@ define({ "api": [
       ]
     },
     "version": "0.0.0",
-    "filename": "./routes/profiles.js",
+    "filename": "./routes/users.js",
     "groupTitle": "Users"
   },
   {
@@ -1346,7 +1352,7 @@ define({ "api": [
       ]
     },
     "version": "0.0.0",
-    "filename": "./routes/profiles.js",
+    "filename": "./routes/users.js",
     "groupTitle": "Users"
   },
   {

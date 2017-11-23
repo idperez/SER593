@@ -235,7 +235,7 @@ router.get( '/coords',
  *          authorization: Bearer QZ3jhbfdof84GFBlSe
  *      }
  *
- * @apiParam {String} jobkey Indeed job key
+ * @apiParam {String} jobkeys Indeed job key
  * @apiSuccessExample {json} Success-Response:
  *
  *      {
@@ -264,7 +264,7 @@ router.get( '/coords',
  *      },
  *
  *
- * @apiError NoJobsKeysFound jobkey not found in query.
+ * @apiError NoJobsKeysFound jobkeys not found in query.
  * @apiError NoJobsFound No jobs found with the given key.
  * @apiError TokenNotFound Bearer token not found in header.
  * @apiError TokenMismatch Bearer token does not match.

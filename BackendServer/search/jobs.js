@@ -84,6 +84,10 @@ exports.getJobsByCoord = ( userObj, lat, long, maxResults, radius ) => {
 
         radius = radius * MILE_TO_KM;
 
+        if( !lat || !long ){
+            reject( 'MissingLocation' );
+        }
+
         let baseQuery = {
             username: keys.ZIP_USERNAME,
             lat: lat,

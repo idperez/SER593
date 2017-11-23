@@ -6,6 +6,9 @@ const util = require( "../util" );
 const jobSearch = require( "../search/jobs" );
 const INDEX_SUFFIX = "-index";
 const TABLE_NAME = 'topia_profiles';
+const TABLE_NAME_JOBS = 'jobs';
+const PRIM_KEY_JOBS = "jobkey";
+const PRIM_KEY_JOB_DETAILS = "job";
 const PRIMARY_KEY = consts.PROF_KEYS.USERNAME;
 const DEFAULT_UPDATE_TIME = 86400000; // Time to recheck saved jobs - 24 hours in ms
 const cityData = require( "../search/cityData" );
@@ -147,7 +150,8 @@ exports.modifyUserItem = ( userObj, key, value, mode ) => {
 
     // Check parameters
     // Key
-    if( !key || !util.objectContains( consts.PROF_KEYS, key ) ) {
+    console.log(key + "hello");
+    if( !key ) {
         promise = Promise.reject( 'InvalidKey' );
     // Mode
     } else if ( !mode || !util.objectContains( consts.MODIFIY_PREFS_MODES, mode ) ) {
@@ -168,7 +172,7 @@ exports.modifyUserItem = ( userObj, key, value, mode ) => {
                 promise = appendListItem( userObj[consts.PROF_KEYS.USERNAME], key, value );
                 break;
             case consts.MODIFIY_PREFS_MODES.LIST_REMOVE:
-                promise = removeListItem( userObj[consts.PROF_KEYS.USERNAME], key, value );
+                promise = removeListItem( userObj, key, value );
                 break;
             default:
                 promise = Promise.reject( 'ModeError' );
@@ -215,30 +219,22 @@ exports.modifyUserPreferences = ( userObj, prefObj ) => {
 
 exports.addSavedJob = ( userObj, jobKey ) => {
     return new Promise( ( resolve, reject ) => {
-       let job = getSavedJob( userObj, jobKey );
-       if( job !== null ){
-           reject( 'JobAlreadySaved' )
+       if( userObj[consts.PROF_KEYS.PREFS_JOBS_SAVED].includes( jobKey ) ){
+           reject( 'JobAlreadySaved' );
        } else {
            // Hit indeed for job info
-           jobSearch.getJobByKey( jobKey ).then( job => {
-               // Save the job
-               if( !job ){
-                   reject( 'JobNotFound' )
-               } else {
-                   let jobObj = job;
-                   // Set the timestamp for when it was last accessed.
-                   jobObj[consts.JOB_PROPS.LAST_CHECKED] = Date.now();
-
-                   appendListItem(
-                       userObj[consts.PROF_KEYS.USERNAME],
-                       consts.PROF_KEYS.PREFS_JOBS_SAVED,
-                       JSON.stringify( jobObj )
-                   ).then( data => {
-                       resolve( data );
-                   }).catch( err => {
-                       reject( err );
-                   });
-               }
+           getSavedJob( jobKey ).then( job => {
+               // We're not really concerned with the return value,
+               // as long as it's resolved we know everything is okay.
+               appendListItem(
+                   userObj[consts.PROF_KEYS.USERNAME],
+                   consts.PROF_KEYS.PREFS_JOBS_SAVED,
+                   jobKey
+               ).then( data => {
+                   resolve( data );
+               }).catch( err => {
+                   reject( err );
+               });
            }).catch( err => {
                reject( err );
            });
@@ -248,19 +244,22 @@ exports.addSavedJob = ( userObj, jobKey ) => {
 
 exports.removeSavedJob = ( userObj, jobKey ) => {
     return new Promise( ( resolve, reject ) => {
-        let job = getSavedJob( userObj, jobKey );
-        if( job === null ){
+        if( !userObj[consts.PROF_KEYS.PREFS_JOBS_SAVED].includes( jobKey ) ){
             reject( 'SavedJobNotFound' );
         } else {
-            removeListItem(
-                userObj[consts.PROF_KEYS.USERNAME],
-                consts.PROF_KEYS.PREFS_JOBS_SAVED,
-                JSON.stringify( job )
-            ).then( data => {
-                resolve( data );
-            }).catch( err => {
-                reject( err );
-            });
+            try{
+                removeListItem(
+                    userObj,
+                    consts.PROF_KEYS.PREFS_JOBS_SAVED,
+                    jobKey
+                ).then( data => {
+                    resolve( data );
+                }).catch( err => {
+                    reject( err );
+                });
+            } catch( err ){
+                reject( "ErrorStringifyJSON" );
+            }
         }
     });
 };
@@ -350,20 +349,27 @@ let appendListItem = ( username, listname, value ) => {
 };
 
 // Remove item from a list or set on DB
-let removeListItem = ( username, listname, elemVal ) => {
+let removeListItem = ( userObj, listname, elemVal ) => {
     return new Promise( ( resolve, reject ) => {
+
+        let list = userObj[listname];
+
+        if( !list.includes( elemVal ) ){
+            reject( 'ElemNotFound' );
+        } else {
+
             let param = {
                 TableName: TABLE_NAME,
-                Key:{
+                Key: {
                     [PRIMARY_KEY]: {
-                        S: username
+                        S: userObj[ consts.PROF_KEYS.USERNAME ]
                     }
                 },
-                ExpressionAttributeNames:{
+                ExpressionAttributeNames: {
                     "#K": listname
                 },
-                ExpressionAttributeValues:{
-                    ":v": { SS: [elemVal.toString()] }
+                ExpressionAttributeValues: {
+                    ":v": { SS: [ elemVal.toString() ] }
                 },
                 UpdateExpression: "DELETE #K :v",
             };
@@ -373,7 +379,8 @@ let removeListItem = ( username, listname, elemVal ) => {
                 } else {
                     resolve( data );
                 }
-            });
+            } );
+        }
     });
 };
 
@@ -405,18 +412,70 @@ let removeUserItem = ( username, key ) => {
     });
 };
 
+// Add job to the job DB table
+let addJob = ( jobKey ) => {
+    return new Promise( ( resolve, reject ) => {
+        jobSearch.getJobByKey( jobKey ).then( job => {
+            let params = {
+                TableName: TABLE_NAME_JOBS,
+                Item: {
+                    [PRIM_KEY_JOBS]: {
+                        "S": jobKey
+                    },
+                    [PRIM_KEY_JOB_DETAILS]: {
+                        "S": JSON.stringify( job )
+                    }
+                },
+                ConditionExpression: "attribute_not_exists(" + PRIM_KEY_JOBS + ")"
+            };
+
+            ddb.putItem( params, ( err, data ) => {
+                if( err ) {
+                    reject( err );
+                } else {
+                    resolve( data );
+                }
+            });
+        });
+    });
+
+};
+
 // Get saved job from the DB
-// Job is null if it's not found on users profile
-let getSavedJob = ( userObj, jobKey ) => {
-    let job = null;
-    let list = userObj[consts.PROF_KEYS.PREFS_JOBS_SAVED];
-    if( list ) {
-        list.forEach( foundJob => {
-            if( foundJob[ "jobkey" ] === jobKey ) {
-                job = foundJob;
-            }
-        } );
-    }
+let getSavedJob = ( jobKey ) => {
+    return new Promise( ( resolve, reject ) =>{
+
+        if( jobKey ) {
+            let params = {
+                TableName: TABLE_NAME_JOBS,
+                ExpressionAttributeValues: {
+                    ":v1": {
+                        S: jobKey
+                    }
+                },
+                KeyConditionExpression: PRIM_KEY_JOBS + " = :v1",
+            };
+
+            ddb.query( params, ( err, data ) => {
+                if( err ) {
+                    reject( err );
+                } else if( data.Items[ 0 ] ) {
+                    if( data.Items.length > 1 ){
+                        reject( "MultipleJobsFound" );
+                    }
+                    let job = data.Items[ 0 ];
+                    resolve( job );
+                } else {
+                    // If it's not on the DB, try to add it.
+                    addJob(jobKey).then( data => {
+                        resolve( data );
+                    }).catch( err => reject( err ));
+                }
+            } );
+        } else {
+            reject( "MissingParams" )
+        }
+    });
 };
 
 // Check the time stamp for when the job was last updated, if stamp expired, update it.

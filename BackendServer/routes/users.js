@@ -71,6 +71,7 @@ router.get( '/profile',
  * @apiError UserNotFound User information is not in the database.
  * @apiError InvalidKey Invalid key given.
  * @apiError InvalidMode Invalid mode given.
+ * @apiError ElemNotFound Element not found in list.
  * @apiError MissingValue No value given.
  * @apiError ModeError Internal error.
  * @apiError TokenNotFound Bearer token not found in header.
@@ -125,7 +126,7 @@ router.post( '/modify',
  *          authorization: Bearer QZ3jhbfdof84GFBlSe
  *      }
  *
- * @apiParam {String} prefs Object to overwrite user preferences.
+ * @apiParam {Object} prefs Object to overwrite user preferences.
  * @apiParamExample {json} Request-Example:
  *      {
  *          "prefs": {
