@@ -88,8 +88,6 @@ router.post( '/login', ( req, res ) => {
  *          authorization: Bearer QZ3jhbfdof84GFBlSe
  *      }
  *
- * @apiParam {String} username
- *
  * @apiError TokenNotFound Bearer token not found in header.
  * @apiError TokenMismatch Bearer token does not match.
  * @apiError TokenExpired Bearer token is expired.
@@ -100,7 +98,7 @@ router.post( '/login', ( req, res ) => {
  *     }
  */
 router.post( '/logout', ( req, res ) => {
-        auth.revokeToken( req.body[consts.PROF_KEYS.USERNAME] ).then( ( data ) => {
+        auth.revokeToken( res.locals.user ).then( ( data ) => {
             res.send( data );
         }).catch( err => {
             res.send( response.errorMessage( err ) );

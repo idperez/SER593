@@ -15,9 +15,9 @@ let LOCATION_NAME_DELIMITERS = [
 ] ;
 const RADIUS = 20;  // Radius for the city job search in miles.
 
-exports.updateCityRatings = ( username ) => {
+exports.updateCityRatings = ( userObj ) => {
     return new Promise( ( resolve, reject ) => {
-        exports.getCityStats( username ).then( ( cityRatiosObj ) => {
+        exports.getCityStats( userObj ).then( ( cityRatiosObj ) => {
 
             let ratings = {};
 
@@ -57,7 +57,7 @@ exports.updateCityRatings = ( username ) => {
 
                 // Update users profile with the new ratings
                 DB_USERS.modifyUserItem(
-                    username,
+                    userObj,
                     consts.PROF_KEYS.CITY_MATCH,
                     ratingsStr,
                     consts.MODIFIY_PREFS_MODES.MODIFY
@@ -77,7 +77,7 @@ exports.updateCityRatings = ( username ) => {
     });
 };
 
-exports.getCityStats = ( username ) => {
+exports.getCityStats = ( userObj ) => {
     return new Promise( ( resolve, reject ) => {
 
         exports.grabCityPopulations().then( cities => {
@@ -88,7 +88,7 @@ exports.getCityStats = ( username ) => {
                 if( cities.hasOwnProperty( key ) ){
                     promises.push(
                         jobSearch.getJobsByCityState(
-                            username,
+                            userObj,
                             cities[key]["city"],
                             cities[key]["state"],
                             1,       // Just 1 job is needed since we only need job count
