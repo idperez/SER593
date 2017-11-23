@@ -41,11 +41,13 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "localhost:3000/search/jobs/companyinfo?companyname=viasat",
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/search/jobs/companyinfo?companyname=viasat",
 					"host": [
-						"localhost"
+						"topia-env-development",
+						"us-west-2",
+						"elasticbeanstalk",
+						"com"
 					],
-					"port": "3000",
 					"path": [
 						"search",
 						"jobs",
