@@ -45,6 +45,7 @@ exports.authorize = ( req, res, next ) => {
             if( !user[consts.PROF_KEYS.ACCESS_EXPR] || user[consts.PROF_KEYS.ACCESS_EXPR] <= Date.now() ) {
                 res.send( response.errorMessage( "TokenExpired" ) );
             } else {
+                res.locals.user = user;
                 next();
             }
         } else {
@@ -74,9 +75,9 @@ exports.register = ( username, password, email ) => {
     });
 };
 
-exports.revokeToken = ( username ) => {
+exports.revokeToken = ( userObj ) => {
     return new Promise( ( resolve, reject ) => {
-        users.modifyUserItem( username, consts.PROF_KEYS.ACCESS_EXPR, 0, consts.MODIFIY_PREFS_MODES.MODIFY ).then( data => {
+        users.modifyUserItem( userObj, consts.PROF_KEYS.ACCESS_EXPR, 0, consts.MODIFIY_PREFS_MODES.MODIFY ).then( data => {
             resolve( data );
         }).catch( err => {
             reject( err );

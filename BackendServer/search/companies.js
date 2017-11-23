@@ -1,7 +1,6 @@
 const keys = require( '../keys/apiKeys' );
 const request = require( 'request' );
 const qs = require( 'querystring' );
-const response = require( "../responses/responses" );
 const GLASSDOOR_ENDPOINT = "http://api.glassdoor.com/api/api.htm";
 
 exports.getCompanyInfo = ( companyName ) => {
