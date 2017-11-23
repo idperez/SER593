@@ -1,6 +1,6 @@
 {
 	"info": {
-		"name": "Topia Jenkins Tests",
+		"name": "TopiaTests",
 		"_postman_id": "f655eba4-8797-fc29-8e90-d768c8d43883",
 		"description": "API tests that Jenkins will run.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
