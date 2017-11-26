@@ -1,34 +1,35 @@
 import React, { Component } from 'react';
-import {
-    Image,
-    StyleSheet
-} from 'react-native';
+import { Container, Content, List, ListItem, Text, Separator } from 'native-base';
 
-import {
-    Body,
-    Button,
-    Card,
-    CardItem,
-    Container,
-    Content,
-    Footer,
-    Text
-} from 'native-base';
-
-import Header from '../../Headers/Header';
+import Header from './../../Headers/Header';
 
 export default class Other extends Component {
-
-    constructor(props) {
-        super(props);
-    }
 
     render() {
         return (
             <Container>
                 <Header/>
                 <Content>
-                    <Text>Other</Text>
+                    <ListItem last>
+                        <Text>Edit Profile</Text>
+                    </ListItem>
+                    <ListItem last>
+                        <Text>Notifications</Text>
+                    </ListItem>
+                    <Separator bordered/>
+                    <ListItem last>
+                        <Text>Help Center</Text>
+                    </ListItem>
+                    <ListItem last>
+                        <Text>Privacy Policy</Text>
+                    </ListItem>
+                    <ListItem last>
+                        <Text>Terms & Conditions</Text>
+                    </ListItem>
+                    <Separator bordered/>
+                    <ListItem last>
+                        <Text>Logout</Text>
+                    </ListItem>
                 </Content>
             </Container>
         );
