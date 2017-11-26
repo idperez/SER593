@@ -12,6 +12,7 @@ const PRIM_KEY_JOB_DETAILS = "job";
 const PRIMARY_KEY = consts.PROF_KEYS.USERNAME;
 const DEFAULT_UPDATE_TIME = 86400000; // Time to recheck saved jobs - 24 hours in ms
 const cityData = require( "../search/cityData" );
+const sanitizeHTML = require( "sanitize-html" );
 
 // Get user profile from database
 // Authorize should be the only caller
@@ -416,6 +417,10 @@ let removeUserItem = ( username, key ) => {
 let addJob = ( jobKey ) => {
     return new Promise( ( resolve, reject ) => {
         jobSearch.getJobByKey( jobKey ).then( job => {
+
+            // Sanitize any HTML tags in the job snippet before saving to the DB.
+            job.snippet = sanitizeHTML( job.snippet );
+
             let params = {
                 TableName: TABLE_NAME_JOBS,
                 Item: {
