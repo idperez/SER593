@@ -6,7 +6,7 @@ const port = process.env.PORT || 3000; // Grab port for AWS
 const auth = require( './routes/auth' );
 const test = require( './routes/test' );
 const jobs = require( './routes/jobs' );
-const profiles = require( './routes/profiles' );
+const profiles = require( './routes/users' );
 const authorize = require( './auth/passGrant' ).authorize;
 
 let app = express();

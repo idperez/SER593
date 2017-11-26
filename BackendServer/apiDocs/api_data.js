@@ -100,19 +100,6 @@ define({ "api": [
         }
       ]
     },
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "username",
-            "description": ""
-          }
-        ]
-      }
-    },
     "error": {
       "fields": {
         "Error 4xx": [
@@ -366,7 +353,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "String",
             "optional": false,
-            "field": "jobkey",
+            "field": "jobkeys",
             "description": "<p>Indeed job key</p>"
           }
         ]
@@ -388,7 +375,7 @@ define({ "api": [
             "group": "Error 4xx",
             "optional": false,
             "field": "NoJobsKeysFound",
-            "description": "<p>jobkey not found in query.</p>"
+            "description": "<p>jobkeys not found in query.</p>"
           },
           {
             "group": "Error 4xx",
@@ -458,13 +445,6 @@ define({ "api": [
     "parameter": {
       "fields": {
         "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "username",
-            "description": "<p>User profile to get job information from.</p>"
-          },
           {
             "group": "Parameter",
             "type": "String",
@@ -598,13 +578,6 @@ define({ "api": [
             "group": "Parameter",
             "type": "String",
             "optional": false,
-            "field": "username",
-            "description": "<p>User profile to get job information from.</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
             "field": "city",
             "description": "<p>City to search.</p>"
           },
@@ -728,13 +701,6 @@ define({ "api": [
             "group": "Parameter",
             "type": "String",
             "optional": false,
-            "field": "username",
-            "description": "<p>User profile to get job information from.</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
             "field": "zip",
             "description": "<p>Zip code.</p>"
           },
@@ -851,13 +817,6 @@ define({ "api": [
             "group": "Parameter",
             "type": "String",
             "optional": false,
-            "field": "username",
-            "description": "<p>Users login username.</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
             "field": "key",
             "description": "<p>Key to add to users job preferences.</p>"
           },
@@ -880,7 +839,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Request-Example:",
-          "content": "{\n  \"username\": \"bob\",\n  \"key\": \"prefs_jobs_types\",\n  \"value\": \"fulltime\",\n  \"mode\": \"listappend\"\n}",
+          "content": "{\n  \"key\": \"prefs_jobs_types\",\n  \"value\": \"fulltime\",\n  \"mode\": \"listappend\"\n}",
           "type": "json"
         }
       ]
@@ -905,6 +864,12 @@ define({ "api": [
             "optional": false,
             "field": "InvalidMode",
             "description": "<p>Invalid mode given.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ElemNotFound",
+            "description": "<p>Element not found in list.</p>"
           },
           {
             "group": "Error 4xx",
@@ -947,7 +912,7 @@ define({ "api": [
       ]
     },
     "version": "0.0.0",
-    "filename": "./routes/profiles.js",
+    "filename": "./routes/users.js",
     "groupTitle": "Users"
   },
   {
@@ -956,7 +921,7 @@ define({ "api": [
     "title": "Modify Multiple",
     "name": "ModifyMultiple",
     "group": "Users",
-    "description": "<p>Modify multiple preferences on users profile.</p> <p>This allows passing in an object containing some keys from a users profile. All keys within the object will overwrite the matching profile key on the database.</p> <p>To remove a key from the database, include it in the object and set it's value to null.</p> <p>NOTE: Entire arrays must be included with this method, as whatever is on the database will be overwritten. See /modify to append or remove from an array value.</p>",
+    "description": "<p>Modify multiple preferences on users profile.</p> <p>This allows passing in an object containing some keys from a users profile. All keys within the object will overwrite the matching profile key on the database.</p> <p>To remove a key from the database, include it in the object and set it's value to null.</p> <p>NOTE: Entire arrays must be included with this method, as whatever is on the database will be overwritten. See /modify to append or remove from an array value.</p> <p>NOTE: Any timely profile updates will be updated at this point, since there was a profile change.</p>",
     "header": {
       "fields": {
         "Header": [
@@ -982,14 +947,7 @@ define({ "api": [
         "Parameter": [
           {
             "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "username",
-            "description": "<p>Users login username.</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
+            "type": "Object",
             "optional": false,
             "field": "prefs",
             "description": "<p>Object to overwrite user preferences.</p>"
@@ -999,7 +957,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Request-Example:",
-          "content": "{\n    \"username\": \"dev\",\n    \"prefs\": {\n       \"prefs_jobs_titles\": [\"Software Engineer\", \"Developer\", \"Java\"],\n        \"prefs_jobs_postedDate\": 60\n    }\n}",
+          "content": "{\n    \"prefs\": {\n       \"prefs_jobs_titles\": [\"Software Engineer\", \"Developer\", \"Java\"],\n        \"prefs_jobs_postedDate\": 60\n    }\n}",
           "type": "json"
         }
       ]
@@ -1066,7 +1024,7 @@ define({ "api": [
       ]
     },
     "version": "0.0.0",
-    "filename": "./routes/profiles.js",
+    "filename": "./routes/users.js",
     "groupTitle": "Users"
   },
   {
@@ -1096,19 +1054,6 @@ define({ "api": [
         }
       ]
     },
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "username",
-            "description": "<p>Users login username.</p>"
-          }
-        ]
-      }
-    },
     "error": {
       "fields": {
         "Error 4xx": [
@@ -1147,7 +1092,7 @@ define({ "api": [
       ]
     },
     "version": "0.0.0",
-    "filename": "./routes/profiles.js",
+    "filename": "./routes/users.js",
     "groupTitle": "Users"
   },
   {
@@ -1180,13 +1125,6 @@ define({ "api": [
     "parameter": {
       "fields": {
         "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "username",
-            "description": "<p>Users login username.</p>"
-          },
           {
             "group": "Parameter",
             "type": "String",
@@ -1235,7 +1173,7 @@ define({ "api": [
       ]
     },
     "version": "0.0.0",
-    "filename": "./routes/profiles.js",
+    "filename": "./routes/users.js",
     "groupTitle": "Users"
   },
   {
@@ -1268,13 +1206,6 @@ define({ "api": [
     "parameter": {
       "fields": {
         "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "username",
-            "description": "<p>Users login username.</p>"
-          },
           {
             "group": "Parameter",
             "type": "String",
@@ -1335,7 +1266,7 @@ define({ "api": [
       ]
     },
     "version": "0.0.0",
-    "filename": "./routes/profiles.js",
+    "filename": "./routes/users.js",
     "groupTitle": "Users"
   },
   {
@@ -1364,19 +1295,6 @@ define({ "api": [
           "type": "json"
         }
       ]
-    },
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "username",
-            "description": "<p>Users login username.</p>"
-          }
-        ]
-      }
     },
     "error": {
       "fields": {
@@ -1434,7 +1352,7 @@ define({ "api": [
       ]
     },
     "version": "0.0.0",
-    "filename": "./routes/profiles.js",
+    "filename": "./routes/users.js",
     "groupTitle": "Users"
   },
   {

@@ -18,8 +18,6 @@ const cityData = require( "../search/cityData" );
  *          authorization: Bearer QZ3jhbfdof84GFBlSe
  *      }
  *
- * @apiParam {String} username Users login username.
- *
  * @apiError UserNotFound User information is not in the database.
  * @apiError TokenNotFound Bearer token not found in header.
  * @apiError TokenMismatch Bearer token does not match.
@@ -34,13 +32,7 @@ const cityData = require( "../search/cityData" );
  */
 router.get( '/profile',
     ( req, res ) => {
-        DB_PROFILES.getUserProfile(
-            req.query[consts.PROF_KEYS.USERNAME]
-        ).then( profile => {
-            res.send( profile );
-        }).catch( err => {
-            res.send( response.errorMessage( err ) );
-        });
+        res.send( res.locals.user );
     }
 );
 
@@ -66,13 +58,11 @@ router.get( '/profile',
  *          authorization: Bearer QZ3jhbfdof84GFBlSe
  *      }
  *
- * @apiParam {String} username Users login username.
  * @apiParam {String} key Key to add to users job preferences.
  * @apiParam {String} value Value to assign to the key. (Required for modes: modify, listappend, listremove)
  * @apiParam {String} mode Specify what operation to run. Options: modify, remove, listappend, listremove
  * @apiParamExample {json} Request-Example:
  *     {
- *       "username": "bob",
  *       "key": "prefs_jobs_types",
  *       "value": "fulltime",
  *       "mode": "listappend"
@@ -81,6 +71,7 @@ router.get( '/profile',
  * @apiError UserNotFound User information is not in the database.
  * @apiError InvalidKey Invalid key given.
  * @apiError InvalidMode Invalid mode given.
+ * @apiError ElemNotFound Element not found in list.
  * @apiError MissingValue No value given.
  * @apiError ModeError Internal error.
  * @apiError TokenNotFound Bearer token not found in header.
@@ -101,7 +92,7 @@ router.post( '/modify',
             val = JSON.parse( val );
         } catch ( err ){} // No error handling needed for this event.
         DB_PROFILES.modifyUserItem(
-            req.body[consts.PROF_KEYS.USERNAME],
+            res.locals.user,
             req.body.key,
             val,
             req.body.mode
@@ -135,11 +126,9 @@ router.post( '/modify',
  *          authorization: Bearer QZ3jhbfdof84GFBlSe
  *      }
  *
- * @apiParam {String} username Users login username.
- * @apiParam {String} prefs Object to overwrite user preferences.
+ * @apiParam {Object} prefs Object to overwrite user preferences.
  * @apiParamExample {json} Request-Example:
  *      {
- *          "username": "dev",
  *          "prefs": {
   *             "prefs_jobs_titles": ["Software Engineer", "Developer", "Java"],
  *              "prefs_jobs_postedDate": 60
@@ -169,7 +158,7 @@ router.post( '/modifymulti',
             val = JSON.parse( val );
         } catch ( err ){} // No error handling needed for this event.
         DB_PROFILES.modifyUserPreferences(
-            req.body[consts.PROF_KEYS.USERNAME],
+            res.locals.user,
             req.body.prefs
         ).then( profile => {
             res.send( profile );
@@ -191,7 +180,6 @@ router.post( '/modifymulti',
  *          authorization: Bearer QZ3jhbfdof84GFBlSe
  *      }
  *
- * @apiParam {String} username Users login username.
  * @apiParam {String} jobkey Indeed job key.
  *
  * @apiError JobAlreadySaved Job is already saved on the users profile.
@@ -211,7 +199,7 @@ router.post( '/modifymulti',
 router.post( '/savejob',
     ( req, res ) => {
 
-        DB_PROFILES.addSavedJob( req.body.username, req.body.jobkey ).then( success => {
+        DB_PROFILES.addSavedJob( res.locals.user, req.body.jobkey ).then( success => {
            res.send( success );
         }).catch( err => {
            res.send( response.errorMessage( err ) );
@@ -231,7 +219,6 @@ router.post( '/savejob',
  *          authorization: Bearer QZ3jhbfdof84GFBlSe
  *      }
  *
- * @apiParam {String} username Users login username.
  * @apiParam {String} jobkey Indeed job key.
  *
  * @apiError SavedJobNotFound Job is not saved on users profile.
@@ -248,8 +235,7 @@ router.post( '/savejob',
  */
 router.post( '/removejob',
     ( req, res ) => {
-
-        DB_PROFILES.removeSavedJob( req.body.username, req.body.jobkey ).then( success => {
+        DB_PROFILES.removeSavedJob( res.locals.user, req.body.jobkey ).then( success => {
             res.send( success );
         }).catch( err => {
             res.send( response.errorMessage( err ) );
@@ -269,8 +255,6 @@ router.post( '/removejob',
  *          authorization: Bearer QZ3jhbfdof84GFBlSe
  *      }
  *
- * @apiParam {String} username Users login username.
- *
  * @apiError TokenNotFound Bearer token not found in header.
  * @apiError TokenMismatch Bearer token does not match.
  * @apiError TokenExpired Bearer token is expired.
@@ -289,7 +273,7 @@ router.post( '/removejob',
 router.post( '/updateratings',
     ( req, res ) => {
 
-        cityData.updateCityRatings( req.body.username ).then( success => {
+        cityData.updateCityRatings( res.locals.user ).then( success => {
             res.send( success );
         }).catch( err => {
             res.send( response.errorMessage( err ) );

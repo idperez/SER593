@@ -6,11 +6,15 @@ const util = require( "../util" );
 const jobSearch = require( "../search/jobs" );
 const INDEX_SUFFIX = "-index";
 const TABLE_NAME = 'topia_profiles';
+const TABLE_NAME_JOBS = 'jobs';
+const PRIM_KEY_JOBS = "jobkey";
+const PRIM_KEY_JOB_DETAILS = "job";
 const PRIMARY_KEY = consts.PROF_KEYS.USERNAME;
 const DEFAULT_UPDATE_TIME = 86400000; // Time to recheck saved jobs - 24 hours in ms
 const cityData = require( "../search/cityData" );
 
 // Get user profile from database
+// Authorize should be the only caller
 exports.getUserProfile = ( username ) => {
     return exports.getUserProfileByPrimaryKey( PRIMARY_KEY, username );
 };
@@ -141,12 +145,13 @@ exports.addNewUser = ( username, password, email ) => {
 };
 
 // Modify an existing user profile key
-exports.modifyUserItem = ( username, key, value, mode ) => {
+exports.modifyUserItem = ( userObj, key, value, mode ) => {
     let promise;
 
     // Check parameters
     // Key
-    if( !key || !util.objectContains( consts.PROF_KEYS, key ) ) {
+    console.log(key + "hello");
+    if( !key ) {
         promise = Promise.reject( 'InvalidKey' );
     // Mode
     } else if ( !mode || !util.objectContains( consts.MODIFIY_PREFS_MODES, mode ) ) {
@@ -158,16 +163,16 @@ exports.modifyUserItem = ( username, key, value, mode ) => {
 
         switch( mode ){
             case consts.MODIFIY_PREFS_MODES.MODIFY:
-                promise = addUserItem( username, key, value );
+                promise = addUserItem( userObj[consts.PROF_KEYS.USERNAME], key, value );
                 break;
             case consts.MODIFIY_PREFS_MODES.REMOVE:
-                promise = removeUserItem( username, key );
+                promise = removeUserItem( userObj[consts.PROF_KEYS.USERNAME], key );
                 break;
             case consts.MODIFIY_PREFS_MODES.LIST_APPEND:
-                promise = appendListItem( username, key, value );
+                promise = appendListItem( userObj[consts.PROF_KEYS.USERNAME], key, value );
                 break;
             case consts.MODIFIY_PREFS_MODES.LIST_REMOVE:
-                promise = removeListItem( username, key, value );
+                promise = removeListItem( userObj, key, value );
                 break;
             default:
                 promise = Promise.reject( 'ModeError' );
@@ -179,7 +184,7 @@ exports.modifyUserItem = ( username, key, value, mode ) => {
 
 // Allows modifying entire user preferences based on a passed in preference object
 // Any keys that match will be updated, if a value is null, that key will be removed from the DB
-exports.modifyUserPreferences = ( username, prefObj ) => {
+exports.modifyUserPreferences = ( userObj, prefObj ) => {
     return new Promise( ( resolve, reject ) => {
 
         let promises = [];
@@ -196,7 +201,7 @@ exports.modifyUserPreferences = ( username, prefObj ) => {
 
                 promises.push(
                     exports.modifyUserItem(
-                        username,
+                        userObj,
                         key,
                         prefObj[ key ],
                         mode
@@ -207,66 +212,55 @@ exports.modifyUserPreferences = ( username, prefObj ) => {
 
         Promise.all( promises ).then( changes => {
             resolve( changes[changes.length - 1] ); // resolve the last change
-            updatesOnProfileChange( username );
+            updatesOnProfileChange( userObj );
         }).catch( err => reject( err ) );
     });
 };
 
-exports.addSavedJob = ( username, jobKey ) => {
+exports.addSavedJob = ( userObj, jobKey ) => {
     return new Promise( ( resolve, reject ) => {
-       getSavedJob( username, jobKey ).then( job => {
-           if( job !== null ){
-               reject( 'JobAlreadySaved' )
-           } else {
-               // Hit indeed for job info
-               jobSearch.getJobByKey( jobKey ).then( job => {
-                   // Save the job
-                   if( !job ){
-                       reject( 'JobNotFound' )
-                   } else {
-                       let jobObj = job;
-                       // Set the timestamp for when it was last accessed.
-                       jobObj[consts.JOB_PROPS.LAST_CHECKED] = Date.now();
-
-                       appendListItem(
-                           username,
-                           consts.PROF_KEYS.PREFS_JOBS_SAVED,
-                           JSON.stringify( jobObj )
-                       ).then( data => {
-                           resolve( data );
-                       }).catch( err => {
-                           reject( err );
-                       });
-                   }
+       if( userObj[consts.PROF_KEYS.PREFS_JOBS_SAVED].includes( jobKey ) ){
+           reject( 'JobAlreadySaved' );
+       } else {
+           // Hit indeed for job info
+           getSavedJob( jobKey ).then( job => {
+               // We're not really concerned with the return value,
+               // as long as it's resolved we know everything is okay.
+               appendListItem(
+                   userObj[consts.PROF_KEYS.USERNAME],
+                   consts.PROF_KEYS.PREFS_JOBS_SAVED,
+                   jobKey
+               ).then( data => {
+                   resolve( data );
                }).catch( err => {
                    reject( err );
                });
-           }
-        }).catch( err => {
-            reject( err );
-        });
+           }).catch( err => {
+               reject( err );
+           });
+       }
     });
 };
 
-exports.removeSavedJob = ( username, jobKey ) => {
+exports.removeSavedJob = ( userObj, jobKey ) => {
     return new Promise( ( resolve, reject ) => {
-        getSavedJob( username, jobKey ).then( job => {
-            if( job === null ){
-                reject( 'SavedJobNotFound' );
-            } else {
+        if( !userObj[consts.PROF_KEYS.PREFS_JOBS_SAVED].includes( jobKey ) ){
+            reject( 'SavedJobNotFound' );
+        } else {
+            try{
                 removeListItem(
-                    username,
+                    userObj,
                     consts.PROF_KEYS.PREFS_JOBS_SAVED,
-                    JSON.stringify( job )
+                    jobKey
                 ).then( data => {
                     resolve( data );
                 }).catch( err => {
                     reject( err );
                 });
+            } catch( err ){
+                reject( "ErrorStringifyJSON" );
             }
-        }).catch( err => {
-            reject( err )
-        });
+        }
     });
 };
 
@@ -355,20 +349,27 @@ let appendListItem = ( username, listname, value ) => {
 };
 
 // Remove item from a list or set on DB
-let removeListItem = ( username, listname, elemVal ) => {
+let removeListItem = ( userObj, listname, elemVal ) => {
     return new Promise( ( resolve, reject ) => {
+
+        let list = userObj[listname];
+
+        if( !list.includes( elemVal ) ){
+            reject( 'ElemNotFound' );
+        } else {
+
             let param = {
                 TableName: TABLE_NAME,
-                Key:{
+                Key: {
                     [PRIMARY_KEY]: {
-                        S: username
+                        S: userObj[ consts.PROF_KEYS.USERNAME ]
                     }
                 },
-                ExpressionAttributeNames:{
+                ExpressionAttributeNames: {
                     "#K": listname
                 },
-                ExpressionAttributeValues:{
-                    ":v": { SS: [elemVal.toString()] }
+                ExpressionAttributeValues: {
+                    ":v": { SS: [ elemVal.toString() ] }
                 },
                 UpdateExpression: "DELETE #K :v",
             };
@@ -378,7 +379,8 @@ let removeListItem = ( username, listname, elemVal ) => {
                 } else {
                     resolve( data );
                 }
-            });
+            } );
+        }
     });
 };
 
@@ -410,24 +412,69 @@ let removeUserItem = ( username, key ) => {
     });
 };
 
-// Get saved job from the DB
-// Job is null if it's not found on users profile
-let getSavedJob = ( username, jobKey ) => {
+// Add job to the job DB table
+let addJob = ( jobKey ) => {
     return new Promise( ( resolve, reject ) => {
-        exports.getUserProfile( username ).then( profile => {
-            let job = null;
-            let list = profile[consts.PROF_KEYS.PREFS_JOBS_SAVED];
-            if( list ) {
-                list.forEach( foundJob => {
-                    if( foundJob[ "jobkey" ] === jobKey ) {
-                        job = foundJob;
+        jobSearch.getJobByKey( jobKey ).then( job => {
+            let params = {
+                TableName: TABLE_NAME_JOBS,
+                Item: {
+                    [PRIM_KEY_JOBS]: {
+                        "S": jobKey
+                    },
+                    [PRIM_KEY_JOB_DETAILS]: {
+                        "S": JSON.stringify( job )
                     }
-                } );
-            }
-            resolve( job );
-        }).catch( err => {
-            reject( err );
+                },
+                ConditionExpression: "attribute_not_exists(" + PRIM_KEY_JOBS + ")"
+            };
+
+            ddb.putItem( params, ( err, data ) => {
+                if( err ) {
+                    reject( err );
+                } else {
+                    resolve( data );
+                }
+            });
         });
+    });
+
+};
+
+// Get saved job from the DB
+let getSavedJob = ( jobKey ) => {
+    return new Promise( ( resolve, reject ) =>{
+
+        if( jobKey ) {
+            let params = {
+                TableName: TABLE_NAME_JOBS,
+                ExpressionAttributeValues: {
+                    ":v1": {
+                        S: jobKey
+                    }
+                },
+                KeyConditionExpression: PRIM_KEY_JOBS + " = :v1",
+            };
+
+            ddb.query( params, ( err, data ) => {
+                if( err ) {
+                    reject( err );
+                } else if( data.Items[ 0 ] ) {
+                    if( data.Items.length > 1 ){
+                        reject( "MultipleJobsFound" );
+                    }
+                    let job = data.Items[ 0 ];
+                    resolve( job );
+                } else {
+                    // If it's not on the DB, try to add it.
+                    addJob(jobKey).then( data => {
+                        resolve( data );
+                    }).catch( err => reject( err ));
+                }
+            } );
+        } else {
+            reject( "MissingParams" )
+        }
     });
 };
 
@@ -477,19 +524,19 @@ let checkAndUpdateSavedJobs = ( username, savedJobs ) => {
     }
 };
 
-let timelyUpdates = ( profileObj, timeGap ) => {
-    let lastUpdated = profileObj[consts.PROF_KEYS.LAST_UPDATED];
+let timelyUpdates = ( userObj, timeGap ) => {
+    let lastUpdated = userObj[consts.PROF_KEYS.LAST_UPDATED];
     let currentTime = Date.now();
 
     if( !lastUpdated || ( lastUpdated + timeGap ) <= currentTime ){
-        let username = profileObj[consts.PROF_KEYS.USERNAME];
+        let username = userObj[consts.PROF_KEYS.USERNAME];
 
         // START UPDATES
 
         // City ratings
-        updateCityRatings( username );
+        updateCityRatings( userObj );
         // Saved jobs
-        checkAndUpdateSavedJobs( username, profileObj[consts.PROF_KEYS.PREFS_JOBS_SAVED] );
+        checkAndUpdateSavedJobs( username, userObj[consts.PROF_KEYS.PREFS_JOBS_SAVED] );
 
         // END UPDATES
 
@@ -508,14 +555,15 @@ let timelyUpdates = ( profileObj, timeGap ) => {
 };
 
 // Any updates that need to happen on a profile/preference change go here.
-let updatesOnProfileChange = ( username ) => {
-    updateCityRatings( username );
+let updatesOnProfileChange = ( userObj ) => {
+    updateCityRatings( userObj );
 };
 
 // Update users city ratings
-let updateCityRatings = ( username ) => {
+let updateCityRatings = ( userObj ) => {
     // Update city ratings
-    cityData.updateCityRatings( username ).then( data => {
+    let username = userObj[consts.PROF_KEYS.USERNAME];
+    cityData.updateCityRatings( userObj ).then( data => {
         console.log( "Updating " + username + " city ratings successful." );
     }).catch( err => {
         console.log( "Error updating " + username + " city ratings: " + err );

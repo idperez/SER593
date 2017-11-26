@@ -1,0 +1,1574 @@
+{
+	"info": {
+		"name": "TopiaTests",
+		"_postman_id": "f655eba4-8797-fc29-8e90-d768c8d43883",
+		"description": "API tests that Jenkins will run.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Profile",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"let schema = {",
+							"    type: \"object\",",
+							"    properties: {",
+							"        username: { type: \"string\" },",
+							"        prefs_jobs_postedDate: { type: \"number\" },",
+							"        last_updated: { type: \"number\" },",
+							"        prefs_jobs_titles: { type: \"array\" },",
+							"        cityMatch: { type: \"object\" },",
+							"        prefs_jobs_saved: { type: \"array\" },",
+							"        prefs_jobs_types: { type: \"array\" },",
+							"",
+							"    },",
+							"    required: [\"username\"]",
+							"};",
+							"",
+							"pm.test('Schema is valid', function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+							"});",
+							"",
+							"pm.test(\"Correct profile returned\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.username).to.eql(\"dev\");",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Set profile to env variables for later testing",
+							"pm.environment.set(\"prefs_jobs_postedDate\", pm.response.json()[\"prefs_jobs_postedDate\"]);",
+							"pm.environment.set(\"email\", pm.response.json()[\"email\"]);",
+							"pm.environment.set(\"last_updated\", pm.response.json()[\"last_updated\"]);"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "topiadev",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/profile",
+					"host": [
+						"topia-env-development",
+						"us-west-2",
+						"elasticbeanstalk",
+						"com"
+					],
+					"path": [
+						"users",
+						"profile"
+					]
+				},
+				"description": "Get profile test\n\nNOTE: This also sets some env variables for the remaining PM tests to use. MUST be run first."
+			},
+			"response": []
+		},
+		{
+			"name": "CompanyInformation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"let schema = {",
+							"    type: \"object\",",
+							"    properties: {",
+							"        \"id\": { type: \"number\" },",
+							"        \"name\": { type: \"string\" },",
+							"        \"website\": { type: \"string\" },",
+							"        \"isEEP\": { type: \"boolean\" },",
+							"        \"exactMatch\": { type: \"boolean\" },",
+							"        \"industry\": { type: \"string\" },",
+							"        \"numberOfRatings\": { type: \"number\" },",
+							"        \"squareLogo\": { type: \"string\" },",
+							"        \"overallRating\": { type: \"string\" },",
+							"        \"ratingDescription\": { type: \"string\" },",
+							"        \"cultureAndValuesRating\": { type: \"string\" },",
+							"        \"seniorLeadershipRating\": { type: \"string\" },",
+							"        \"compensationAndBenefitsRating\": { type: \"string\" },",
+							"        \"careerOpportunitiesRating\": { type: \"string\" },",
+							"        \"workLifeBalanceRating\": { type: \"string\" },",
+							"        \"recommendToFriendRating\": { type: \"number\" },",
+							"        \"sectorId\": { type: \"number\" },",
+							"        \"sectorName\": { type: \"string\" },",
+							"        \"industryId\": { type: \"number\" },",
+							"        \"industryName\": { type: \"string\" },",
+							"        \"ceo\": {",
+							"            type: \"object\",",
+							"            properties: {",
+							"                \"name\": { type: \"string\" },",
+							"                \"title\": { type: \"string\" },",
+							"                \"numberOfRatings\": { type: \"number\" },",
+							"                \"pctApprove\": { type: \"number\" },",
+							"                \"pctDisapprove\": { type: \"number\" },",
+							"                \"image\": {",
+							"                    type: \"object\",",
+							"                    properties: {",
+							"                        \"src\": { type: \"string\" },",
+							"                        \"height\": { type: \"number\" },",
+							"                        \"width\": { type: \"number\" }",
+							"                    },",
+							"                    \"additionalProperties\": false,",
+							"                    \"minProperties\": 3",
+							"                }",
+							"            },",
+							"            \"additionalProperties\": false,",
+							"            \"minProperties\": 6",
+							"        }",
+							"    },",
+							"    \"additionalProperties\": false,",
+							"    \"minProperties\": 21",
+							"};",
+							"",
+							"pm.test('Schema is valid', function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+							"});",
+							"",
+							"pm.test(\"Correct company returned\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.name).to.eql(\"ViaSat\");",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "topiadev",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/search/jobs/companyinfo?companyname=viasat",
+					"host": [
+						"topia-env-development",
+						"us-west-2",
+						"elasticbeanstalk",
+						"com"
+					],
+					"path": [
+						"search",
+						"jobs",
+						"companyinfo"
+					],
+					"query": [
+						{
+							"key": "companyname",
+							"value": "viasat",
+							"equals": true
+						}
+					]
+				},
+				"description": "/search/jobs/companyinfo endpoint"
+			},
+			"response": []
+		},
+		{
+			"name": "JobByKey",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"let schema = {",
+							"    type: \"object\",",
+							"    properties: {",
+							"        \"jobtitle\": { type:\"string\" },",
+							"        \"company\": { type:\"string\" },",
+							"        \"city\": { type:\"string\" },",
+							"        \"state\": { type:\"string\" },",
+							"        \"country\": { type:\"string\" },",
+							"        \"language\": { type:\"string\" },",
+							"        \"formattedLocation\": { type:\"string\" },",
+							"        \"source\": { type:\"string\" },",
+							"        \"date\": { type:\"string\" },",
+							"        \"snippet\": { type:\"string\" },",
+							"        \"url\": { type:\"string\" },",
+							"        \"onmousedown\": { type:\"string\" },",
+							"        \"latitude\": { type:\"number\" },",
+							"        \"longitude\": { type:\"number\" },",
+							"        \"jobkey\": { type:\"string\" },",
+							"        \"sponsored\":{ type:\"boolean\" },",
+							"        \"expired\": { type:\"boolean\" },",
+							"        \"indeedApply\": { type:\"boolean\" },",
+							"        \"formattedLocationFull\": { type:\"string\" },",
+							"        \"formattedRelativeTime\": { type:\"string\" },",
+							"        \"stations\": { type:\"string\" },",
+							"        \"recommendations\": { type:\"array\" },",
+							"    },",
+							"    \"additionalProperties\": false,",
+							"    \"minProperties\": 22",
+							"};",
+							"",
+							"pm.test('Schema is valid', function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+							"});",
+							"",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Correct job returned\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.jobkey).to.eql(\"455ba8b70208e25b\");",
+							"});",
+							"",
+							"pm.test(\"Correct job information returned\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.company).to.eql(\"ARM\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "topiadev",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/search/jobs/bykey?jobkeys=455ba8b70208e25b",
+					"host": [
+						"topia-env-development",
+						"us-west-2",
+						"elasticbeanstalk",
+						"com"
+					],
+					"path": [
+						"search",
+						"jobs",
+						"bykey"
+					],
+					"query": [
+						{
+							"key": "jobkeys",
+							"value": "455ba8b70208e25b",
+							"equals": true
+						}
+					]
+				},
+				"description": "This may fail if a job has been expired for long enough."
+			},
+			"response": []
+		},
+		{
+			"name": "JobsByCoordinates",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"let schema = {",
+							"    type: \"array\",",
+							"};",
+							"",
+							"let schemaElem = {",
+							"    type: \"object\",",
+							"    properties: {",
+							"        \"jobtitle\": { type:\"string\" },",
+							"        \"company\": { type:\"string\" },",
+							"        \"city\": { type:\"string\" },",
+							"        \"state\": { type:\"string\" },",
+							"        \"country\": { type:\"string\" },",
+							"        \"language\": { type:\"string\" },",
+							"        \"formattedLocation\": { type:\"string\" },",
+							"        \"source\": { type:\"string\" },",
+							"        \"date\": { type:\"string\" },",
+							"        \"snippet\": { type:\"string\" },",
+							"        \"url\": { type:\"string\" },",
+							"        \"onmousedown\": { type:\"string\" },",
+							"        \"latitude\": { type:\"number\" },",
+							"        \"longitude\": { type:\"number\" },",
+							"        \"jobkey\": { type:\"string\" },",
+							"        \"sponsored\":{ type:\"boolean\" },",
+							"        \"expired\": { type:\"boolean\" },",
+							"        \"indeedApply\": { type:\"boolean\" },",
+							"        \"formattedLocationFull\": { type:\"string\" },",
+							"        \"formattedRelativeTime\": { type:\"string\" },",
+							"        \"stations\": { type:\"string\" },",
+							"    },",
+							"    \"minProperties\": 21",
+							"};",
+							"",
+							"pm.test('Element schema is valid', function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(tv4.validate(jsonData[0], schemaElem)).to.be.true;",
+							"});",
+							"",
+							"pm.test('Schema is valid', function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+							"});",
+							"",
+							"pm.test('Array not empty', function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.length > 0).to.be.true;",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "topiadev",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/search/jobs/coords?lat=40.766538&long=-73.977849&limit=100&radius=2",
+					"host": [
+						"topia-env-development",
+						"us-west-2",
+						"elasticbeanstalk",
+						"com"
+					],
+					"path": [
+						"search",
+						"jobs",
+						"coords"
+					],
+					"query": [
+						{
+							"key": "lat",
+							"value": "40.766538",
+							"equals": true
+						},
+						{
+							"key": "long",
+							"value": "-73.977849",
+							"equals": true
+						},
+						{
+							"key": "limit",
+							"value": "100",
+							"equals": true
+						},
+						{
+							"key": "radius",
+							"value": "2",
+							"equals": true
+						}
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "JobsByZip",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"let schema = {",
+							"    type: \"array\",",
+							"};",
+							"",
+							"let schemaElem = {",
+							"    type: \"object\",",
+							"    properties: {",
+							"        \"jobtitle\": { type:\"string\" },",
+							"        \"company\": { type:\"string\" },",
+							"        \"city\": { type:\"string\" },",
+							"        \"state\": { type:\"string\" },",
+							"        \"country\": { type:\"string\" },",
+							"        \"language\": { type:\"string\" },",
+							"        \"formattedLocation\": { type:\"string\" },",
+							"        \"source\": { type:\"string\" },",
+							"        \"date\": { type:\"string\" },",
+							"        \"snippet\": { type:\"string\" },",
+							"        \"url\": { type:\"string\" },",
+							"        \"onmousedown\": { type:\"string\" },",
+							"        \"latitude\": { type:\"number\" },",
+							"        \"longitude\": { type:\"number\" },",
+							"        \"jobkey\": { type:\"string\" },",
+							"        \"sponsored\":{ type:\"boolean\" },",
+							"        \"expired\": { type:\"boolean\" },",
+							"        \"indeedApply\": { type:\"boolean\" },",
+							"        \"formattedLocationFull\": { type:\"string\" },",
+							"        \"formattedRelativeTime\": { type:\"string\" },",
+							"        \"stations\": { type:\"string\" },",
+							"    },",
+							"    \"minProperties\": 21",
+							"};",
+							"",
+							"pm.test('Element schema is valid', function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(tv4.validate(jsonData[0], schemaElem)).to.be.true;",
+							"});",
+							"",
+							"pm.test('Schema is valid', function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+							"});",
+							"",
+							"pm.test('Array not empty', function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.length > 0).to.be.true;",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "topiadev",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/search/jobs/zip?zip=85212&limit=200&radius=21",
+					"host": [
+						"topia-env-development",
+						"us-west-2",
+						"elasticbeanstalk",
+						"com"
+					],
+					"path": [
+						"search",
+						"jobs",
+						"zip"
+					],
+					"query": [
+						{
+							"key": "zip",
+							"value": "85212",
+							"equals": true
+						},
+						{
+							"key": "limit",
+							"value": "200",
+							"equals": true
+						},
+						{
+							"key": "radius",
+							"value": "21",
+							"equals": true
+						}
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "JobsByLocation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"let schema = {",
+							"    type: \"array\",",
+							"};",
+							"",
+							"let schemaElem = {",
+							"    type: \"object\",",
+							"    properties: {",
+							"        \"jobtitle\": { type:\"string\" },",
+							"        \"company\": { type:\"string\" },",
+							"        \"city\": { type:\"string\" },",
+							"        \"state\": { type:\"string\" },",
+							"        \"country\": { type:\"string\" },",
+							"        \"language\": { type:\"string\" },",
+							"        \"formattedLocation\": { type:\"string\" },",
+							"        \"source\": { type:\"string\" },",
+							"        \"date\": { type:\"string\" },",
+							"        \"snippet\": { type:\"string\" },",
+							"        \"url\": { type:\"string\" },",
+							"        \"onmousedown\": { type:\"string\" },",
+							"        \"latitude\": { type:\"number\" },",
+							"        \"longitude\": { type:\"number\" },",
+							"        \"jobkey\": { type:\"string\" },",
+							"        \"sponsored\":{ type:\"boolean\" },",
+							"        \"expired\": { type:\"boolean\" },",
+							"        \"indeedApply\": { type:\"boolean\" },",
+							"        \"formattedLocationFull\": { type:\"string\" },",
+							"        \"formattedRelativeTime\": { type:\"string\" },",
+							"        \"stations\": { type:\"string\" },",
+							"    },",
+							"    \"minProperties\": 21",
+							"};",
+							"",
+							"pm.test('Element schema is valid', function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(tv4.validate(jsonData[0], schemaElem)).to.be.true;",
+							"});",
+							"",
+							"pm.test('Schema is valid', function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+							"});",
+							"",
+							"pm.test('Array not empty', function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.length > 0).to.be.true;",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "topiadev",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/search/jobs/location?city=Seattle&state=WA&limit=300&radius=15",
+					"host": [
+						"topia-env-development",
+						"us-west-2",
+						"elasticbeanstalk",
+						"com"
+					],
+					"path": [
+						"search",
+						"jobs",
+						"location"
+					],
+					"query": [
+						{
+							"key": "city",
+							"value": "Seattle",
+							"equals": true
+						},
+						{
+							"key": "state",
+							"value": "WA",
+							"equals": true
+						},
+						{
+							"key": "limit",
+							"value": "300",
+							"equals": true
+						},
+						{
+							"key": "radius",
+							"value": "15",
+							"equals": true
+						}
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "SaveJob",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"const JOB_KEY = \"455ba8b70208e25b\"",
+							"",
+							"// This will need to be updated once the job table is added",
+							"pm.sendRequest({",
+							"    url: \"topia-env-development.us-west-2.elasticbeanstalk.com/users/profile\",",
+							"    method: 'GET',",
+							"    header: 'Authorization:Bearer topiadev',",
+							"    }, function (err, response) {",
+							"    pm.test('Contains new job', function() {",
+							"        let jsonData = response.json();",
+							"        jsonData = jsonData[\"prefs_jobs_saved\"];",
+							"        let contains = false;",
+							"        ",
+							"        for( let i = 0; i < jsonData.length; i++ ){",
+							"            if( jsonData[i] == JOB_KEY ){",
+							"                contains = true;",
+							"            }",
+							"        }",
+							"        ",
+							"        pm.expect(contains).to.be.true;",
+							"    });",
+							"});",
+							"",
+							"pm.test('No error', function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.err).to.be.undefined;",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "topiadev",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "jobkey",
+							"value": "455ba8b70208e25b",
+							"description": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/savejob",
+					"host": [
+						"topia-env-development",
+						"us-west-2",
+						"elasticbeanstalk",
+						"com"
+					],
+					"path": [
+						"users",
+						"savejob"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "RemoveJob",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"const JOB_KEY = \"455ba8b70208e25b\"",
+							"",
+							"// This will need to be updated once the job table is added",
+							"// DELAY START - remove when the job table is added",
+							"function pausecomp(millis)",
+							" {",
+							"  var date = new Date();",
+							"  var curDate = null;",
+							"  do { curDate = new Date(); }",
+							"  while(curDate-date < millis);",
+							"}",
+							"pausecomp(5000);",
+							"// DELAY END",
+							"",
+							"pm.sendRequest({",
+							"    url: \"topia-env-development.us-west-2.elasticbeanstalk.com/users/profile\",",
+							"    method: 'GET',",
+							"    header: 'Authorization:Bearer topiadev',",
+							"    }, function (err, response) {",
+							"    pm.test('Does not contain new job', function() {",
+							"        let jsonData = response.json();",
+							"        jsonData = jsonData[\"prefs_jobs_saved\"];",
+							"        let contains = false;",
+							"        ",
+							"        for( let i = 0; i < jsonData.length; i++ ){",
+							"            if( jsonData[i].jobkey == JOB_KEY ){",
+							"                contains = true;",
+							"            }",
+							"        }",
+							"        ",
+							"        pm.expect(contains).to.be.false;",
+							"    });",
+							"});",
+							"",
+							"pm.test('No error', function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.err).to.be.undefined;",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "topiadev",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "jobkey",
+							"value": "455ba8b70208e25b",
+							"description": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/removejob",
+					"host": [
+						"topia-env-development",
+						"us-west-2",
+						"elasticbeanstalk",
+						"com"
+					],
+					"path": [
+						"users",
+						"removejob"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Modify_Modify",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"const TEST_VAL = 34",
+							"",
+							"pm.sendRequest({",
+							"    url: \"topia-env-development.us-west-2.elasticbeanstalk.com/users/profile\",",
+							"    method: 'GET',",
+							"    header: { Authorization:'Bearer topiadev' },",
+							"    }, function (err, response) {",
+							"    pm.test('Value has changed', function() {",
+							"        let jsonData = response.json();",
+							"        jsonData = jsonData[\"prefs_jobs_postedDate\"];",
+							"        pm.expect(jsonData === TEST_VAL).to.be.true;",
+							"    });",
+							"});",
+							"",
+							"pm.test('No error', function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.err).to.be.undefined;",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "topiadev",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "mode",
+							"value": "modify",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "key",
+							"value": "prefs_jobs_postedDate",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "value",
+							"value": "34",
+							"description": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/modify",
+					"host": [
+						"topia-env-development",
+						"us-west-2",
+						"elasticbeanstalk",
+						"com"
+					],
+					"path": [
+						"users",
+						"modify"
+					]
+				},
+				"description": "Using the modify mode."
+			},
+			"response": []
+		},
+		{
+			"name": "Modify_Modify Cleanup",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"pm.sendRequest({",
+							"    url: \"topia-env-development.us-west-2.elasticbeanstalk.com/users/profile\",",
+							"    method: 'GET',",
+							"    header: { Authorization:'Bearer topiadev' },",
+							"    }, function (err, response) {",
+							"    pm.test('Value has changed', function() {",
+							"        let jsonData = response.json();",
+							"        let expected = parseInt(pm.environment.get(\"prefs_jobs_postedDate\"));",
+							"        jsonData = jsonData[\"prefs_jobs_postedDate\"];",
+							"        pm.expect(jsonData === expected).to.be.true;",
+							"    });",
+							"});",
+							"",
+							"pm.test('No error', function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.err).to.be.undefined;",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "topiadev",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "mode",
+							"value": "modify",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "key",
+							"value": "prefs_jobs_postedDate",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "value",
+							"value": "{{prefs_jobs_postedDate}}",
+							"description": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/modify",
+					"host": [
+						"topia-env-development",
+						"us-west-2",
+						"elasticbeanstalk",
+						"com"
+					],
+					"path": [
+						"users",
+						"modify"
+					]
+				},
+				"description": "Using the modify mode."
+			},
+			"response": []
+		},
+		{
+			"name": "Modify_Remove",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"",
+							"// This will need to be updated once the job table is added",
+							"pm.sendRequest({",
+							"    url: \"topia-env-development.us-west-2.elasticbeanstalk.com/users/profile\",",
+							"    method: 'GET',",
+							"    header: { Authorization:'Bearer topiadev' },",
+							"    }, function (err, response) {",
+							"    pm.test('Value has changed', function() {",
+							"        let jsonData = response.json();",
+							"        jsonData = jsonData[\"email\"];",
+							"        pm.expect(!jsonData).to.be.true;",
+							"    });",
+							"});",
+							"",
+							"pm.test('No error', function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.err).to.be.undefined;",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "topiadev",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "mode",
+							"value": "remove",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "key",
+							"value": "email",
+							"description": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/modify",
+					"host": [
+						"topia-env-development",
+						"us-west-2",
+						"elasticbeanstalk",
+						"com"
+					],
+					"path": [
+						"users",
+						"modify"
+					]
+				},
+				"description": "Using the remove mode."
+			},
+			"response": []
+		},
+		{
+			"name": "Modify_Remove Cleanup",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"",
+							"// This will need to be updated once the job table is added",
+							"pm.sendRequest({",
+							"    url: \"topia-env-development.us-west-2.elasticbeanstalk.com/users/profile\",",
+							"    method: 'GET',",
+							"    header: { Authorization:'Bearer topiadev' },",
+							"    }, function (err, response) {",
+							"    pm.test('Value has changed', function() {",
+							"        let jsonData = response.json();",
+							"        jsonData = jsonData[\"email\"];",
+							"        pm.expect(jsonData === pm.variables.get(\"email\")).to.be.true;",
+							"    });",
+							"});",
+							"",
+							"pm.test('No error', function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.err).to.be.undefined;",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "topiadev",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "mode",
+							"value": "modify",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "key",
+							"value": "email",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "value",
+							"value": "{{email}}",
+							"description": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/modify",
+					"host": [
+						"topia-env-development",
+						"us-west-2",
+						"elasticbeanstalk",
+						"com"
+					],
+					"path": [
+						"users",
+						"modify"
+					]
+				},
+				"description": "Using the remove mode."
+			},
+			"response": []
+		},
+		{
+			"name": "Modify_ListAppend",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"const TEST_VAL = \"testType\"",
+							"",
+							"pm.sendRequest({",
+							"    url: \"topia-env-development.us-west-2.elasticbeanstalk.com/users/profile\",",
+							"    method: 'GET',",
+							"    header: { Authorization:'Bearer topiadev' },",
+							"    }, function (err, response) {",
+							"    pm.test('Contains new type', function() {",
+							"        let jsonData = response.json();",
+							"        jsonData = jsonData[\"prefs_jobs_types\"];",
+							"        let contains = false;",
+							"        ",
+							"        for( let i = 0; i < jsonData.length; i++ ){",
+							"            if( jsonData[i] === TEST_VAL ){",
+							"                contains = true;",
+							"            }",
+							"        }",
+							"        ",
+							"        pm.expect(contains).to.be.true;",
+							"        ",
+							"    });",
+							"});",
+							"",
+							"pm.test('No error', function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.err).to.be.undefined;",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "topiadev",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "mode",
+							"value": "listappend",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "key",
+							"value": "prefs_jobs_types",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "value",
+							"value": "testType",
+							"description": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/modify",
+					"host": [
+						"topia-env-development",
+						"us-west-2",
+						"elasticbeanstalk",
+						"com"
+					],
+					"path": [
+						"users",
+						"modify"
+					]
+				},
+				"description": "Using listappend mode."
+			},
+			"response": []
+		},
+		{
+			"name": "Modify_ListRemove",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"const TEST_VAL = \"testType\"",
+							"",
+							"pm.sendRequest({",
+							"    url: \"topia-env-development.us-west-2.elasticbeanstalk.com/users/profile\",",
+							"    method: 'GET',",
+							"    header: { Authorization:'Bearer topiadev' },",
+							"    }, function (err, response) {",
+							"    pm.test('Contains new type', function() {",
+							"        let jsonData = response.json();",
+							"        jsonData = jsonData[\"prefs_jobs_types\"];",
+							"        let contains = false;",
+							"        ",
+							"        for( let i = 0; i < jsonData.length; i++ ){",
+							"            if( jsonData[i] === TEST_VAL ){",
+							"                contains = true;",
+							"            }",
+							"        }",
+							"        ",
+							"        pm.expect(contains).to.be.false;",
+							"        ",
+							"    });",
+							"});",
+							"",
+							"pm.test('No error', function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.err).to.be.undefined;",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "topiadev",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "mode",
+							"value": "listremove",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "key",
+							"value": "prefs_jobs_types",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "value",
+							"value": "testType",
+							"description": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/modify",
+					"host": [
+						"topia-env-development",
+						"us-west-2",
+						"elasticbeanstalk",
+						"com"
+					],
+					"path": [
+						"users",
+						"modify"
+					]
+				},
+				"description": "Using listappend mode."
+			},
+			"response": []
+		},
+		{
+			"name": "Modify_ModifyMultiple",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"const TEST_DATE = 89;",
+							"const TEST_EMAIL = \"testEmail@email.com\";",
+							"const TEST_LAST_UPDATED = 123456;",
+							"",
+							"",
+							"pm.sendRequest({",
+							"    url: \"topia-env-development.us-west-2.elasticbeanstalk.com/users/profile\",",
+							"    method: 'GET',",
+							"    header: { Authorization:'Bearer topiadev' },",
+							"    }, function (err, response) {",
+							"    pm.test('Value has changed', function() {",
+							"        let jsonData = response.json();",
+							"        let date = jsonData[\"prefs_jobs_postedDate\"];",
+							"        let email = jsonData[\"email\"];",
+							"        let last_updated = jsonData[\"last_updated\"];",
+							"",
+							"        pm.expect(date === 89).to.be.true;",
+							"        pm.expect(email === TEST_EMAIL).to.be.true;",
+							"        pm.expect(last_updated === TEST_LAST_UPDATED).to.be.true;",
+							"",
+							"    });",
+							"});",
+							"",
+							"pm.test('No error', function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.err).to.be.undefined;",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "topiadev",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"prefs\" :{\n\t\t\"last_updated\": 123456,\n\t\t\"email\": \"testEmail@email.com\",\n\t\t\"prefs_jobs_postedDate\": 89\n\t}\n}"
+				},
+				"url": {
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/modifymulti",
+					"host": [
+						"topia-env-development",
+						"us-west-2",
+						"elasticbeanstalk",
+						"com"
+					],
+					"path": [
+						"users",
+						"modifymulti"
+					]
+				},
+				"description": "Using the modify mode."
+			},
+			"response": []
+		},
+		{
+			"name": "Modify_ModifyMultiple Cleanup",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"const TEST_DATE = parseInt( pm.environment.get(\"prefs_jobs_postedDate\") );",
+							"const TEST_EMAIL = pm.environment.get(\"email\");",
+							"const TEST_LAST_UPDATED = parseInt( pm.environment.get(\"last_updated\") );",
+							"",
+							"",
+							"pm.sendRequest({",
+							"    url: \"topia-env-development.us-west-2.elasticbeanstalk.com/users/profile\",",
+							"    method: 'GET',",
+							"    header: { Authorization:'Bearer topiadev' },",
+							"    }, function (err, response) {",
+							"    pm.test('Values were reverted', function() {",
+							"        let jsonData = response.json();",
+							"        let date = jsonData[\"prefs_jobs_postedDate\"];",
+							"        let email = jsonData[\"email\"];",
+							"        let last_updated = jsonData[\"last_updated\"];",
+							"",
+							"        pm.expect(date === TEST_DATE).to.be.true;",
+							"        pm.expect(email === TEST_EMAIL).to.be.true;",
+							"        pm.expect(last_updated === TEST_LAST_UPDATED).to.be.true;",
+							"",
+							"    });",
+							"});",
+							"",
+							"pm.test('No error', function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.err).to.be.undefined;",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "topiadev",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"prefs\" :{\n\t\t\"last_updated\": \"{{last_updated}}\",\n\t\t\"email\": \"{{email}}\",\n\t\t\"prefs_jobs_postedDate\": \"{{prefs_jobs_postedDate}}\"\n\t}\n}"
+				},
+				"url": {
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/modifymulti",
+					"host": [
+						"topia-env-development",
+						"us-west-2",
+						"elasticbeanstalk",
+						"com"
+					],
+					"path": [
+						"users",
+						"modifymulti"
+					]
+				},
+				"description": "Using the modify mode."
+			},
+			"response": []
+		}
+	]
+}

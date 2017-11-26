@@ -51,12 +51,12 @@ exports.getJobByKey = ( jobKey ) => {
     });
 };
 
-exports.getJobsByCityState = ( username, city, state, maxResults, radius, numJobs = false ) => {
+exports.getJobsByCityState = ( userObj, city, state, maxResults, radius, numJobs = false ) => {
     return new Promise( ( resolve, reject ) => {
         if( !city || !state ){
             reject( 'MissingLocation' );
         } else {
-            getJobsList( username, city, state, null, maxResults, radius, numJobs ).then( jobList => {
+            getJobsList( userObj, city, state, null, maxResults, radius, numJobs ).then( jobList => {
                 resolve( jobList );
             }).catch( err => {
                 reject( err );
@@ -65,12 +65,12 @@ exports.getJobsByCityState = ( username, city, state, maxResults, radius, numJob
     });
 };
 
-exports.getJobsByZip = ( username, zip, maxResults, radius ) => {
+exports.getJobsByZip = ( userObj, zip, maxResults, radius ) => {
     return new Promise( ( resolve, reject ) => {
         if( !zip ){
             reject( 'MissingLocation' )
         } else {
-            getJobsList( username, null, null, zip, maxResults, radius ).then( jobList => {
+            getJobsList( userObj, null, null, zip, maxResults, radius ).then( jobList => {
                 resolve( jobList );
             }).catch( err => {
                 reject( err );
@@ -79,13 +79,17 @@ exports.getJobsByZip = ( username, zip, maxResults, radius ) => {
     });
 };
 
-exports.getJobsByCoord = ( username, lat, long, maxResults, radius ) => {
+exports.getJobsByCoord = ( userObj, lat, long, maxResults, radius ) => {
     return new Promise( ( resolve, reject ) => {
 
         radius = radius * MILE_TO_KM;
 
+        if( !lat || !long ){
+            reject( 'MissingLocation' );
+        }
+
         let baseQuery = {
-            [consts.PROF_KEYS.USERNAME]: keys.ZIP_USERNAME,
+            username: keys.ZIP_USERNAME,
             lat: lat,
             lng: long,
             radius: radius > MAX_ZIP_RADIUS_KM ? MAX_ZIP_RADIUS_KM : radius,
@@ -107,7 +111,7 @@ exports.getJobsByCoord = ( username, lat, long, maxResults, radius ) => {
                     let jobProms = [];
                     maxResults = Math.floor( maxResults / postalResults.length ); // Spread max results out by zip code
                     postalResults.forEach( ( zipResult ) => {
-                        jobProms.push( exports.getJobsByZip( username, zipResult.postalCode, maxResults, radius ) );
+                        jobProms.push( exports.getJobsByZip( userObj, zipResult.postalCode, maxResults, radius ) );
                     } );
                     Promise.all( jobProms ).then( totalResults => {
                         // Flatten results before sending
@@ -122,104 +126,100 @@ exports.getJobsByCoord = ( username, lat, long, maxResults, radius ) => {
 };
 
 // Helper to get jobs by city/state or zip, which is required by indeed.
-function getJobsList( username, city, state, zip, maxResults, radius, numJobs = false ){
+function getJobsList( profile, city, state, zip, maxResults, radius, numJobs = false ){
     return new Promise( ( resolve, reject ) => {
-        DB_USERS.getUserProfile( username ).then( profile => {
-            let jobAge = profile[ consts.PROF_KEYS.PREFS_JOBS_DATE ] ?
-                profile[ consts.PROF_KEYS.PREFS_JOBS_DATE ] : DEFAULT_JOB_AGE;
-            let jobTypes = profile[ consts.PROF_KEYS.PREFS_JOBS_TYPES ] ?
-                profile[ consts.PROF_KEYS.PREFS_JOBS_TYPES ] : reject( "NoJobTypes" );
-            let jobTitles = profile[ consts.PROF_KEYS.PREFS_JOBS_TITLES ] ?
-                profile[ consts.PROF_KEYS.PREFS_JOBS_TITLES ] : [""]; // Empty string to get all results
-            let typePromises = [];
+        let jobAge = profile[ consts.PROF_KEYS.PREFS_JOBS_DATE ] ?
+            profile[ consts.PROF_KEYS.PREFS_JOBS_DATE ] : DEFAULT_JOB_AGE;
+        let jobTypes = profile[ consts.PROF_KEYS.PREFS_JOBS_TYPES ] ?
+            profile[ consts.PROF_KEYS.PREFS_JOBS_TYPES ] : reject( "NoJobTypes" );
+        let jobTitles = profile[ consts.PROF_KEYS.PREFS_JOBS_TITLES ] ?
+            profile[ consts.PROF_KEYS.PREFS_JOBS_TITLES ] : [""]; // Empty string to get all results
+        let typePromises = [];
 
-            maxResults /= jobTypes.length;
+        maxResults /= jobTypes.length;
 
-            jobTitles = utils.isArray( jobTitles ) ? jobTitles : [jobTitles];
-            jobTypes = utils.isArray( jobTypes ) ? jobTypes : [jobTypes];
-            jobTypes.forEach( jobType => {
+        jobTitles = utils.isArray( jobTitles ) ? jobTitles : [jobTitles];
+        jobTypes = utils.isArray( jobTypes ) ? jobTypes : [jobTypes];
+        jobTypes.forEach( jobType => {
 
-                typePromises.push( new Promise( ( typeResolve, typeReject ) => {
+            typePromises.push( new Promise( ( typeResolve, typeReject ) => {
 
-                    let baseQuery = {
-                        publisher: keys.INDEED_KEY,
-                        format: 'json',
-                        v: INDEED_VERSION,  // API version
-                        limit: RESULTS_PER_PAGE, // Number of results per call, max is 25
-                        filter: 1,          // Filter duplicate results
-                        latlong: 1,         // Returns the lat/log of each job
-                        co: "us",           // Country
-                        userip: "localhost",
-                        useragent: 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 ' +
-                        '(KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36',
-                        radius: radius ? radius : DEFAULT_RADIUS,
-                        // Database values
-                        jt: jobType,                                // Job type
-                        fromage: jobAge, // Max number of days back job was posted
-                        q: jobTitles.join( "," )                    // Keywords
+                let baseQuery = {
+                    publisher: keys.INDEED_KEY,
+                    format: 'json',
+                    v: INDEED_VERSION,  // API version
+                    limit: RESULTS_PER_PAGE, // Number of results per call, max is 25
+                    filter: 1,          // Filter duplicate results
+                    latlong: 1,         // Returns the lat/log of each job
+                    co: "us",           // Country
+                    userip: "localhost",
+                    useragent: 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 ' +
+                    '(KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36',
+                    radius: radius ? radius : DEFAULT_RADIUS,
+                    // Database values
+                    jt: jobType,                                // Job type
+                    fromage: jobAge, // Max number of days back job was posted
+                    q: jobTitles.join( "," )                    // Keywords
 
-                    };
+                };
 
-                    // Set location
-                    if( city && state ) {
-                        baseQuery[ "l" ] = city + ", " + state;
-                    } else {
-                        baseQuery[ "l" ] = zip.toString();
-                    }
-
-                    let query = qs.stringify( baseQuery );
-
-                    // Get total results from API first
-                    request( INDEED_ENDPOINT + '?start=0&' + query, function( err, response, body ) {
-                        if( err ) {
-                            reject( err );
-                        } else {
-                            let numOfResults = JSON.parse( body ).totalResults;
-
-                            // If number of jobs is requested, end here.
-                            if( numJobs ){
-                                typeResolve( numOfResults );
-                            } else {
-                                let promises = [];
-                                for( let i = 0; i < numOfResults && i < maxResults; i += RESULTS_PER_PAGE ) {
-                                    promises.push( new Promise( ( jobResolve, jobReject ) => {
-                                            request( INDEED_ENDPOINT + '?start=' + i + '&' + query, function( err, innerResponse, innerBody ) {
-                                                if( err ) {
-                                                    jobReject( err );
-                                                } else {
-                                                    jobResolve( JSON.parse( innerBody ).results );
-                                                }
-                                            } );
-                                        } )
-                                    );
-                                }
-                                // Pages
-                                Promise.all( promises ).then( totalResults => {
-                                    // Flatten results before sending
-                                    typeResolve( [].concat.apply( [], totalResults ) );
-                                } ).catch( err => {
-                                    typeReject( err );
-                                } );
-                            }
-                        }
-                    } );
-                } ) );
-            } );
-            // Job types
-            Promise.all( typePromises ).then( totalResults => {
-                // Flatten results before sending
-                if( numJobs ) {
-                    let sumOfResults = 0;
-                    for( let i = 0; i < totalResults.length; i++ ){
-                        sumOfResults += totalResults[i];
-                    }
-                    resolve( { city: city, state: state, jobNum:sumOfResults } );
+                // Set location
+                if( city && state ) {
+                    baseQuery[ "l" ] = city + ", " + state;
                 } else {
-                    resolve( [].concat.apply( [], totalResults ) );
+                    baseQuery[ "l" ] = zip.toString();
                 }
-            }).catch( err => {
-                reject( err );
-            });
+
+                let query = qs.stringify( baseQuery );
+
+                // Get total results from API first
+                request( INDEED_ENDPOINT + '?start=0&' + query, function( err, response, body ) {
+                    if( err ) {
+                        reject( err );
+                    } else {
+                        let numOfResults = JSON.parse( body ).totalResults;
+
+                        // If number of jobs is requested, end here.
+                        if( numJobs ){
+                            typeResolve( numOfResults );
+                        } else {
+                            let promises = [];
+                            for( let i = 0; i < numOfResults && i < maxResults; i += RESULTS_PER_PAGE ) {
+                                promises.push( new Promise( ( jobResolve, jobReject ) => {
+                                        request( INDEED_ENDPOINT + '?start=' + i + '&' + query, function( err, innerResponse, innerBody ) {
+                                            if( err ) {
+                                                jobReject( err );
+                                            } else {
+                                                jobResolve( JSON.parse( innerBody ).results );
+                                            }
+                                        } );
+                                    } )
+                                );
+                            }
+                            // Pages
+                            Promise.all( promises ).then( totalResults => {
+                                // Flatten results before sending
+                                typeResolve( [].concat.apply( [], totalResults ) );
+                            } ).catch( err => {
+                                typeReject( err );
+                            } );
+                        }
+                    }
+                } );
+            } ) );
+        } );
+        // Job types
+        Promise.all( typePromises ).then( totalResults => {
+            // Flatten results before sending
+            if( numJobs ) {
+                let sumOfResults = 0;
+                for( let i = 0; i < totalResults.length; i++ ){
+                    sumOfResults += totalResults[i];
+                }
+                resolve( { city: city, state: state, jobNum:sumOfResults } );
+            } else {
+                resolve( [].concat.apply( [], totalResults ) );
+            }
         }).catch( err => {
             reject( err );
         });
