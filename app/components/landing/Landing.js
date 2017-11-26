@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import {
     Image,
-    StyleSheet
+    StyleSheet,
+    View
 } from 'react-native';
 
 import {
@@ -30,29 +31,16 @@ export default class Landing extends Component {
     render() {
         return (
             <Container>
-                <Content>
-                    <Card style={styles.card}>
-                        <CardItem>
-                            <Body>
-                                <Body>
-                                    <Text>Welcome to Topia!</Text>
-                                    <Text note>endless exploration</Text>
-                                </Body>
-                            </Body>
-                        </CardItem>
-                        <CardItem cardBody>
-                            <Image source={require('./../../images/icons/landing/hero.png')} style={{height: 200, width: null, flex: 1}}/>
-                        </CardItem>
-                        <CardItem>
-                            <Body>
-                                <Button full style={styles.explore} onPress={Actions.explore}>
-                                    <Text style={styles.buttonText}>Explore</Text>
-                                </Button>
-                            </Body>
-                        </CardItem>
-                    </Card>
-                </Content>
-                <Footer>
+                <Image
+                    source={require('./../../images/icons/landing/landing-wallpaper.jpg')}
+                    style={styles.container}>
+                    <Container>
+                        <Content scrollEnabled={false}>
+                            <Image source={require('../../images/logo/topia-splash.png')} style={styles.image} />
+                        </Content>
+                    </Container>
+                </Image>
+                <Footer style={styles.footer}>
                     <FooterTab>
                         <Button full style={styles.login} onPress={Actions.login}>
                             <Text style={styles.buttonText}>Log In</Text>
@@ -68,31 +56,27 @@ export default class Landing extends Component {
 }
 
 const styles = StyleSheet.create({
-    header: {
-        backgroundColor: '#9B59B6'
+    container: {
+        flex: 1,
+        width: undefined,
+        height: undefined,
+        backgroundColor:'transparent',
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     image: {
-        marginBottom: 10
-    },
-    card: {
-        marginHorizontal: 10
+        marginTop: 25
     },
     buttonText: {
         color: 'white'
     },
-    explore: {
-        backgroundColor: '#AEA8D3'
-    },
     login: {
-        backgroundColor: '#9B59B6'
-    },
-    register: {
         backgroundColor: '#674172'
     },
-    headerImage: {
-        marginTop: -5,
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: 50
+    register: {
+        backgroundColor: '#9B59B6'
+    },
+    footer: {
+        borderTopWidth: 0
     }
 });

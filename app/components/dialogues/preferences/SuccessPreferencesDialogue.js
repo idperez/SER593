@@ -35,6 +35,10 @@ export default class SuccessPreferencesDialogue extends Component {
         this.scaleAnimationDialog.show();
     }
 
+    okayPressed() {
+        this.scaleAnimationDialog.dismiss();
+    }
+
     render() {
         return (
             <View style={styles.container}>
@@ -53,7 +57,7 @@ export default class SuccessPreferencesDialogue extends Component {
                     <Footer>
                         <FooterTab>
                             <View style={{flex: 1}}>
-                                <Button full style={styles.continue}>
+                                <Button full style={styles.continue} onPress={() => this.okayPressed()}>
                                     <Text style={styles.buttonText}>Okay</Text>
                                 </Button>
                             </View>

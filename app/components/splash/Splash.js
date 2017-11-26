@@ -11,11 +11,15 @@ export default class Splash extends Component {
 
     render() {
         return (
-            <Container style={styles.container} >
-                <Content>
-                    <Image source={require('../../images/logo/topia-splash.png')} style={styles.image} />
-                </Content>
-            </Container>
+            <Image
+                source={require('./../../images/icons/landing/landing-wallpaper.jpg')}
+                style={styles.container}>
+                <Container>
+                    <Content scrollEnabled={false}>
+                        <Image source={require('../../images/logo/topia-splash.png')} style={styles.image} />
+                    </Content>
+                </Container>
+            </Image>
         );
     }
 }
@@ -23,11 +27,13 @@ export default class Splash extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        width: undefined,
+        height: undefined,
+        backgroundColor:'transparent',
         justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#9B59B6'
+        alignItems: 'center'
     },
     image: {
-        marginTop: 150
+        marginTop: 25
     }
 });
