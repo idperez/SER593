@@ -94,13 +94,26 @@ exports.getUserProfileByPrimaryKey = ( primKey, value ) => {
                         }
                     }
 
-                    // As stated below, resolve before the saved job update
-                    resolve( resultProfile );
+                    // Get saved jobs from the job table
+                    let jobProms = [];
+                    let jobKeys = resultProfile[consts.PROF_KEYS.PREFS_JOBS_SAVED];
+                    jobKeys.forEach( jobKey => {
+                        jobProms.push(
+                            getSavedJob( jobKey )
+                        );
+                    });
+                    Promise.all( jobProms ).then( jobs => {
 
-                    // Check expiration time stamp for the users profile.
-                    // This runs after the response, so the current call for the user profile
-                    // will not have to wait for the updates.
-                    timelyUpdates( resultProfile, DEFAULT_UPDATE_TIME );
+                        resultProfile[consts.PROF_KEYS.PREFS_JOBS_SAVED] = jobs;
+
+                        resolve( resultProfile );
+
+                        // Check expiration time stamp for the users profile.
+                        // This runs after the response, so the current call for the user profile
+                        // will not have to wait for the updates.
+                        timelyUpdates( resultProfile, DEFAULT_UPDATE_TIME );
+
+                    }).catch( err => reject( err ));
 
                 } else {
                     reject( 'NoResultsFound' );
@@ -469,7 +482,12 @@ let getSavedJob = ( jobKey ) => {
                         reject( "MultipleJobsFound" );
                     }
                     let job = data.Items[ 0 ];
-                    resolve( job );
+                    job = job[PRIM_KEY_JOB_DETAILS].S; // Get the job value back
+                    try{
+                        resolve( JSON.parse( job ) );
+                    } catch( err ){
+                        reject( err );
+                    }
                 } else {
                     // If it's not on the DB, try to add it.
                     addJob(jobKey).then( data => {
