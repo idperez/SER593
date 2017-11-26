@@ -663,7 +663,7 @@
 							"        let contains = false;",
 							"        ",
 							"        for( let i = 0; i < jsonData.length; i++ ){",
-							"            if( jsonData[i] == JOB_KEY ){",
+							"            if( jsonData[i].jobkey == JOB_KEY ){",
 							"                contains = true;",
 							"            }",
 							"        }",

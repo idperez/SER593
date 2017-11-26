@@ -260,23 +260,16 @@ exports.addSavedJob = ( userObj, jobKey ) => {
 
 exports.removeSavedJob = ( userObj, jobKey ) => {
     return new Promise( ( resolve, reject ) => {
-        if( !userObj[consts.PROF_KEYS.PREFS_JOBS_SAVED].includes( jobKey ) ){
-            reject( 'SavedJobNotFound' );
-        } else {
-            try{
-                removeListItem(
-                    userObj,
-                    consts.PROF_KEYS.PREFS_JOBS_SAVED,
-                    jobKey
-                ).then( data => {
-                    resolve( data );
-                }).catch( err => {
-                    reject( err );
-                });
-            } catch( err ){
-                reject( "ErrorStringifyJSON" );
-            }
-        }
+
+        removeListItem(
+            userObj,
+            consts.PROF_KEYS.PREFS_JOBS_SAVED,
+            jobKey
+        ).then( data => {
+            resolve( data );
+        }).catch( err => {
+            reject( err );
+        });
     });
 };
 
@@ -368,35 +361,29 @@ let appendListItem = ( username, listname, value ) => {
 let removeListItem = ( userObj, listname, elemVal ) => {
     return new Promise( ( resolve, reject ) => {
 
-        let list = userObj[listname];
-
-        if( !list.includes( elemVal ) ){
-            reject( 'ElemNotFound' );
-        } else {
-
-            let param = {
-                TableName: TABLE_NAME,
-                Key: {
-                    [PRIMARY_KEY]: {
-                        S: userObj[ consts.PROF_KEYS.USERNAME ]
-                    }
-                },
-                ExpressionAttributeNames: {
-                    "#K": listname
-                },
-                ExpressionAttributeValues: {
-                    ":v": { SS: [ elemVal.toString() ] }
-                },
-                UpdateExpression: "DELETE #K :v",
-            };
-            ddb.updateItem( param, ( err, data ) => {
-                if( err ) {
-                    reject( err );
-                } else {
-                    resolve( data );
+        let param = {
+            TableName: TABLE_NAME,
+            Key: {
+                [PRIMARY_KEY]: {
+                    S: userObj[ consts.PROF_KEYS.USERNAME ]
                 }
-            } );
-        }
+            },
+            ExpressionAttributeNames: {
+                "#K": listname
+            },
+            ExpressionAttributeValues: {
+                ":v": { SS: [ elemVal.toString() ] }
+            },
+            UpdateExpression: "DELETE #K :v",
+        };
+        ddb.updateItem( param, ( err, data ) => {
+            if( err ) {
+                reject( err );
+            } else {
+                resolve( data );
+            }
+        });
+
     });
 };
 
