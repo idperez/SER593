@@ -111,7 +111,9 @@ exports.getUserProfileByPrimaryKey = ( primKey, value ) => {
                         // Check expiration time stamp for the users profile.
                         // This runs after the response, so the current call for the user profile
                         // will not have to wait for the updates.
-                        timelyUpdates( resultProfile, DEFAULT_UPDATE_TIME );
+
+                        // DISABLED UNTIL AFTER SHOWCASE - Issue #137
+                        // timelyUpdates( resultProfile, DEFAULT_UPDATE_TIME );
 
                     }).catch( err => reject( err ));
 
