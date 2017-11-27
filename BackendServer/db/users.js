@@ -112,8 +112,7 @@ exports.getUserProfileByPrimaryKey = ( primKey, value ) => {
                         // This runs after the response, so the current call for the user profile
                         // will not have to wait for the updates.
 
-                        // DISABLED UNTIL AFTER SHOWCASE - Issue #137
-                        // timelyUpdates( resultProfile, DEFAULT_UPDATE_TIME );
+                        timelyUpdates( resultProfile, DEFAULT_UPDATE_TIME );
 
                     }).catch( err => reject( err ));
 
@@ -166,7 +165,6 @@ exports.modifyUserItem = ( userObj, key, value, mode ) => {
 
     // Check parameters
     // Key
-    console.log(key + "hello");
     if( !key ) {
         promise = Promise.reject( 'InvalidKey' );
     // Mode
@@ -547,14 +545,16 @@ let timelyUpdates = ( userObj, timeGap ) => {
 
         // City ratings
         updateCityRatings( userObj );
+
+        // DISABLED UNTIL AFTER SHOWCASE - Issue #137
         // Saved jobs
-        checkAndUpdateSavedJobs( username, userObj[consts.PROF_KEYS.PREFS_JOBS_SAVED] );
+        //checkAndUpdateSavedJobs( username, userObj[consts.PROF_KEYS.PREFS_JOBS_SAVED] );
 
         // END UPDATES
 
         // Update time stamp
         exports.modifyUserItem(
-            username,
+            userObj,
             consts.PROF_KEYS.LAST_UPDATED,
             currentTime,
             consts.MODIFIY_PREFS_MODES.MODIFY

@@ -4,16 +4,8 @@ const router = express.Router();
 const users = require( "../db/users" );
 const city = require("../search/cityData");
 
-router.get('/getuserprofilebyprimarykey', ( req, res ) => {
-    users.getUserProfileByPrimaryKey( req.query.primkey, req.query.value ).then( user => {
-        res.send( user );
-    }).catch( err => {
-        res.send( err );
-    })
-});
-
-router.get('/getuserprofile', ( req, res ) => {
-    users.getUserProfileByPrimaryKey( req.query.username ).then( user => {
+router.get('/cityratings', ( req, res ) => {
+    city.updateCityRatings( res.locals.user ).then( user => {
         res.send( user );
     }).catch( err => {
         res.send( err );

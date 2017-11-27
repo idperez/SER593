@@ -32,6 +32,7 @@ exports.updateCityRatings = ( userObj ) => {
 
             let gapSize = maxRatio - minRatio;
 
+            let orderedRatings = [];
             // Algorithm step #2: Since all the ratios have been applied
             // Lets go through and compare against the min and the max
             for( let key in cities ){
@@ -46,8 +47,21 @@ exports.updateCityRatings = ( userObj ) => {
                     // Calculate rating
                     let increase = gapSize + ( cities[key].ratio - minRatio );
                     rating = ( ( increase / gapSize ) * 100 ) - 100;
-                    ratings[key].rating = rating.toFixed(1);
+                    ratings[key].rating = parseFloat( rating.toFixed(1) );
+
+                    orderedRatings.push( ratings[key] );
                 }
+
+            }
+
+            // Sort ratings highest to lowest
+            orderedRatings.sort( ( city1, city2 ) => {
+                return city2.rating - city1.rating;
+            });
+
+            // Set the ratings in the objects
+            for( let i = 0; i < orderedRatings.length; i++ ){
+                ratings[orderedRatings[i].city].ranking = i + 1;
             }
 
             let ratingsStr = "";
