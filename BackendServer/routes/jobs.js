@@ -235,7 +235,7 @@ router.get( '/coords',
  *          authorization: Bearer QZ3jhbfdof84GFBlSe
  *      }
  *
- * @apiParam {String} jobkeys Indeed job key
+ * @apiParam {String} jobkey Indeed job key
  * @apiSuccessExample {json} Success-Response:
  *
  *      {
@@ -277,7 +277,7 @@ router.get( '/coords',
  */
 router.get( '/bykey',
     ( req, res ) => {
-        jobSearch.getJobByKey( req.query.jobkeys ).then( jobResults => {
+        jobSearch.getJobByKey( req.query.jobkey ).then( jobResults => {
             res.send( jobResults );
         }).catch( err => {
             res.send( response.errorMessage( err ) );

@@ -10,15 +10,12 @@ const passwordHash = require('password-hash');
 exports.authenticate = ( username, password ) => {
     return new Promise(( resolve, reject ) => {
         users.getUserProfile( username ).then( userProfile => {
-            if( passwordHash.verify( password, userProfile[consts.PROF_KEYS.PASSWORD]  ) ) {
+            if( passwordHash.verify( password, userProfile[consts.PROF_KEYS.PASSWORD] ) ) {
                 let accessToken = generateToken();
                 // Save token to user profile
                 saveToken(
-                    userProfile.username,
-                    {
-                        token: accessToken.token,
-                        expr: accessToken.tokenExpr
-                    }
+                    userProfile,
+                    accessToken
                 ).then( () =>{
                     // Success, send the token.
                     resolve( accessToken.token );
@@ -86,12 +83,12 @@ exports.revokeToken = ( userObj ) => {
 };
 
 // Used to save access token to DB
-let saveToken = ( username, token ) => {
+let saveToken = ( userObj, token ) => {
     return new Promise( ( resolve, reject ) => {
         // TODO - clean up to make it one single call to database
         let promises = [
-            users.modifyUserItem( username, consts.PROF_KEYS.ACCESS_TOKEN, token.token, consts.MODIFIY_PREFS_MODES.MODIFY ),
-            users.modifyUserItem( username, consts.PROF_KEYS.ACCESS_EXPR, token.expr, consts.MODIFIY_PREFS_MODES.MODIFY )
+            users.modifyUserItem( userObj, consts.PROF_KEYS.ACCESS_TOKEN, token.token, consts.MODIFIY_PREFS_MODES.MODIFY ),
+            users.modifyUserItem( userObj, consts.PROF_KEYS.ACCESS_EXPR, token.expr, consts.MODIFIY_PREFS_MODES.MODIFY )
         ];
         Promise.all( promises ).then( () => {
             resolve();
@@ -107,6 +104,6 @@ let generateToken = () => {
     let token = tokenGen.generate( tokenProps.tokenSize );
     return {
         token: token,
-        tokenExpr: tokenExpr
+        expr: tokenExpr
     }
 };

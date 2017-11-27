@@ -272,7 +272,7 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/search/jobs/bykey?jobkeys=455ba8b70208e25b",
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/search/jobs/bykey?jobkey=455ba8b70208e25b",
 					"host": [
 						"topia-env-development",
 						"us-west-2",
@@ -286,7 +286,7 @@
 					],
 					"query": [
 						{
-							"key": "jobkeys",
+							"key": "jobkey",
 							"value": "455ba8b70208e25b",
 							"equals": true
 						}

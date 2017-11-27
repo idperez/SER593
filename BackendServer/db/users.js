@@ -12,7 +12,6 @@ const PRIM_KEY_JOB_DETAILS = "job";
 const PRIMARY_KEY = consts.PROF_KEYS.USERNAME;
 const DEFAULT_UPDATE_TIME = 86400000; // Time to recheck saved jobs - 24 hours in ms
 const cityData = require( "../search/cityData" );
-const sanitizeHTML = require( "sanitize-html" );
 
 // Get user profile from database
 // Authorize should be the only caller
@@ -94,27 +93,34 @@ exports.getUserProfileByPrimaryKey = ( primKey, value ) => {
                         }
                     }
 
-                    // Get saved jobs from the job table
-                    let jobProms = [];
-                    let jobKeys = resultProfile[consts.PROF_KEYS.PREFS_JOBS_SAVED];
-                    jobKeys.forEach( jobKey => {
-                        jobProms.push(
-                            getSavedJob( jobKey )
-                        );
-                    });
-                    Promise.all( jobProms ).then( jobs => {
+                    // Extra safety to make sure the user has a job key on DB
+                    if( resultProfile[consts.PROF_KEYS.PREFS_JOBS_SAVED] ) {
+                        // Get saved jobs from the job table
+                        let jobProms = [];
+                        let jobKeys = resultProfile[ consts.PROF_KEYS.PREFS_JOBS_SAVED ];
+                        jobKeys.forEach( jobKey => {
+                            jobProms.push(
+                                getSavedJob( jobKey )
+                            );
+                        } );
+                        Promise.all( jobProms ).then( jobs => {
 
-                        resultProfile[consts.PROF_KEYS.PREFS_JOBS_SAVED] = jobs;
+                            resultProfile[ consts.PROF_KEYS.PREFS_JOBS_SAVED ] = jobs;
 
-                        resolve( resultProfile );
+                            resolve( resultProfile );
 
-                        // Check expiration time stamp for the users profile.
-                        // This runs after the response, so the current call for the user profile
-                        // will not have to wait for the updates.
+                            // Check expiration time stamp for the users profile.
+                            // This runs after the response, so the current call for the user profile
+                            // will not have to wait for the updates.
 
-                        timelyUpdates( resultProfile, DEFAULT_UPDATE_TIME );
+                            timelyUpdates( resultProfile, DEFAULT_UPDATE_TIME );
 
-                    }).catch( err => reject( err ));
+                        } ).catch( err => reject( err ) );
+
+                    // If they don't have a saved jobs key, just send what's available.
+                    } else {
+                        resolve( resultProfile )
+                    }
 
                 } else {
                     reject( 'NoResultsFound' );
