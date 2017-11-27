@@ -18,8 +18,6 @@ import {
     Text
 } from 'native-base';
 
-import Header from '../../Headers/Header';
-
 import MapView from 'react-native-maps';
 
 import MapSearchBox from './../../map/MapSearchBox';
@@ -35,15 +33,6 @@ import carouselStyles from './Carousel/Styles/index.js';
 import jobs from './../../../../lib/jobs/jobs';
 
 const SLIDER_1_FIRST_ITEM = 1;
-
-const ENTRIES = [
-    {
-        jobTitle: 'Senior Software Developer',
-        company: 'IBM',
-        snippet: 'We are looking for Software Developers to join our Cloud Innovation Lab team in Austin, TX . With industry leadership in analytics, security, commerce, and...',
-        illustration: 'http://i.imgur.com/UYiroysl.jpg'
-    }
-];
 
 export default class Home extends Component {
 
@@ -165,11 +154,10 @@ export default class Home extends Component {
                     ref={component => {this._map = component;}}
                     style={styles.map}
                     region={this.state.region}>
-                    <MapSearchBox citySearched={this.citySearched}/>
                     {this.state.mapMarker}
                 </MapView>
+                <MapSearchBox citySearched={this.citySearched}/>
                 <SuccessRegisterDialogue ref="firstTime"/>
-                <Button onPress={() => this.getJobs()}><Text>Search</Text></Button>
                 <View style={styles.carousel} >
                     <Carousel
                         ref={(c) => { if (!this.state.slider1Ref) { this.setState({ slider1Ref: c }); } }}
