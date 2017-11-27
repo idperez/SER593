@@ -27,8 +27,6 @@ import {
 
 import ActionSheet from 'react-native-actionsheet';
 
-import Collapsible from 'react-native-collapsible';
-
 const CANCEL_INDEX = 0;
 const UNSAVE_INDEX = 1;
 const options = [ 'Cancel', 'Unsave' ];
@@ -49,13 +47,6 @@ export default class CityMatch extends Component {
 
     showActionSheet() {
         this.ActionSheet.show();
-    }
-
-    tirggerOptions() {
-        this.setState({
-            showJobOptions: !this.state.showJobOptions,
-            arrowIconUp: !this.state.arrowIconUp
-        });
     }
 
     handlePress(choice) {
@@ -86,20 +77,6 @@ export default class CityMatch extends Component {
                                 </View>
                             </Col>
                         </Grid>
-                        <Body>
-                            <View style={styles.container}>
-                                <TouchableHighlight onPress={() => this.tirggerOptions()} underlayColor="white">
-                                    <Icon
-                                        style={{color: '#9B59B6'}}
-                                        name={
-                                            (this.state.arrowIconUp)
-                                                ? "ios-arrow-down"
-                                                : "ios-arrow-up"
-                                        }
-                                    />
-                                </TouchableHighlight>
-                            </View>
-                        </Body>
                     </Body>
                 </CardItem>
                 <ActionSheet
@@ -109,21 +86,6 @@ export default class CityMatch extends Component {
                     destructiveButtonIndex={UNSAVE_INDEX}
                     onPress={this.handlePress}
                 />
-                <Collapsible collapsed={this.state.showJobOptions}>
-                    <Footer style={styles.footer}>
-                        <FooterTab>
-                            <Button full small style={styles.aboutButton}>
-                                <Text style={styles.buttonText}>Los Angeles</Text>
-                            </Button>
-                            <Button full small style={styles.exploreButton}>
-                                <Text style={styles.buttonText}>Map</Text>
-                            </Button>
-                            <Button full small style={styles.viewButton}>
-                                <Text style={styles.buttonText}>View</Text>
-                            </Button>
-                        </FooterTab>
-                    </Footer>
-                </Collapsible>
             </Card>
         );
     }

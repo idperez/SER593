@@ -21,8 +21,6 @@ import Login from './login/Login';
 
 import Register from './register/Register';
 
-import MapDemo from './map/MapDemo';
-
 import Home from './Home/Explore/Home';
 
 import Saves from './Home/Saves/Saves';
@@ -50,6 +48,32 @@ export default class App extends Component {
             <SplashContainer>
                 <Router>
                     <Scene key="root">
+                        <Scene
+                            key="landing"
+                            component={Landing}
+                            title={<Image source={require('./../images/logo/topia-sm.png')} style={styles.image} />}
+                            navigationBarStyle={{ backgroundColor: '#9B59B6' }}
+                            hideNavBar={true}
+                            initial
+                        />
+                        <Scene
+                            key="register"
+                            component={Register}
+                            title={<Image source={require('./../images/logo/topia-sm.png')} style={styles.image} />}
+                            navBarButtonColor='#ffffff'
+                            backButtonBarStyle={{ color: '#9B59B6' }}
+                            navigationBarStyle={{ backgroundColor: '#9B59B6' }}
+                            backTitle=" "
+                        />
+                        <Scene
+                            key="login"
+                            component={Login}
+                            title={<Image source={require('./../images/logo/topia-sm.png')} style={styles.image} />}
+                            navBarButtonColor='#ffffff'
+                            backButtonBarStyle={{ color: '#9B59B6' }}
+                            navigationBarStyle={{ backgroundColor: '#9B59B6' }}
+                            backTitle=" "
+                        />
                         <Scene key="tabbar" tabs={true}>
                             <Scene key="Explore" hideNavBar={true}>
                                 <Scene

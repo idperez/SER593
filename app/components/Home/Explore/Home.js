@@ -51,19 +51,22 @@ export default class Home extends Component {
             },
             slider1ActiveSlide: SLIDER_1_FIRST_ITEM,
             slider1Ref: null,
+            slider1Item: 0,
             jobData: [],
+            carouselData: [],
             mapMarker: <View/>
         };
 
         this.getToken();
         this.citySearched.bind(this);
         this.getJobs.bind(this);
+        this.markerPressed.bind(this);
     }
 
-    getJobs = () => {
+    getJobs = (region) => {
         jobs.getJobInformation(
-            this.state.region.latitude,
-            this.state.region.longitude
+            region.latitude,
+            region.longitude
         ).then(jobData => {
             this.setState({
                 jobData
@@ -87,9 +90,26 @@ export default class Home extends Component {
         });
     }
 
-    markerPressed(job) {
-        alert(job.company);
-    }
+    markerPressed = (job) => {
+        let index = 0;
+        this.state.jobData.map((aJob, i) => {
+           if(job.jobkey === aJob.jobkey) {
+               index = i;
+           }
+        });
+
+        this.setState({
+            slider1Item: index,
+            carouselData: this.state.jobData,
+            region: {
+                latitude: job.latitude,
+                longitude: job.longitude,
+                latitudeDelta: 0.3121,
+                longitudeDelta: 0.3121
+            }
+        });
+        this._map.animateToRegion(this.state.region, 1000);
+    };
 
     setMarkers(jobData) {
         let markers = [];
@@ -114,16 +134,6 @@ export default class Home extends Component {
         this.setState({
             mapMarker: markers
         });
-
-        this.setState({
-            region: {
-                latitude: jobData[0].latitude,
-                longitude: jobData[0].longitude,
-                latitudeDelta: 0.3421,
-                longitudeDelta: 0.3421
-            }
-        });
-        this._map.animateToRegion(this.state.region, 100);
     }
 
     citySearched = (latitude, longitude) => {
@@ -133,7 +143,8 @@ export default class Home extends Component {
                 longitude: longitude,
                 latitudeDelta: 0.3421,
                 longitudeDelta: 0.3421
-            }
+            },
+            carouselData: []
         });
         this._map.animateToRegion(this.state.region, 100);
     };
@@ -147,13 +158,37 @@ export default class Home extends Component {
         );
     }
 
+    onRegionChangeComplete = (region) => {
+        this.setState({region})
+    };
+
+    onMapReady = () => {
+        this.getJobs(this.state.region);
+    };
+
+    onCarouselChange(index) {
+        const swipedJob = this.state.jobData[index];
+        this.setState({ slider1ActiveSlide: index });
+        this.setState({
+            region: {
+                latitude: swipedJob.latitude,
+                longitude: swipedJob.longitude,
+                latitudeDelta: 0.3421,
+                longitudeDelta: 0.3421
+            }
+        });
+        this._map.animateToRegion(this.state.region, 100);
+    }
+
     render() {
         return (
             <Container style={styles.homeContainer}>
                 <MapView
                     ref={component => {this._map = component;}}
                     style={styles.map}
-                    region={this.state.region}>
+                    region={this.state.region}
+                    onRegionChangeComplete={this.onRegionChangeComplete}
+                    onMapReady={this.onMapReady}>
                     {this.state.mapMarker}
                 </MapView>
                 <MapSearchBox citySearched={this.citySearched}/>
@@ -161,11 +196,11 @@ export default class Home extends Component {
                 <View style={styles.carousel} >
                     <Carousel
                         ref={(c) => { if (!this.state.slider1Ref) { this.setState({ slider1Ref: c }); } }}
-                        data={this.state.jobData}
+                        data={this.state.carouselData}
                         renderItem={this._renderItem}
                         sliderWidth={sliderWidth}
                         itemWidth={itemWidth}
-                        firstItem={SLIDER_1_FIRST_ITEM}
+                        firstItem={this.state.slider1Item}
                         inactiveSlideScale={0.94}
                         inactiveSlideOpacity={0.7}
                         enableMomentum={false}
@@ -173,7 +208,7 @@ export default class Home extends Component {
                         contentContainerCustomStyle={carouselStyles.sliderContentContainer}
                         loop={true}
                         loopClonesPerSide={2}
-                        onSnapToItem={(index) => this.setState({ slider1ActiveSlide: index }) }
+                        onSnapToItem={(index) => this.onCarouselChange(index)}
                     />
                 </View>
             </Container>
