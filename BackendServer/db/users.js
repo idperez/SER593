@@ -424,9 +424,6 @@ let addJob = ( jobKey ) => {
     return new Promise( ( resolve, reject ) => {
         jobSearch.getJobByKey( jobKey ).then( job => {
 
-            // Sanitize any HTML tags in the job snippet before saving to the DB.
-            job.snippet = sanitizeHTML( job.snippet );
-
             let params = {
                 TableName: TABLE_NAME_JOBS,
                 Item: {

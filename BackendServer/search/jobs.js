@@ -231,10 +231,14 @@ function getJobsList( profile, city, state, zip, maxResults, radius, numJobs = f
     });
 }
 
-// Helper to sanitize all the job snippits before sending
+// Helper to sanitize all the job snippets before sending
 let sanitizeSnippets = ( jobsArr ) => {
     for( let i = 0; i < jobsArr.length; i++ ){
-        jobsArr[i].snippet = sanitizeHTML(jobsArr[i].snippet);
+        jobsArr[i].snippet = sanitizeHTML( jobsArr[i].snippet, {
+            allowedTags: [],
+            allowedAttributes: []
+        });
     }
+    console.log(jobsArr);
     return jobsArr;
 };
