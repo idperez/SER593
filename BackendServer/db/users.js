@@ -277,6 +277,20 @@ exports.removeSavedJob = ( userObj, jobKey ) => {
     });
 };
 
+// Change the users city match results to an array sorted by city rank
+exports.cityMatchToArray = ( cityMatches ) => {
+    let resArray = [];
+
+    for( let key in cityMatches ){
+        if( cityMatches.hasOwnProperty( key ) ){
+            let ranking = cityMatches[key].ranking;
+            resArray[ranking - 1] = cityMatches[key];
+        }
+    }
+
+    return resArray;
+};
+
 // Add new user profile item
 let addUserItem = ( username, key, value ) => {
     return new Promise( ( resolve, reject ) =>{

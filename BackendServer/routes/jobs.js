@@ -20,7 +20,7 @@ const consts = require( "../constants" );
  * @apiParam {String} city City to search.
  * @apiParam {String} state State to search. (2 letter abbreviation)
  * @apiParam {Number} limit Max number of results.
- * @apiParam {Number} radius from city center to get results (Optional: default is 25).
+ * @apiParam {Number} [radius=25] Radius from city center to search for jobs.
  *
  * @apiSuccessExample {json} Success-Response:
  *  [
@@ -92,7 +92,7 @@ router.get( '/location',
  *
  * @apiParam {String} zip Zip code.
  * @apiParam {Number} limit Max number of results.
- * @apiParam {Number} radius Radius in miles (Optional: default is 25).
+ * @apiParam {Number} [radius=25] Radius in miles from center of zip code.
  *
  * @apiSuccessExample {json} Success-Response:
  *  [
@@ -164,7 +164,7 @@ router.get( '/zip',
  * @apiParam {String} lat Latitude
  * @apiParam {String} long Longitude
  * @apiParam {Number} limit Max number of results.
- * @apiParam {String} radius Radius in miles (Optional: default is 25).
+ * @apiParam {String} [radius=25] Radius in miles from coordinate point.
  *
  * @apiSuccessExample {json} Success-Response:
  *  [
