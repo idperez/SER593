@@ -6,6 +6,7 @@ const qs = require( 'querystring' );
 const DB_USERS = require( '../db/users' );
 const utils = require('../util');
 const consts = require( "../constants" );
+const sanitizeHTML = require( "sanitize-html" );
 
 const INDEED_ENDPOINT = 'http://api.indeed.com/ads/apisearch';
 const INDEED_JOB_KEY_API = 'http://api.indeed.com/ads/apigetjobs';
@@ -43,7 +44,9 @@ exports.getJobByKey = ( jobKey ) => {
                 if( !utils.isArray( jobs ) || utils.emptyArray( jobs ) ){
                     reject( 'JobNotFound' );
                 } else {
-                    resolve( jobs[0] );
+                    let job = jobs[0];
+                    job = sanitizeSnippets( [job] )[0];
+                    resolve( job );
                 }
             }
         } );
@@ -210,7 +213,6 @@ function getJobsList( profile, city, state, zip, maxResults, radius, numJobs = f
         } );
         // Job types
         Promise.all( typePromises ).then( totalResults => {
-            // Flatten results before sending
             if( numJobs ) {
                 let sumOfResults = 0;
                 for( let i = 0; i < totalResults.length; i++ ){
@@ -218,7 +220,10 @@ function getJobsList( profile, city, state, zip, maxResults, radius, numJobs = f
                 }
                 resolve( { city: city, state: state, jobNum:sumOfResults } );
             } else {
-                resolve( [].concat.apply( [], totalResults ) );
+                // Flatten results before sending
+                let jobsArr = [].concat.apply( [], totalResults );
+                jobsArr = sanitizeSnippets( jobsArr );
+                resolve( jobsArr );
             }
         }).catch( err => {
             reject( err );
@@ -226,3 +231,14 @@ function getJobsList( profile, city, state, zip, maxResults, radius, numJobs = f
     });
 }
 
+// Helper to sanitize all the job snippets before sending
+let sanitizeSnippets = ( jobsArr ) => {
+    for( let i = 0; i < jobsArr.length; i++ ){
+        jobsArr[i].snippet = sanitizeHTML( jobsArr[i].snippet, {
+            allowedTags: [],
+            allowedAttributes: []
+        });
+    }
+    console.log(jobsArr);
+    return jobsArr;
+};

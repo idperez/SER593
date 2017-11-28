@@ -353,7 +353,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "String",
             "optional": false,
-            "field": "jobkeys",
+            "field": "jobkey",
             "description": "<p>Indeed job key</p>"
           }
         ]
@@ -469,9 +469,10 @@ define({ "api": [
           {
             "group": "Parameter",
             "type": "String",
-            "optional": false,
+            "optional": true,
             "field": "radius",
-            "description": "<p>Radius in miles (Optional: default is 25).</p>"
+            "defaultValue": "25",
+            "description": "<p>Radius in miles from coordinate point.</p>"
           }
         ]
       }
@@ -598,9 +599,10 @@ define({ "api": [
           {
             "group": "Parameter",
             "type": "Number",
-            "optional": false,
+            "optional": true,
             "field": "radius",
-            "description": "<p>from city center to get results (Optional: default is 25).</p>"
+            "defaultValue": "25",
+            "description": "<p>Radius from city center to search for jobs.</p>"
           }
         ]
       }
@@ -714,9 +716,10 @@ define({ "api": [
           {
             "group": "Parameter",
             "type": "Number",
-            "optional": false,
+            "optional": true,
             "field": "radius",
-            "description": "<p>Radius in miles (Optional: default is 25).</p>"
+            "defaultValue": "25",
+            "description": "<p>Radius in miles from center of zip code.</p>"
           }
         ]
       }
@@ -1050,6 +1053,27 @@ define({ "api": [
         {
           "title": "Header-Example:",
           "content": "{\n    authorization: Bearer QZ3jhbfdof84GFBlSe\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Boolean",
+            "optional": true,
+            "field": "cityarray",
+            "defaultValue": "false",
+            "description": "<p>Optional - Return city match results as a sorted array by match percentage.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "{\n  \"cityarray\": true\n}",
           "type": "json"
         }
       ]

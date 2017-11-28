@@ -18,6 +18,13 @@ const cityData = require( "../search/cityData" );
  *          authorization: Bearer QZ3jhbfdof84GFBlSe
  *      }
  *
+ * @apiParam {Boolean} [cityarray=false] Optional - Return city match results as a sorted array by match percentage.
+ * @apiParamExample {json} Request-Example:
+ *     {
+ *       "cityarray": true
+ *     }
+ *
+ *
  * @apiError UserNotFound User information is not in the database.
  * @apiError TokenNotFound Bearer token not found in header.
  * @apiError TokenMismatch Bearer token does not match.
@@ -32,7 +39,16 @@ const cityData = require( "../search/cityData" );
  */
 router.get( '/profile',
     ( req, res ) => {
-        res.send( res.locals.user );
+        let useCityArray = req.query.cityarray;
+
+        if( useCityArray && useCityArray === "true" ) {
+            let profile = res.locals.user;
+            profile[consts.PROF_KEYS.CITY_MATCH] = DB_PROFILES.cityMatchToArray( profile[consts.PROF_KEYS.CITY_MATCH] );
+            res.send( profile );
+        } else {
+            res.send( res.locals.user );
+        }
+
     }
 );
 
