@@ -29,7 +29,7 @@ export default class MapSearchBox extends Component {
                     }}
                     query={{
                         // available options: https://developers.google.com/places/web-service/autocomplete
-                        key: 'AIzaSyAEtLBeeFTxB_D-EX_Wo4U-kqov5nprVXQ',
+                        key: 'AIzaSyB0qLyeZGKreKL1ktvePOAnMD2XJPRkCE4',
                         language: 'en', // language of the results
                         types: '(cities)', // default: 'geocode'
                     }}

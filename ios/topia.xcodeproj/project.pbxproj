@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -53,6 +52,7 @@
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 		8459EFA11ED046A9B2B37934 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F1823D6C333C44B9B37B7372 /* SimpleLineIcons.ttf */; };
 		9176A52E62834E8D9B6EBCB1 /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3E71D35348024B86B6BC1438 /* Ionicons.ttf */; };
+		96C28DC3B14B43BEAA2DEAF1 /* libRCTYouTube.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E8737363C3CA4A03A605B33C /* libRCTYouTube.a */; };
 		A45325EADDD945E79B9264EE /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 01E4E5FF27FE4A5CAFFF1EB3 /* FontAwesome.ttf */; };
 		AA0CC4BB3DAE4EFBB83B0B29 /* libAirMaps.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 40EBD054BB5649DB8CFECB77 /* libAirMaps.a */; };
 		AADF1F829AE64C94B60E5A09 /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A5496378FAA344B89D4D4EE5 /* Zocial.ttf */; };
@@ -60,6 +60,9 @@
 		BE3FF9EB0F7D485B92C96344 /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 01725AE42D1548D6B190B1FA /* Ionicons.ttf */; };
 		C2F0452C58FC469C9752E399 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3D003DA8120A4E80BC4A7919 /* FontAwesome.ttf */; };
 		CC2A0354C5C14DA885B3C9CF /* Roboto_medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A223F73F588F41A29025F8DB /* Roboto_medium.ttf */; };
+		E20DBFF759BD4C77ACD8F290 /* OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 451205D3E3BE4A899CB12545 /* OFL.txt */; };
+		E62812031FCCF7C000EB353B /* YTPlayerView-iframe-player.html in Resources */ = {isa = PBXBuildFile; fileRef = E62812021FCCF7C000EB353B /* YTPlayerView-iframe-player.html */; };
+		E7D4A1C76CFE467D9535ECE0 /* YTPlayerView-iframe-player.html in Resources */ = {isa = PBXBuildFile; fileRef = B1BD51CFA12F49488AF87036 /* YTPlayerView-iframe-player.html */; };
 		F2E62A33A23542629C2DF1E8 /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C3DC5A99EEA84591840CEE87 /* MaterialIcons.ttf */; };
 		FE97E45B23A949FAA4BD8D00 /* rubicon-icon-font.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 26B2C5A1456947298746FE2A /* rubicon-icon-font.ttf */; };
 /* End PBXBuildFile section */
@@ -254,6 +257,13 @@
 			remoteGlobalIDString = 58B5119B1A9E6C1200147676;
 			remoteInfo = RCTText;
 		};
+		E62811F11FCCF73C00EB353B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B3E52EA85E484F5587CC348B /* RCTYouTube.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8BDB9BC91B4289AE00EF9FEF;
+			remoteInfo = RCTYouTube;
+		};
 		E64D68EB1FCB851100BCF24D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 35AFD0E131324D8ABDB6F364 /* rnpc_demo.xcodeproj */;
@@ -347,6 +357,7 @@
 		3D003DA8120A4E80BC4A7919 /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
 		3E71D35348024B86B6BC1438 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/native-base/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		40EBD054BB5649DB8CFECB77 /* libAirMaps.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libAirMaps.a; sourceTree = "<group>"; };
+		451205D3E3BE4A899CB12545 /* OFL.txt */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = OFL.txt; path = "../node_modules/native-base/Fonts/OFL.txt"; sourceTree = "<group>"; };
 		4FC04A11F500442CB70FC945 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
 		548EB79B67C548AD83235166 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		55EFC9591C4A4FD59FD2AE71 /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/native-base/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
@@ -357,10 +368,14 @@
 		8CFB79469BFA46FA967E70F7 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/native-base/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
 		A223F73F588F41A29025F8DB /* Roboto_medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Roboto_medium.ttf; path = "../node_modules/native-base/Fonts/Roboto_medium.ttf"; sourceTree = "<group>"; };
 		A5496378FAA344B89D4D4EE5 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/native-base/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
+		B1BD51CFA12F49488AF87036 /* YTPlayerView-iframe-player.html */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "YTPlayerView-iframe-player.html"; path = "../node_modules/react-native-youtube/assets/YTPlayerView-iframe-player.html"; sourceTree = "<group>"; };
+		B3E52EA85E484F5587CC348B /* RCTYouTube.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RCTYouTube.xcodeproj; path = "../node_modules/react-native-youtube/RCTYouTube.xcodeproj"; sourceTree = "<group>"; };
 		BD7212895E934F12B6D24279 /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Feather.ttf"; sourceTree = "<group>"; };
 		C3DC5A99EEA84591840CEE87 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/native-base/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
 		D210AB48B2E7461AB4E46627 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/native-base/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		E497779BA5CF48C1B895DB85 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
+		E62812021FCCF7C000EB353B /* YTPlayerView-iframe-player.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = "YTPlayerView-iframe-player.html"; path = "../node_modules/react-native-youtube/assets/YTPlayerView-iframe-player.html"; sourceTree = "<group>"; };
+		E8737363C3CA4A03A605B33C /* libRCTYouTube.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRCTYouTube.a; sourceTree = "<group>"; };
 		EABD9B486DAB47B19E012AFF /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
 		EE47662BBEF047FE870E5533 /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = "../node_modules/native-base/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
 		EFFD5C5789784B978290FDE1 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
@@ -395,6 +410,7 @@
 				257C70CD048543F68A9ED0AA /* libRNVectorIcons.a in Frameworks */,
 				AA0CC4BB3DAE4EFBB83B0B29 /* libAirMaps.a in Frameworks */,
 				226D6A59DE3F4AA49F80DF97 /* libRCTActionSheet.a in Frameworks */,
+				96C28DC3B14B43BEAA2DEAF1 /* libRCTYouTube.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -559,6 +575,8 @@
 				36995946D619483B97DB9CF1 /* Octicons.ttf */,
 				4FC04A11F500442CB70FC945 /* SimpleLineIcons.ttf */,
 				1C9CFEF997934AFA93F746A6 /* Zocial.ttf */,
+				451205D3E3BE4A899CB12545 /* OFL.txt */,
+				B1BD51CFA12F49488AF87036 /* YTPlayerView-iframe-player.html */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -598,6 +616,7 @@
 				2FC4BD9D0CF84F169B2009C2 /* RNVectorIcons.xcodeproj */,
 				1D5B996C06524AF697D26725 /* AirMaps.xcodeproj */,
 				35AFD0E131324D8ABDB6F364 /* rnpc_demo.xcodeproj */,
+				B3E52EA85E484F5587CC348B /* RCTYouTube.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -614,6 +633,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				E62812021FCCF7C000EB353B /* YTPlayerView-iframe-player.html */,
 				13B07FAE1A68108700A75B9A /* topia */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* topiaTests */,
@@ -631,6 +651,14 @@
 				00E356EE1AD99517003FC87E /* topiaTests.xctest */,
 				2D02E47B1E0B4A5D006451C7 /* topia-tvOS.app */,
 				2D02E4901E0B4A5D006451C7 /* topia-tvOSTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E62811DC1FCCF73C00EB353B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E62811F21FCCF73C00EB353B /* libRCTYouTube.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -818,6 +846,10 @@
 				{
 					ProductGroup = 139FDEE71B06529A00C62182 /* Products */;
 					ProjectRef = 139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */;
+				},
+				{
+					ProductGroup = E62811DC1FCCF73C00EB353B /* Products */;
+					ProjectRef = B3E52EA85E484F5587CC348B /* RCTYouTube.xcodeproj */;
 				},
 				{
 					ProductGroup = 146834001AC3E56700842450 /* Products */;
@@ -1018,6 +1050,13 @@
 			remoteRef = 832341B41AAA6A8300B99B32 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		E62811F21FCCF73C00EB353B /* libRCTYouTube.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRCTYouTube.a;
+			remoteRef = E62811F11FCCF73C00EB353B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		E64D68EC1FCB851100BCF24D /* rnpc_demo.app */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.application;
@@ -1113,6 +1152,9 @@
 				41D0D5C0608B450D88B6FABA /* Octicons.ttf in Resources */,
 				B2D9AD52577943AFB497DD0A /* SimpleLineIcons.ttf in Resources */,
 				1ADCEC334C3646648A9CC8BE /* Zocial.ttf in Resources */,
+				E20DBFF759BD4C77ACD8F290 /* OFL.txt in Resources */,
+				E62812031FCCF7C000EB353B /* YTPlayerView-iframe-player.html in Resources */,
+				E7D4A1C76CFE467D9535ECE0 /* YTPlayerView-iframe-player.html in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1240,12 +1282,14 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-percentage-circle/rnpc_demo/ios/rnpc_demo",
+					"$(SRCROOT)/../node_modules/react-native-youtube/**",
 				);
 				INFOPLIST_FILE = topiaTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1269,12 +1313,14 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-percentage-circle/rnpc_demo/ios/rnpc_demo",
+					"$(SRCROOT)/../node_modules/react-native-youtube/**",
 				);
 				INFOPLIST_FILE = topiaTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1301,6 +1347,7 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-percentage-circle/rnpc_demo/ios/rnpc_demo",
+					"$(SRCROOT)/../node_modules/react-native-youtube/**",
 				);
 				INFOPLIST_FILE = topia/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1327,6 +1374,7 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-percentage-circle/rnpc_demo/ios/rnpc_demo",
+					"$(SRCROOT)/../node_modules/react-native-youtube/**",
 				);
 				INFOPLIST_FILE = topia/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1358,11 +1406,13 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-percentage-circle/rnpc_demo/ios/rnpc_demo",
+					"$(SRCROOT)/../node_modules/react-native-youtube/**",
 				);
 				INFOPLIST_FILE = "topia-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1396,11 +1446,13 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-percentage-circle/rnpc_demo/ios/rnpc_demo",
+					"$(SRCROOT)/../node_modules/react-native-youtube/**",
 				);
 				INFOPLIST_FILE = "topia-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1435,6 +1487,7 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.topia-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1459,6 +1512,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",

@@ -23,12 +23,15 @@
 		"react-native-percent-circle": "0.0.6",
 		"react-native-percentage-circle": "^1.0.6",
 		"react-native-popup-dialog": "^0.9.39",
+		"react-native-ratings": "^4.1.0",
+		"react-native-root-toast": "^2.2.0",
 		"react-native-router-flux": "^4.0.0-beta.22",
 		"react-native-searchbar": "^1.13.0",
 		"react-native-slider": "^0.11.0",
 		"react-native-snap-carousel": "^3.4.0",
 		"react-native-textinput-effects": "^0.4.2",
-		"react-native-vector-icons": "^4.4.0"
+		"react-native-vector-icons": "^4.4.0",
+		"react-native-youtube": "^1.0.1"
 	},
 	"devDependencies": {
 		"babel-jest": "21.0.2",
