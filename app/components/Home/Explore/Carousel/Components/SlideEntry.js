@@ -12,7 +12,13 @@ import {
 
 import styles from './../Styles/EntryStyles';
 
+import { Actions } from 'react-native-router-flux';
+
 export default class SliderEntry extends Component {
+
+    onPress(data) {
+        Actions.jobProfile({jobData: data});
+    }
 
     render () {
         const { data: { jobtitle, snippet, company}, even } = this.props;
@@ -30,7 +36,7 @@ export default class SliderEntry extends Component {
             <TouchableOpacity
                 activeOpacity={1}
                 style={styles.slideInnerContainer}
-                onPress={() => { alert(`You've clicked '${jobtitle}'`); }}
+                onPress={() =>  this.onPress(this.props)}
             >
                 <View style={[styles.textContainer, even ? styles.textContainerEven : {}]}>
                     <Text>{company}</Text>

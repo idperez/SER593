@@ -11,7 +11,19 @@ import {
     Icon
 } from 'native-base';
 
-import { Router, Scene } from 'react-native-router-flux';
+import {
+    Scene,
+    Router,
+    Actions,
+    Reducer,
+    ActionConst,
+    Overlay,
+    Tabs,
+    Modal,
+    Drawer,
+    Stack,
+    Lightbox,
+} from 'react-native-router-flux';
 
 import SplashContainer from './splash/SplashContainer';
 
@@ -28,6 +40,8 @@ import Saves from './Home/Saves/Saves';
 import Preferences from './Home/Preferences/Preferences';
 
 import Other from './Home/Other/Other';
+
+import JobProfile from './Home/Explore/Job/JobProfile';
 
 class TabIcon extends Component {
     render() {
@@ -48,37 +62,17 @@ export default class App extends Component {
             <SplashContainer>
                 <Router>
                     <Scene key="root">
-                        <Scene
-                            key="landing"
-                            component={Landing}
-                            title={<Image source={require('./../images/logo/topia-sm.png')} style={styles.image} />}
-                            navigationBarStyle={{ backgroundColor: '#9B59B6' }}
-                            hideNavBar={true}
-                            initial
-                        />
-                        <Scene
-                            key="register"
-                            component={Register}
-                            title={<Image source={require('./../images/logo/topia-sm.png')} style={styles.image} />}
-                            navBarButtonColor='#ffffff'
-                            backButtonBarStyle={{ color: '#9B59B6' }}
-                            navigationBarStyle={{ backgroundColor: '#9B59B6' }}
-                            backTitle=" "
-                        />
-                        <Scene
-                            key="login"
-                            component={Login}
-                            title={<Image source={require('./../images/logo/topia-sm.png')} style={styles.image} />}
-                            navBarButtonColor='#ffffff'
-                            backButtonBarStyle={{ color: '#9B59B6' }}
-                            navigationBarStyle={{ backgroundColor: '#9B59B6' }}
-                            backTitle=" "
-                        />
                         <Scene key="tabbar" tabs={true}>
                             <Scene key="Explore" hideNavBar={true}>
                                 <Scene
                                     key="exp"
-                                    component={Home}
+                                    component={JobProfile}
+                                    iconName="home"
+                                    icon={TabIcon}
+                                />
+                                <Scene
+                                    key="jobProfile"
+                                    component={JobProfile}
                                     iconName="home"
                                     icon={TabIcon}
                                 />
