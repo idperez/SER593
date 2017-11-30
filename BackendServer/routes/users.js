@@ -145,10 +145,9 @@ router.post( '/modify',
  * @apiParam {Object} prefs Object to overwrite user preferences.
  * @apiParamExample {json} Request-Example:
  *      {
- *          "prefs": {
-  *             "prefs_jobs_titles": ["Software Engineer", "Developer", "Java"],
- *              "prefs_jobs_postedDate": 60
-  *          }
+ *
+ *         "prefs_jobs_titles": ["Software Engineer", "Developer", "Java"],
+ *         "prefs_jobs_postedDate": 60
  *      }
  *
  * @apiError UserNotFound User information is not in the database.
@@ -175,7 +174,7 @@ router.post( '/modifymulti',
         } catch ( err ){} // No error handling needed for this event.
         DB_PROFILES.modifyUserPreferences(
             res.locals.user,
-            req.body.prefs
+            req.body
         ).then( profile => {
             res.send( profile );
         }).catch( err => {

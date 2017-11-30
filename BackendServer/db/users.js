@@ -209,6 +209,8 @@ exports.modifyUserPreferences = ( userObj, prefObj ) => {
 
         let promises = [];
 
+        console.log(typeof prefObj);
+
         // Get every key from the obj and update it on the DB
         for( let key in prefObj ){
             if( prefObj.hasOwnProperty( key ) ){
