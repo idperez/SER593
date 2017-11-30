@@ -338,17 +338,15 @@
 							"",
 							"pm.test('Element schema is valid', function() {",
 							"    let jsonData = pm.response.json();",
-							"    pm.expect(tv4.validate(jsonData[0], schemaElem)).to.be.true;",
+							"    // We only care about this test if we actually got a result back",
+							"    if( jsonData.length > 0 ){",
+							"        pm.expect(tv4.validate(jsonData[0], schemaElem)).to.be.true;",
+							"    }",
 							"});",
 							"",
-							"pm.test('Schema is valid', function() {",
+							"pm.test('An array was returned', function() {",
 							"    let jsonData = pm.response.json();",
 							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
-							"});",
-							"",
-							"pm.test('Array not empty', function() {",
-							"    let jsonData = pm.response.json();",
-							"    pm.expect(jsonData.length > 0).to.be.true;",
 							"});",
 							"",
 							"pm.test(\"Status code is 200\", function () {",
@@ -374,7 +372,7 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/search/jobs/coords?lat=40.766538&long=-73.977849&limit=100&radius=2",
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/search/jobs/coords?lat=40.766538&long=-73.977849&limit=100&radius=20",
 					"host": [
 						"topia-env-development",
 						"us-west-2",
@@ -404,7 +402,7 @@
 						},
 						{
 							"key": "radius",
-							"value": "2",
+							"value": "20",
 							"equals": true
 						}
 					]
@@ -455,17 +453,15 @@
 							"",
 							"pm.test('Element schema is valid', function() {",
 							"    let jsonData = pm.response.json();",
-							"    pm.expect(tv4.validate(jsonData[0], schemaElem)).to.be.true;",
+							"    // We only care about this test if we actually got a result back",
+							"    if( jsonData.length > 0 ){",
+							"        pm.expect(tv4.validate(jsonData[0], schemaElem)).to.be.true;",
+							"    }",
 							"});",
 							"",
-							"pm.test('Schema is valid', function() {",
+							"pm.test('An array was returned', function() {",
 							"    let jsonData = pm.response.json();",
 							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
-							"});",
-							"",
-							"pm.test('Array not empty', function() {",
-							"    let jsonData = pm.response.json();",
-							"    pm.expect(jsonData.length > 0).to.be.true;",
 							"});",
 							"",
 							"pm.test(\"Status code is 200\", function () {",
@@ -566,17 +562,15 @@
 							"",
 							"pm.test('Element schema is valid', function() {",
 							"    let jsonData = pm.response.json();",
-							"    pm.expect(tv4.validate(jsonData[0], schemaElem)).to.be.true;",
+							"    // We only care about this test if we actually got a result back",
+							"    if( jsonData.length > 0 ){",
+							"        pm.expect(tv4.validate(jsonData[0], schemaElem)).to.be.true;",
+							"    }",
 							"});",
 							"",
-							"pm.test('Schema is valid', function() {",
+							"pm.test('An array was returned', function() {",
 							"    let jsonData = pm.response.json();",
 							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
-							"});",
-							"",
-							"pm.test('Array not empty', function() {",
-							"    let jsonData = pm.response.json();",
-							"    pm.expect(jsonData.length > 0).to.be.true;",
 							"});",
 							"",
 							"pm.test(\"Status code is 200\", function () {",
@@ -601,7 +595,7 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/search/jobs/location?city=Seattle&state=WA&limit=300&radius=15",
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/search/jobs/location?city=Seattle&state=WA&limit=300&radius=200",
 					"host": [
 						"topia-env-development",
 						"us-west-2",
@@ -631,7 +625,7 @@
 						},
 						{
 							"key": "radius",
-							"value": "15",
+							"value": "200",
 							"equals": true
 						}
 					]
@@ -1468,7 +1462,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"prefs\" :{\n\t\t\"last_updated\": 123456,\n\t\t\"email\": \"testEmail@email.com\",\n\t\t\"prefs_jobs_postedDate\": 89\n\t}\n}"
+					"raw": "{\n\t\"last_updated\": 123456,\n\t\"email\": \"testEmail@email.com\",\n\t\"prefs_jobs_postedDate\": 89\n}"
 				},
 				"url": {
 					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/modifymulti",
@@ -1551,7 +1545,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"prefs\" :{\n\t\t\"last_updated\": \"{{last_updated}}\",\n\t\t\"email\": \"{{email}}\",\n\t\t\"prefs_jobs_postedDate\": \"{{prefs_jobs_postedDate}}\"\n\t}\n}"
+					"raw": "{\n\t\"last_updated\": \"{{last_updated}}\",\n\t\"email\": \"{{email}}\",\n\t\"prefs_jobs_postedDate\": \"{{prefs_jobs_postedDate}}\"\n}"
 				},
 				"url": {
 					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/modifymulti",
