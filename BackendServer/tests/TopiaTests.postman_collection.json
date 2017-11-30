@@ -47,7 +47,7 @@
 							"pm.environment.set(\"prefs_jobs_postedDate\", pm.response.json()[\"prefs_jobs_postedDate\"]);",
 							"pm.environment.set(\"email\", pm.response.json()[\"email\"]);",
 							"pm.environment.set(\"last_updated\", pm.response.json()[\"last_updated\"]);",
-							"pm.environment.set(\"prefs_jobs_titles\", pm.response.json()[\"prefs_jobs_titles\"]);",
+							"pm.environment.set(\"prefs_jobs_titles\", JSON.stringify( pm.response.json()[\"prefs_jobs_titles\"] ) );",
 							""
 						]
 					}
@@ -1736,7 +1736,7 @@
 						"type": "text/javascript",
 						"exec": [
 							"",
-							"const TEST_TITLES = pm.environment.get(\"prefs_jobs_titles\");",
+							"const TEST_TITLES = JSON.parse( pm.environment.get(\"prefs_jobs_titles\") );",
 							"",
 							"pm.sendRequest({",
 							"    url: \"topia-env-development.us-west-2.elasticbeanstalk.com/users/profile\",",
@@ -1789,7 +1789,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"prefs_jobs_titles\": \"{{prefs_jobs_titles}}\"\n}"
+					"raw": "{\n\t\"prefs_jobs_titles\": {{prefs_jobs_titles}}\n}"
 				},
 				"url": {
 					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/modifymulti",
