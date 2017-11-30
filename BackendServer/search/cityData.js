@@ -4,15 +4,19 @@ const POPULATION_ENDPOINT = "https://api.census.gov/data/2016/pep/population";
 const request = require( 'request' );
 const DB_USERS = require( '../db/users' );
 const consts = require( "../constants" );
+const util = require( "../util.js" );
 const qs = require( 'querystring' );
 const CITY_NAME_POS = 1;     // Position of city name string in the population array
 const CITY_POP_POS = 0;      // Position of the city population in the population array
 const MAX_POP = "999999999"; // Maximum population city to get city percentage match for.
 const MIN_POP = "500000";    // Minimum population city to get city percentage match for.
 let LOCATION_NAME_DELIMITERS = [
-    " city, ", // An extra "city" word is added to all the city names.
-    " (balance), " // Some locations have a balance here instead of city
+    " city",        // An extra "city" word is added to all the city names.
+    " (balance)",   // Some locations have a balance here instead of city
+    "-",            // Remove shared name with nearby smaller towns
+    "/"             // Remove shared name with nearby smaller towns
 ] ;
+const CITY_STATE_SEPARATOR = ", ";
 const RADIUS = 20;  // Radius for the city job search in miles.
 
 exports.updateCityRatings = ( userObj ) => {
@@ -20,6 +24,8 @@ exports.updateCityRatings = ( userObj ) => {
         exports.getCityStats( userObj ).then( ( cityRatiosObj ) => {
 
             let ratings = {};
+
+            console.log(cityRatiosObj);
 
             // Parse out param
             let cities = cityRatiosObj.cities;
@@ -181,18 +187,25 @@ exports.grabCityPopulations = () => {
                 body = JSON.parse( body );
                 for( let i = 1; i < body.length; i++ ){
                     let location = body[i][CITY_NAME_POS];
-                    let splitLoc = [];
+                    let splitLoc = location.split( CITY_STATE_SEPARATOR );
                     let pop = parseInt( body[i][CITY_POP_POS] );
+                    let city = splitLoc[0];
+                    let state = splitLoc[1];
 
-                    // Parse the city/state location string
-                    for( let j = 0; j < LOCATION_NAME_DELIMITERS.length && splitLoc.length < 2; j++ ){
-                        splitLoc = location.split( LOCATION_NAME_DELIMITERS[j] );
+                    // Clean city name
+                    let splitCity = [];
+                    for( let j = 0; j < LOCATION_NAME_DELIMITERS.length; j++ ){
+                        splitCity = city.split( LOCATION_NAME_DELIMITERS[j] );
+                        // Only update if a split occurred.
+                        if( util.isArray( splitCity ) ) {
+                            city = splitCity[ 0 ]; // Always take far left of city string when a split occurs
+                        }
                     }
 
-                    if( splitLoc[0] && splitLoc[1] ) {
-                        cityMatchJSON[ splitLoc[0] ] = { // Use city name as the key
-                            city: splitLoc[0],
-                            state: splitLoc[1],
+                    if( city && state ) {
+                        cityMatchJSON[ city ] = { // Use city name as the key
+                            city: city,
+                            state: state,
                             population: pop
                         };
                     }
