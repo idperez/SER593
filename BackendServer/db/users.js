@@ -109,11 +109,13 @@ exports.getUserProfileByPrimaryKey = ( primKey, value ) => {
 
                             resolve( resultProfile );
 
-                            // Check expiration time stamp for the users profile.
-                            // This runs after the response, so the current call for the user profile
-                            // will not have to wait for the updates.
-
+                            /*
+                               Check expiration time stamp for the users profile.
+                               This runs after the response, so the current call for the user profile
+                               will not have to wait for the updates.
+                            */
                             timelyUpdates( resultProfile, DEFAULT_UPDATE_TIME );
+
 
                         } ).catch( err => reject( err ) );
 
@@ -165,7 +167,25 @@ exports.addNewUser = ( username, password, email ) => {
     });
 };
 
+// Endpoint entrance to modify an existing user profile key
+// This is for routing use to prevent a loop on profile change updates
+exports.modifyUserItemEndpoint = ( userObj, key, value, mode ) => {
+    let promise = exports.modifyUserItem( userObj, key, value, mode );
+
+    // Updates on profile change
+    promise.then( ( data ) => {
+        exports.getUserProfile( userObj[consts.PROF_KEYS.USERNAME] )
+            .then( updatedProfile => {
+                updatesOnProfileChange( updatedProfile );
+            }).catch( err => { console.log( err ) });
+    }).catch( err => console.log(err));
+
+
+    return promise;
+};
+
 // Modify an existing user profile key
+// Internal program use
 exports.modifyUserItem = ( userObj, key, value, mode ) => {
     let promise;
 
@@ -173,10 +193,10 @@ exports.modifyUserItem = ( userObj, key, value, mode ) => {
     // Key
     if( !key ) {
         promise = Promise.reject( 'InvalidKey' );
-    // Mode
+        // Mode
     } else if ( !mode || !util.objectContains( consts.MODIFIY_PREFS_MODES, mode ) ) {
         promise = Promise.reject( 'InvalidMode' );
-    // Value
+        // Value
     } else if ( !value && mode !== consts.MODIFIY_PREFS_MODES.REMOVE ) {
         promise = Promise.reject( 'MissingValue' );
     } else {
@@ -209,8 +229,6 @@ exports.modifyUserPreferences = ( userObj, prefObj ) => {
 
         let promises = [];
 
-        console.log(typeof prefObj);
-
         // Get every key from the obj and update it on the DB
         for( let key in prefObj ){
             if( prefObj.hasOwnProperty( key ) ){
@@ -234,7 +252,12 @@ exports.modifyUserPreferences = ( userObj, prefObj ) => {
 
         Promise.all( promises ).then( changes => {
             resolve( changes[changes.length - 1] ); // resolve the last change
-            updatesOnProfileChange( userObj );
+
+            // Updates on profile change
+            exports.getUserProfile( userObj[consts.PROF_KEYS.USERNAME] )
+                .then( updatedProfile => {
+                    updatesOnProfileChange( updatedProfile );
+                }).catch( err => { console.log( err ) })
         }).catch( err => reject( err ) );
     });
 };
@@ -292,6 +315,7 @@ exports.cityMatchToArray = ( cityMatches ) => {
 
     return resArray;
 };
+
 
 // Add new user profile item
 let addUserItem = ( username, key, value ) => {

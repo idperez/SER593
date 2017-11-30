@@ -17,15 +17,13 @@ let LOCATION_NAME_DELIMITERS = [
     "/"             // Remove shared name with nearby smaller towns
 ] ;
 const CITY_STATE_SEPARATOR = ", ";
-const RADIUS = 20;  // Radius for the city job search in miles.
+const RADIUS = 0;  // Radius for the city job search in miles.
 
 exports.updateCityRatings = ( userObj ) => {
     return new Promise( ( resolve, reject ) => {
         exports.getCityStats( userObj ).then( ( cityRatiosObj ) => {
 
             let ratings = {};
-
-            console.log(cityRatiosObj);
 
             // Parse out param
             let cities = cityRatiosObj.cities;
