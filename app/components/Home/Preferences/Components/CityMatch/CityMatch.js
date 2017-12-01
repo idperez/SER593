@@ -28,46 +28,81 @@ import CityCard from './CityCard';
 
 import profile from '../../../../../../lib/profile/profile';
 
+const cities = [
+    {
+        city: "california",
+        state: "cali"
+    } ,
+    {
+        city: "california",
+        state: "cali"
+    },
+    {
+        city: "california",
+        state: "cali"
+    },
+    {
+        city: "california",
+        state: "cali"
+    }
+];
+
 export default class CityMatch extends Component {
 
     constructor(props) {
         super(props);
 
         this.state = {
-            cities: <View/>
-        };
+            cityMatch: [],
+            cityMatchList: []
+        }
+    };
 
-        this.getCityMatches();
-    }
-
-    getCityMatches() {
-        profile.getProfile().then(profile => {
-            const cities = profile.cityMatch;
-            let cityArr = [];
-
-            let index = 0;
-
-            for(let city in cities) {
-                let data = cities[city];
-                cityArr.push(<CityCard
-                    key={index}
-                    city={data.city}
-                    state={data.state}
-                    rating={data.rating}
-                />);
-                index++;
-            }
-            this.setState({cities: cityArr});
-        }).catch(err => {
-            throw err;
+    initializeCityMatch = () => {
+        return new Promise((resolve, reject) => {
+            profile.getProfile().then(profile => {
+                resolve(profile.cityMatch);
+            }).catch(err => {
+                throw err;
+            });
         });
     };
+
+    reloadCityMatch = () => {
+        setTimeout(() => {
+            profile.getProfile().then(profile => {
+                this.setState({cityMatch: profile.cityMatch});
+            }).catch(err => {
+                throw err;
+            });
+        }, 3000);
+    };
+
+    displayList = () => {
+        return (
+            <View>
+                {this.state.cityMatch.map((city, index) =>
+                <CityCard
+                    key={index}
+                    city={city.city}
+                    state={city.state}
+                    rating={city.rating}
+                />)}
+            </View>
+        );
+    };
+
+    componentDidMount() {
+        this.initializeCityMatch().then(cityMatch => {
+            this.setState({cityMatch});
+        });
+    }
 
     render() {
         return (
             <Container>
                 <Content>
-                    {this.state.cities}
+                    {this.displayList()}
                 </Content>
             </Container>
         );

@@ -77,7 +77,7 @@ export default class App extends Component {
                                     icon={TabIcon}
                                 />
                             </Scene>
-                            <Scene key="Saves" title="Saves" hideNavBar={true}>
+                            <Scene key="Saves" title="Saves" hideNavBar={true} type='replace'>
                                 <Scene
                                     key="save"
                                     component={Saves}
@@ -109,13 +109,4 @@ export default class App extends Component {
     }
 }
 
-const styles = StyleSheet.create({
-    image: {
-        marginTop: -3,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    backGround: {
-        backgroundColor: '#9B59B6'
-    }
-});
+console.disableYellowBox = true;

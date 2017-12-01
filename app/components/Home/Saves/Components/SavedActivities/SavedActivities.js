@@ -32,11 +32,21 @@ export default class SavedActivities extends Component {
 
     render() {
         return (
-            <Container>
-                <Content>
-                    <Text>Activities</Text>
+            <Container style={styles.container}>
+                <Content style={styles.content}>
+                    <Icon name="ios-sunny-outline"/>
                 </Content>
             </Container>
         );
     }
 }
+
+const styles = StyleSheet.create({
+    container: {
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    content: {
+        marginTop: 100
+    }
+});

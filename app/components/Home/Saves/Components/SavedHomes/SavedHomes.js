@@ -32,11 +32,21 @@ export default class SavedHomes extends Component {
 
     render() {
         return (
-            <Container>
-                <Content>
-                    <Text>Home</Text>
+            <Container style={styles.container}>
+                <Content style={styles.content}>
+                    <Icon name="home"/>
                 </Content>
             </Container>
         );
     }
 }
+
+const styles = StyleSheet.create({
+    container: {
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    content: {
+        marginTop: 100
+    }
+});

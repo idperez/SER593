@@ -23,12 +23,6 @@ import {
 
 import { Dropdown } from 'react-native-material-dropdown';
 
-import Header from '../../../../Headers/Header';
-
-import SuccessPreferencesDialogue from '../../../../dialogues/preferences/SuccessPreferencesDialogue';
-
-import preferences from '../../../../../../lib/preferences/preferences';
-
 const jobTypes = [
     {
         value: 'Full Time'
@@ -106,21 +100,20 @@ export default class PreferencesForm extends Component {
         return days;
     }
 
-    savePreferences() {
+
+    savePreferencesSubmit = () => {
         if(this.state.jobTitle.length > 1) {
-            const daysOld = this.getDaysOld(this.state.datePosted);
-            preferences.setProfile(
+            if(this.state.jobType.length === 0) {
+                this.setState({jobType: "Full Time"})
+            }
+
+            this.props.savePreferences(
                 this.state.jobTitle,
                 this.state.jobType,
-                daysOld
-            ).then((result) => {
-                alert(JSON.stringify(result));
-                this.refs.preferencesSaved.successSavedPreferences();
-            }).catch(err => {
-                throw err;
-            });
+                31
+            );
         }
-    }
+    };
 
     render() {
         return (
@@ -151,6 +144,7 @@ export default class PreferencesForm extends Component {
                                 <Dropdown
                                     label='Job Type'
                                     data={jobTypes}
+                                    dropdownPosition={1}
                                     onChangeText={(jobType) => this.setJobType(jobType)}
                                 />
                             </View>
@@ -166,12 +160,11 @@ export default class PreferencesForm extends Component {
                 </Content>
                 <Footer>
                     <FooterTab>
-                        <Button full style={styles.savePreferences} onPress={() => this.savePreferences()}>
+                        <Button full style={styles.savePreferences} onPress={() => this.savePreferencesSubmit()}>
                             <Text style={styles.buttonText}>Save Preferences</Text>
                         </Button>
                     </FooterTab>
                 </Footer>
-                <SuccessPreferencesDialogue ref="preferencesSaved"/>
             </Container>
         );
     }

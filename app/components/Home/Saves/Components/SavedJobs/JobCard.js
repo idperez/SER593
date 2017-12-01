@@ -27,10 +27,6 @@ import {
 
 import ActionSheet from 'react-native-actionsheet';
 
-import Toast from 'react-native-root-toast';
-
-import remove from './../../../../../../lib/jobs/save';
-
 const CANCEL_INDEX = 0;
 const UNSAVE_INDEX = 1;
 const options = [ 'Cancel', 'Unsave' ];
@@ -44,47 +40,23 @@ export default class CityMatch extends Component {
             showJobOptions: true,
             arrowIconUp: true
         };
-
-        this.handlePress = this.handlePress.bind(this);
-        this.showActionSheet = this.showActionSheet.bind(this);
     }
 
-    showActionSheet() {
+    showActionSheet = () => {
         this.ActionSheet.show();
-    }
+    };
 
-    removeJob() {
-        remove.removeJob(this.props.jobkey).then(res => {
-            let toast = Toast.show('Job Removed!', {
-                duration: Toast.durations.LONG,
-                position: Toast.positions.BOTTOM,
-                shadow: true,
-                animation: true,
-                hideOnPress: true,
-                delay: 0,
-            });
-
-            setTimeout(function () {
-                Toast.hide(toast);
-            }, 1000);
-
-            this.props.refreshJobs(this.props.index);
-        }).catch(err => {
-            throw err;
-        });
-    }
-
-    handlePress(choice) {
+    handlePress = (choice) => {
         switch(choice) {
             case UNSAVE_INDEX:
-                this.removeJob();
+                this.props.removeJob(this.props.jobkey);
                 break;
         }
-    }
+    };
 
-    sanitizeDaysOld(dayString) {
+    sanitizeDaysOld = (dayString) => {
         return dayString.split(" ")[0].replace("+", "");
-    }
+    };
 
     render() {
         return (

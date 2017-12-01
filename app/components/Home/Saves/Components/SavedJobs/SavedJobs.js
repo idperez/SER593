@@ -24,6 +24,10 @@ import JobCard from './JobCard';
 
 import profile from '../../../../../../lib/profile/profile';
 
+import Toast from 'react-native-root-toast';
+
+import remove from './../../../../../../lib/jobs/save';
+
 export default class SavedJobs extends Component {
 
     constructor(props) {
@@ -32,49 +36,83 @@ export default class SavedJobs extends Component {
         this.state = {
             savedJobs: []
         };
-
-        this.refreshJobs.bind(this);
-        this.getSavedJobs();
     }
 
-    refreshJobs(index) {
-        const jobArr = this.state.savedJobs.splice(index, 1);
-        this.setState({savedJobs: jobArr});
-    }
-
-    getSavedJobs() {
-        profile.getProfile().then(profile => {
-            const jobs = profile.prefs_jobs_saved;
-            let jobsArr = [];
-
-            let index = 0;
-
-            jobs.map(job => {
-                jobsArr.push(<JobCard
-                    key={job.jobkey}
-                    city={job.city}
-                    state={job.state}
-                    daysOld={job.formattedRelativeTime}
-                    title={job.jobtitle}
-                    company={job.company}
-                    jobkey={job.jobkey}
-                    refreshJobs={this.refreshJobs()}
-                    index={index}
-                />);
-                index++;
+    removeJob = (jobkey) => {
+        remove.removeJob(jobkey).then(res => {
+            let toast = Toast.show('Job Removed!', {
+                duration: Toast.durations.LONG,
+                position: Toast.positions.BOTTOM,
+                shadow: true,
+                animation: true,
+                hideOnPress: true,
+                delay: 0,
             });
 
-            this.setState({savedJobs: jobsArr});
+            setTimeout(function () {
+                Toast.hide(toast);
+            }, 1000);
+
+            this.getSavedJobs().then(result => {
+                this.setState({
+                    savedJobs: result
+                });
+            });
         }).catch(err => {
             throw err;
         });
     };
 
+    getSavedJobs = () => {
+        return new Promise((resolve, reject) => {
+            profile.getProfile().then(profile => {
+                resolve(profile.prefs_jobs_saved)
+            }).catch(err => {
+                throw err;
+            });
+        });
+    };
+
+    displayList = () => {
+        return (
+            <View>
+                {this.state.savedJobs.map((job, index) =>
+                    <JobCard
+                        key={job.jobkey}
+                        city={job.city}
+                        state={job.state}
+                        daysOld={job.formattedRelativeTime}
+                        title={job.jobtitle}
+                        company={job.company}
+                        jobkey={job.jobkey}
+                        removeJob={this.removeJob}
+                    />)
+                }
+            </View>
+        );
+    };
+
+    componentWillReceiveProps() {
+        this.getSavedJobs().then(result => {
+            this.setState({
+                savedJobs: result
+            });
+        });
+    }
+
+    componentDidMount() {
+        this.getSavedJobs().then(result => {
+            this.setState({
+                savedJobs: result
+            });
+        });
+    }
+
     render() {
         return (
             <Container>
                 <Content>
-                    {this.state.savedJobs}
+                    {this.displayList()}
                 </Content>
             </Container>
         );
