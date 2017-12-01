@@ -960,7 +960,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Request-Example:",
-          "content": "{\n    \"prefs\": {\n       \"prefs_jobs_titles\": [\"Software Engineer\", \"Developer\", \"Java\"],\n        \"prefs_jobs_postedDate\": 60\n    }\n}",
+          "content": "{\n\n   \"prefs_jobs_titles\": [\"Software Engineer\", \"Developer\", \"Java\"],\n   \"prefs_jobs_postedDate\": 60\n}",
           "type": "json"
         }
       ]
