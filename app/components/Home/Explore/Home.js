@@ -114,8 +114,7 @@ export default class Home extends Component {
     setMarkers(jobData) {
         let markers = [];
 
-        jobData.map(
-            (job) => {
+        jobData.map((job) => {
                 markers.push(
                     <MapView.Marker key={job.jobkey}
                         coordinate={{

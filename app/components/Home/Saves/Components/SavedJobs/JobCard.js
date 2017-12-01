@@ -27,6 +27,10 @@ import {
 
 import ActionSheet from 'react-native-actionsheet';
 
+import Toast from 'react-native-root-toast';
+
+import remove from './../../../../../../lib/jobs/save';
+
 const CANCEL_INDEX = 0;
 const UNSAVE_INDEX = 1;
 const options = [ 'Cancel', 'Unsave' ];
@@ -49,12 +53,37 @@ export default class CityMatch extends Component {
         this.ActionSheet.show();
     }
 
+    removeJob() {
+        remove.removeJob(this.props.jobkey).then(res => {
+            let toast = Toast.show('Job Removed!', {
+                duration: Toast.durations.LONG,
+                position: Toast.positions.BOTTOM,
+                shadow: true,
+                animation: true,
+                hideOnPress: true,
+                delay: 0,
+            });
+
+            setTimeout(function () {
+                Toast.hide(toast);
+            }, 1000);
+
+            this.props.refreshJobs(this.props.index);
+        }).catch(err => {
+            throw err;
+        });
+    }
+
     handlePress(choice) {
         switch(choice) {
             case UNSAVE_INDEX:
-                alert("unsave");
+                this.removeJob();
                 break;
         }
+    }
+
+    sanitizeDaysOld(dayString) {
+        return dayString.split(" ")[0].replace("+", "");
     }
 
     render() {
@@ -64,16 +93,16 @@ export default class CityMatch extends Component {
                     <Body>
                         <Grid>
                             <Col size={90}>
-                                <H3>Intel</H3>
-                                <Text>Software Engineer 3</Text>
-                                <Text style={styles.cityText}>Phoenix, Arizona</Text>
+                                <H3>{this.props.company}</H3>
+                                <Text>{this.props.title}</Text>
+                                <Text style={styles.cityText}>{this.props.city}, {this.props.state}</Text>
                             </Col>
                             <Col size={10}>
                                 <View style={styles.container}>
                                     <TouchableHighlight onPress={this.showActionSheet} underlayColor="white">
                                         <Icon style={{color: '#9B59B6'}} name="ios-heart"/>
                                     </TouchableHighlight>
-                                    <Text style={styles.dayText}>13d</Text>
+                                    <Text style={styles.dayText}>{this.sanitizeDaysOld(this.props.daysOld)}d</Text>
                                 </View>
                             </Col>
                         </Grid>

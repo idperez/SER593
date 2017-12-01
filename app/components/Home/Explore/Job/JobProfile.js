@@ -31,8 +31,6 @@ import JobHeader from './Components/JobHeader';
 
 import JobTitle from './Components/JobTitle';
 
-import JobFooter from './Components/JobFooter';
-
 import TopRating from './Components/TopRating';
 
 import OtherRatings from './Components/OtherRatings';
@@ -45,49 +43,65 @@ export default class JobProfile extends Component {
 
     constructor(props) {
         super(props);
-
-        this.state = {
-            video: <View/>
-        };
     }
 
     render() {
+        const { company } = this.props;
+        const { job } = this.props;
         return (
             <Container style={styles.container}>
                 <Content>
-                    <JobHeader title="Garmin"/>
+                    <JobHeader title={job.company}/>
                     <JobTitle
-                        companyIcon="https://media.glassdoor.com/sqls/12667/garmin-squarelogo-1470061748290.png"
-                        daysOld="13"
-                        title="Software Engineer 1"
-                        city="Chandler"
-                        state="AZ"
-                        url="http://www.indeed.com/viewjob?jk=440966298f2524a6&qd=AHBv2aSOJz5QeLJ8HScbwOCGNrM6JWIrPXRWz-lk3Z-lAxUFdHl0o3f_kXYP_3W8sqo2-h2X5iMb9B7ISxmiCi_9-lsXIosBqhLuZL1-euySLPY5W3V58OPvgfARweeS6oc3nzBK-77NWsOXheHOMA&indpubnum=7658403343281086&atk=1bvvla63pa3d49sh"
+                        companyIcon={company.squareLogo ? company.squareLogo : "https://cdn.pixabay.com/photo/2017/07/31/16/13/briefcase-2558671__480.jpg" }
+                        daysOld={job.formattedRelativeTime}
+                        title={job.jobtitle}
+                        city={job.city}
+                        state={job.state}
+                        url={job.url}
+                        jobkey={job.jobkey}
                     />
-                    <TopRating
-                        company="Garmin"
-                        overall={3.6}
-                        recommend={55}
-                    />
+                    {(company.overallRating && company.recommendToFriendRating) ?
+                        <TopRating
+                            company={job.company}
+                            overall={company.overallRating}
+                            recommend={company.recommendToFriendRating}
+                        />
+                        :
+                        <View/>
+                    }
                     <Grid>
-                        <Col>
-                            <OtherRatings
-                                culture={3.6}
-                                leadership={2.0}
-                                compensation={3.0}
-                                opportunities={3.4}
-                                life={2.3}
-                            />
-                        </Col>
-                        <Col>
-                            <CEORating
-                                url="https://media.glassdoor.com/people/sqll/3520/mazda-masamichi-kogai.png"
-                                name="Masamichi Kogai"
-                                approval={53}
-                            />
-                        </Col>
+                        {(company.cultureAndValuesRating
+                        && company.seniorLeadershipRating
+                        && company.compensationAndBenefitsRating
+                        && company.careerOpportunitiesRating
+                        && company.workLifeBalanceRating) ?
+                            <Col>
+                                <OtherRatings
+                                    culture={company.cultureAndValuesRating}
+                                    leadership={company.seniorLeadershipRating}
+                                    compensation={company.compensationAndBenefitsRating}
+                                    opportunities={company.careerOpportunitiesRating}
+                                    life={company.workLifeBalanceRating}
+                                />
+                            </Col>
+                            :
+                            <View/>
+                        }
+                        {company.ceo &&
+                         company.ceo.image?
+                            <Col>
+                                <CEORating
+                                    url={company.ceo.image.src}
+                                    name={company.ceo.name}
+                                    approval={company.ceo.pctApprove}
+                                />
+                            </Col>
+                               :
+                            <View/>
+                        }
                     </Grid>
-                    <Video company="garmin"/>
+                    <Video company={job.company} />
                 </Content>
             </Container>
         );
