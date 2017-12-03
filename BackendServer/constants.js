@@ -6,7 +6,7 @@ exports.PROF_KEYS = {
     PASSWORD: "password",
     EMAIL: "email",
     PREFS_JOBS_TITLES: "prefs_jobs_titles",
-    PREFS_JOBS_TYPES: "prefs_jobs_types",
+    PREFS_JOBS_TYPES: "prefs_jobs_types", // "fulltime", "parttime", "contract", "internship", "temporary".
     PREFS_JOBS_DATE: "prefs_jobs_postedDate", // Number of days old
     PREFS_JOBS_SAVED: "prefs_jobs_saved",
     CITY_MATCH: "cityMatch",
