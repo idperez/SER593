@@ -100,7 +100,7 @@ export default class PreferencesForm extends Component {
                 days = 31;
                 break;
             default:
-                days = 1;
+                days = 31;
                 break;
         }
         return days;
@@ -115,7 +115,7 @@ export default class PreferencesForm extends Component {
                 daysOld
             ).then((result) => {
                 alert(JSON.stringify(result));
-                // this.refs.preferencesSaved.successSavedPreferences();
+                this.refs.preferencesSaved.successSavedPreferences();
             }).catch(err => {
                 throw err;
             });

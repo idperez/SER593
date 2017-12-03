@@ -12,12 +12,39 @@ import {
 
 import styles from './../Styles/EntryStyles';
 
+import company from './../../../../../../lib/jobs/company';
+
 import { Actions } from 'react-native-router-flux';
+
+import BusyIndicator from 'react-native-busy-indicator';
+
+import loaderHandler from 'react-native-busy-indicator/LoaderHandler';
 
 export default class SliderEntry extends Component {
 
-    onPress(data) {
-        Actions.jobProfile({jobData: data});
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            showContent: true
+        }
+    }
+
+    openJob(job) {
+        this.setState({showContent: false});
+        loaderHandler.showLoader("");
+        company.getCompanyInfo(job.data.company).then(company => {
+            this.setState({showContent: true});
+            loaderHandler.hideLoader();
+            if(!company.err) {
+                Actions.jobProfile({
+                    company: company,
+                    job: job.data
+                });
+            }
+        }).catch(err => {
+            throw err;
+        });
     }
 
     render () {
@@ -36,7 +63,7 @@ export default class SliderEntry extends Component {
             <TouchableOpacity
                 activeOpacity={1}
                 style={styles.slideInnerContainer}
-                onPress={() =>  this.onPress(this.props)}
+                onPress={() =>  this.openJob(this.props)}
             >
                 <View style={[styles.textContainer, even ? styles.textContainerEven : {}]}>
                     <Text>{company}</Text>
@@ -47,6 +74,13 @@ export default class SliderEntry extends Component {
                     >
                         { snippet }
                     </Text>
+                    <BusyIndicator
+                        overlayColor='transparent'
+                        color="#674172"
+                        textColor="#674172"
+                        Size="large"
+                        text=""
+                    />
                 </View>
             </TouchableOpacity>
         );

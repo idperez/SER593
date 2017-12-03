@@ -66,7 +66,7 @@ export default class App extends Component {
                             <Scene key="Explore" hideNavBar={true}>
                                 <Scene
                                     key="exp"
-                                    component={JobProfile}
+                                    component={Home}
                                     iconName="home"
                                     icon={TabIcon}
                                 />

@@ -65,7 +65,7 @@ export default class OtherRatings extends Component {
                         <Rating
                             type="star"
                             fractions={1}
-                            startingValue={this.props.culture}
+                            startingValue={parseInt(this.props.culture)}
                             imageSize={25}
                             style={{ paddingVertical: 10 }}
                         />
@@ -73,7 +73,7 @@ export default class OtherRatings extends Component {
                         <Rating
                             type="star"
                             fractions={1}
-                            startingValue={this.props.leadership}
+                            startingValue={parseInt(this.props.leadership)}
                             imageSize={25}
                             style={{ paddingVertical: 10 }}
                         />
@@ -81,7 +81,7 @@ export default class OtherRatings extends Component {
                         <Rating
                             type="star"
                             fractions={1}
-                            startingValue={this.props.compensation}
+                            startingValue={parseInt(this.props.compensation)}
                             imageSize={25}
                             style={{ paddingVertical: 10 }}
                         />
@@ -89,7 +89,7 @@ export default class OtherRatings extends Component {
                         <Rating
                             type="star"
                             fractions={1}
-                            startingValue={this.props.opportunities}
+                            startingValue={parseInt(this.props.opportunities)}
                             imageSize={25}
                             style={{ paddingVertical: 10 }}
                         />
@@ -97,7 +97,7 @@ export default class OtherRatings extends Component {
                         <Rating
                             type="star"
                             fractions={1}
-                            startingValue={this.props.life}
+                            startingValue={parseInt(this.props.life)}
                             imageSize={25}
                             style={{ paddingVertical: 10 }}
                         />

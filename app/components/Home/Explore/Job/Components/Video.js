@@ -43,12 +43,18 @@ export default class Video extends Component {
 
     getRecruitingVideo(company) {
         jobVideo.getRecruitingVideo(company).then(videos => {
-            if(videos.items.length > 0) {
-                this.setState({
-                    videoId: videos.items[0].id.videoId
-                });
+            if(videos.items) {
+                if(videos.items.length > 0) {
+                    this.setState({
+                        videoId: videos.items[0].id.videoId
+                    });
+                } else {
+                    this.getCompanyVideo(company);
+                }
             } else {
-                this.getCompanyVideo(company);
+                this.setState({
+                    videoId: "F_NEIwDiCSw"
+                });
             }
         }).catch(err => {
             throw err;
@@ -57,10 +63,12 @@ export default class Video extends Component {
 
     getCompanyVideo(company) {
         jobVideo.getCompanyVideo(company).then(videos => {
-            if(videos.items.length > 0) {
-                this.setState({
-                    videoId: videos.items[0].id.videoId
-                });
+            if(videos.items) {
+                if (videos.items.length > 0) {
+                    this.setState({
+                        videoId: videos.items[0].id.videoId
+                    });
+                }
             } else {
                 this.setState({
                     videoId: "F_NEIwDiCSw"

@@ -27,6 +27,10 @@ import {
     FooterTab
 } from 'native-base';
 
+import Toast from 'react-native-root-toast';
+
+import save from './../../../../../../lib/jobs/save';
+
 export default class JobTitle extends Component {
 
     constructor(props) {
@@ -39,9 +43,30 @@ export default class JobTitle extends Component {
 
     saveJob() {
         if(!this.state.jobSaved) {
-            this.setState({jobSaved: true});
+            save.saveJob(this.props.jobkey).then(res => {
+                let toast = Toast.show('Job Saved!', {
+                    duration: Toast.durations.LONG,
+                    position: Toast.positions.BOTTOM,
+                    shadow: true,
+                    animation: true,
+                    hideOnPress: true,
+                    delay: 0,
+                });
+
+                setTimeout(function () {
+                    Toast.hide(toast);
+                }, 1000);
+
+                this.setState({jobSaved: true});
+            }).catch(err => {
+                throw err;
+            });
         }
     }
+
+    sanitizeDatePosted(dateString) {
+        return dateString.split(" ")[0].replace("+", "");
+    };
 
     render() {
         return (
@@ -65,7 +90,7 @@ export default class JobTitle extends Component {
                                         <TouchableHighlight underlayColor="white" onPress={() => this.saveJob()}>
                                             <Icon style={{color: '#9B59B6'}} name={this.state.jobSaved? "ios-heart" : "ios-heart-outline"}/>
                                         </TouchableHighlight>
-                                        <Text style={styles.dayText}>{this.props.daysOld}d</Text>
+                                        <Text style={styles.dayText}>{this.sanitizeDatePosted(this.props.daysOld)}d</Text>
                                     </Body>
                                 </Body>
                             </View>

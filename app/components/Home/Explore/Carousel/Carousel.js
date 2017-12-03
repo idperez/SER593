@@ -40,7 +40,6 @@ export default class Carousel extends Component {
         };
     }
 
-
     render() {
         return (
             <View style={styles.carousel} >
