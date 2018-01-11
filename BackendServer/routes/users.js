@@ -107,13 +107,13 @@ router.post( '/modify',
         try {
             val = JSON.parse( val );
         } catch ( err ){} // No error handling needed for this event.
-        DB_PROFILES.modifyUserItem(
+        DB_PROFILES.modifyUserItemEndpoint(
             res.locals.user,
             req.body.key,
             val,
             req.body.mode
-        ).then( profile => {
-            res.send( profile );
+        ).then( data => {
+            res.send( data );
         }).catch( err => {
             res.send( response.errorMessage( err ) );
         });
@@ -175,8 +175,8 @@ router.post( '/modifymulti',
         DB_PROFILES.modifyUserPreferences(
             res.locals.user,
             req.body
-        ).then( profile => {
-            res.send( profile );
+        ).then( data => {
+            res.send( data );
         }).catch( err => {
             res.send( response.errorMessage( err ) );
         });

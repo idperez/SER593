@@ -1575,7 +1575,7 @@
 						"type": "text/javascript",
 						"exec": [
 							"",
-							"const TEST_TITLE = \"Blackjack\"",
+							"const TEST_TITLE = \"Poker\"",
 							"",
 							"",
 							"pm.sendRequest({",
@@ -1624,7 +1624,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"prefs_jobs_titles\": [\"Blackjack\"]\n}"
+					"raw": "{\n\t\"prefs_jobs_titles\": [\"Poker\"]\n}"
 				},
 				"url": {
 					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/modifymulti",
@@ -1709,7 +1709,10 @@
 						"value": "application/x-www-form-urlencoded"
 					}
 				],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/updateratings",
 					"host": [

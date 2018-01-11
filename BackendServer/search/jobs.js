@@ -129,7 +129,7 @@ exports.getJobsByCoord = ( userObj, lat, long, maxResults, radius ) => {
 };
 
 // Helper to get jobs by city/state or zip, which is required by indeed.
-function getJobsList( profile, city, state, zip, maxResults, radius, numJobs = false ){
+function getJobsList( profile, city, state, zip, maxResults, radius = DEFAULT_RADIUS, numJobs = false ){
     return new Promise( ( resolve, reject ) => {
         let jobAge = profile[ consts.PROF_KEYS.PREFS_JOBS_DATE ] ?
             profile[ consts.PROF_KEYS.PREFS_JOBS_DATE ] : DEFAULT_JOB_AGE;
@@ -158,7 +158,7 @@ function getJobsList( profile, city, state, zip, maxResults, radius, numJobs = f
                     userip: "localhost",
                     useragent: 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 ' +
                     '(KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36',
-                    radius: radius ? radius : DEFAULT_RADIUS,
+                    radius: radius,
                     // Database values
                     jt: jobType,                                // Job type
                     fromage: jobAge, // Max number of days back job was posted
