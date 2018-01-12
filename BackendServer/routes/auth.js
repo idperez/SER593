@@ -9,9 +9,18 @@ const consts = require( "../constants" );
  * @apiName Register
  * @apiGroup Authentication
  *
+ * @apiExample Example-Request(s)
+ *      path-to-topia-api.com/auth/register
+ *
  * @apiParam {String} username
  * @apiParam {String} password
  * @apiParam {String} email
+ * @apiParamExample {json} Example:
+ *     {
+ *       "username": "freddy123",
+ *       "password": "pw123456",
+ *       "email": "freddy123@gmail.com"
+ *     }
  *
  * @apiError MissingInformation Username or password is missing
  * @apiError UsernameTaken There is already an account with the supplied username.
@@ -47,8 +56,16 @@ router.post( '/register', ( req, res ) => {
  * @apiName Login
  * @apiGroup Authentication
  *
+ * @apiExample Example-Request(s)
+ *      path-to-topia-api.com/auth/login
+ *
  * @apiParam {String} username
  * @apiParam {String} password
+ * @apiParamExample {json} Example:
+ *     {
+ *       "username": "freddy123",
+ *       "password": "pw123456"
+ *     }
  *
  * @apiError ErrorGettingProfile Cannot find profile associated with username during authentication.
  * @apiError PasswordMismatch Password was incorrect.
@@ -87,6 +104,9 @@ router.post( '/login', ( req, res ) => {
  *      {
  *          authorization: Bearer QZ3jhbfdof84GFBlSe
  *      }
+ *
+ * @apiExample Example-Request(s)
+ *      path-to-topia-api.com/auth/logout
  *
  * @apiError TokenNotFound Bearer token not found in header.
  * @apiError TokenMismatch Bearer token does not match.

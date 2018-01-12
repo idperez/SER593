@@ -1,4 +1,3 @@
-const keys = require( '../keys/apiKeys' );
 const request = require( 'request' );
 const qs = require( 'querystring' );
 const GLASSDOOR_ENDPOINT = "http://api.glassdoor.com/api/api.htm";
@@ -11,8 +10,8 @@ exports.getCompanyInfo = ( companyName ) => {
             );
         }
         let jobQuery = {
-            "t.p": keys.glassdoor.partnerId,
-            "t.k": keys.glassdoor.partnerKey,
+            "t.p": process.env.KEY_ID_GLASSDOOR,
+            "t.k": process.env.KEY_KEY_GLASSDOOR,
             format: 'json',
             v: 1,                // API version
             action: 'employers', // Must be set to employers

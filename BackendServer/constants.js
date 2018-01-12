@@ -15,6 +15,14 @@ exports.PROF_KEYS = {
     LAST_UPDATED: "last_updated"
 };
 
+// Profile keys to exclude from the profile object when sending to front-end
+// These must be defined in PROF_KEYS.
+exports.PROF_KEYS_TO_EXCLUDE = [
+    exports.PROF_KEYS.PASSWORD,
+    exports.PROF_KEYS.ACCESS_TOKEN,
+    exports.PROF_KEYS.LAST_UPDATED
+];
+
 // Modes for modifying a user preference
 exports.MODIFIY_PREFS_MODES = {
     MODIFY: "modify",           // Modify an existing DB value
@@ -27,4 +35,8 @@ exports.MODIFIY_PREFS_MODES = {
 exports.JOB_PROPS = {
     LAST_CHECKED: "last_checked" // The timestamp in ms of when the job was last updated
 };
+
+// Temp token to be used between registration and authentication
+// This is an invalid token, with no access.
+exports.TEMP_TOKEN = "registering";
 

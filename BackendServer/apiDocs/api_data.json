@@ -5,6 +5,13 @@
     "title": "Login",
     "name": "Login",
     "group": "Authentication",
+    "examples": [
+      {
+        "title": "Example-Request(s)",
+        "content": "path-to-topia-api.com/auth/login",
+        "type": "json"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -23,7 +30,14 @@
             "description": ""
           }
         ]
-      }
+      },
+      "examples": [
+        {
+          "title": "Example:",
+          "content": "{\n  \"username\": \"freddy123\",\n  \"password\": \"pw123456\"\n}",
+          "type": "json"
+        }
+      ]
     },
     "error": {
       "fields": {
@@ -100,6 +114,13 @@
         }
       ]
     },
+    "examples": [
+      {
+        "title": "Example-Request(s)",
+        "content": "path-to-topia-api.com/auth/logout",
+        "type": "json"
+      }
+    ],
     "error": {
       "fields": {
         "Error 4xx": [
@@ -141,6 +162,13 @@
     "title": "Register",
     "name": "Register",
     "group": "Authentication",
+    "examples": [
+      {
+        "title": "Example-Request(s)",
+        "content": "path-to-topia-api.com/auth/register",
+        "type": "json"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -166,7 +194,14 @@
             "description": ""
           }
         ]
-      }
+      },
+      "examples": [
+        {
+          "title": "Example:",
+          "content": "{\n  \"username\": \"freddy123\",\n  \"password\": \"pw123456\",\n  \"email\": \"freddy123@gmail.com\"\n}",
+          "type": "json"
+        }
+      ]
     },
     "error": {
       "fields": {
@@ -225,8 +260,8 @@
   },
   {
     "type": "get",
-    "url": "/search/jobs/companyinfo",
-    "title": "CompanyInfo",
+    "url": "/jobs/companies/:companyname",
+    "title": "Company Information",
     "name": "Company",
     "group": "Jobs",
     "description": "<p>Get company information for a job.</p>",
@@ -250,6 +285,13 @@
         }
       ]
     },
+    "examples": [
+      {
+        "title": "Example-Request(s)",
+        "content": "path-to-topia-api.com/jobs/companies/viasat",
+        "type": "json"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -321,8 +363,8 @@
   },
   {
     "type": "get",
-    "url": "/search/jobs/bykey",
-    "title": "JobByKey",
+    "url": "/jobs/:jobkey",
+    "title": "Job Information",
     "name": "JobByKey",
     "group": "Jobs",
     "description": "<p>Get job by key</p>",
@@ -346,6 +388,13 @@
         }
       ]
     },
+    "examples": [
+      {
+        "title": "Example-Request(s)",
+        "content": "path-to-topia-api.com/jobs/455ba8b70208e25b",
+        "type": "json"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -363,7 +412,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "\n{\n  \"jobtitle\": \"Graduate SubSystems Engineer\",\n  \"company\": \"ARM\",\n  \"city\": \"Austin\",\n  \"state\": \"TX\",\n  \"country\": \"US\",\n  \"language\": \"en\",\n  \"formattedLocation\": \"Austin, TX\",\n  \"source\": \"ARM\",\n  \"date\": \"Wed, 20 Sep 2017 02:04:17 GMT\",\n  \"snippet\": \"Bachelors or Masters degree in Electrical/Computer Engineering or Computer Science with a 3.5+ GPA. Be motivated to continuously develop skills and accept a variety of responsibilities as part of contributing to the design center’s success. We employ leading-edge modeling, design and verification technologies to design low-power high-performance products....\",\n  \"url\": \"http://www.indeed.com/rc/clk?jk=455ba8b70208e25b&atk=\",\n  \"onmousedown\": \"indeed_clk(this,'');\",\n  \"latitude\": 30.266483,\n  \"longitude\": -97.74176,\n  \"jobkey\": \"455ba8b70208e25b\",\n  \"sponsored\": false,\n  \"expired\": false,\n  \"indeedApply\": false,\n  \"formattedLocationFull\": \"Austin, TX\",\n  \"formattedRelativeTime\": \"10 days ago\",\n  \"stations\": \"\",\n  \"recommendations\": []\n},",
+          "content": "\n{\n  \"jobtitle\": \"Graduate SubSystems Engineer\",\n  \"company\": \"ARM\",\n  \"city\": \"Austin\",\n  \"state\": \"TX\",\n  \"country\": \"US\",\n  \"language\": \"en\",\n  \"formattedLocation\": \"Austin, TX\",\n  \"source\": \"ARM\",\n  \"date\": \"Wed, 20 Sep 2017 02:04:17 GMT\",\n  \"snippet\": \"Bachelors or Masters degree in Electrical/Computer Engineering or Computer Science with a 3.5+ GPA. Be motivated to continuously develop skills and accept a variety of responsibilities as part of contributing to the design center’s success. We employ leading-edge modeling, design and verification technologies to design low-power high-performance products....\",\n  \"url\": \"http://www.indeed.com/rc/clk?jk=455ba8b70208e25b&atk=\",\n  \"onmousedown\": \"indeed_clk(this,'');\",\n  \"latitude\": 30.266483,\n  \"longitude\": -97.74176,\n  \"jobkey\": \"455ba8b70208e25b\",\n  \"sponsored\": false,\n  \"expired\": false,\n  \"indeedApply\": false,\n  \"formattedLocationFull\": \"Austin, TX\",\n  \"formattedRelativeTime\": \"10 days ago\",\n  \"stations\": \"\",\n  \"recommendations\": []\n}",
           "type": "json"
         }
       ]
@@ -417,11 +466,11 @@
   },
   {
     "type": "get",
-    "url": "/search/jobs/coords",
-    "title": "JobsByCoordinates",
-    "name": "JobsByCoordinates",
+    "url": "/jobs",
+    "title": "Jobs Search",
+    "name": "JobsSearch",
     "group": "Jobs",
-    "description": "<p>Get jobs by supplied coordinates and user preferences.</p>",
+    "description": "<p>Get jobs by supplied city-state, zip, or coordinates.</p> <p>NOTE: The returned array may contain an object with null lat/long for jobs that do not have location information.</p>",
     "header": {
       "fields": {
         "Header": [
@@ -442,152 +491,62 @@
         }
       ]
     },
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "lat",
-            "description": "<p>Latitude</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "long",
-            "description": "<p>Longitude</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "Number",
-            "optional": false,
-            "field": "limit",
-            "description": "<p>Max number of results.</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": true,
-            "field": "radius",
-            "defaultValue": "25",
-            "description": "<p>Radius in miles from coordinate point.</p>"
-          }
-        ]
+    "examples": [
+      {
+        "title": "Example-Request(s)",
+        "content": "path-to-topia-api.com/jobs?type=location&city=Denver&state=CO&limit=500\npath-to-topia-api.com/jobs?type=zip&zip=07853&limit=500\npath-to-topia-api.com/jobs?type=coordinates&lat=32.959613&long=-117.157757&limit=500",
+        "type": "json"
       }
-    },
-    "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "[\n  {\n    \"jobtitle\": \"Senior Software Developer\",\n    \"company\": \"IBM\",\n    \"city\": \"Austin\",\n    \"state\": \"TX\",\n    \"country\": \"US\",\n    \"language\": \"en\",\n    \"formattedLocation\": \"Austin, TX\",\n    \"source\": \"IBM\",\n    \"date\": \"Fri, 08 Sep 2017 03:01:34 GMT\",\n    \"snippet\": \"We are looking for <b>Software</b> Developers to join our Cloud Innovation Lab team in Austin, TX . With industry leadership in analytics, security, commerce, and...\",\n    \"url\": \"http://www.indeed.com/viewjob?jk=2fb6f6598eb121bb&qd=AHBv2aSOJz5QeLJ8HScbwBYPiZNGjz23m_pprWrYM6_QIqvTB8w9VPZxJV3B6V4zrh6KYLpBfM79FCbByGe97Rkt9i6ApQ8v0up_BH1c3Wcep6I5-twM7jC8td-9rGTG&indpubnum=7658403343281086&atk=1bra0uipja39cfrp\",\n    \"onmousedown\": \"indeed_clk(this,'5681');\",\n    \"latitude\": 30.266483,\n    \"longitude\": -97.74176,\n    \"jobkey\": \"2fb6f6598eb121bb\",\n    \"sponsored\": false,\n    \"expired\": false,\n    \"indeedApply\": false,\n    \"formattedLocationFull\": \"Austin, TX\",\n    \"formattedRelativeTime\": \"22 days ago\",\n    \"stations\": \"\"\n   },\n   ...\n]",
-          "type": "json"
-        }
-      ]
-    },
-    "error": {
-      "fields": {
-        "Error 4xx": [
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "NoResultsFound",
-            "description": "<p>No results were returned.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "MissingLocation",
-            "description": "<p>lat/long missing from query.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "NoJobDate",
-            "description": "<p>No max job age was found on db for this user.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "NoJobTypes",
-            "description": "<p>No job types were found on db for this user.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "TokenNotFound",
-            "description": "<p>Bearer token not found in header.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "TokenMismatch",
-            "description": "<p>Bearer token does not match.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "TokenExpired",
-            "description": "<p>Bearer token is expired.</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Error-Response:",
-          "content": "{\n  \"err\": \"MissingLocation\",\n  \"msg\": \"\"\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "version": "0.0.0",
-    "filename": "./routes/jobs.js",
-    "groupTitle": "Jobs"
-  },
-  {
-    "type": "get",
-    "url": "/search/jobs/location",
-    "title": "JobsByLocation",
-    "name": "JobsByLocation",
-    "group": "Jobs",
-    "description": "<p>Get jobs by supplied city and state and user preferences.</p>",
-    "header": {
-      "fields": {
-        "Header": [
-          {
-            "group": "Header",
-            "type": "String",
-            "optional": false,
-            "field": "authorization",
-            "description": "<p>Bearer token</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Header-Example:",
-          "content": "{\n    authorization: Bearer QZ3jhbfdof84GFBlSe\n}",
-          "type": "json"
-        }
-      ]
-    },
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "allowedValues": [
+              "\"location\"",
+              "\"zip\"",
+              "\"coordinates\""
+            ],
+            "optional": false,
+            "field": "type",
+            "description": "<p>Type of search to perform.</p>"
+          },
           {
             "group": "Parameter",
             "type": "String",
             "optional": false,
             "field": "city",
-            "description": "<p>City to search.</p>"
+            "description": "<p>City to search. Req with location type.</p>"
           },
           {
             "group": "Parameter",
             "type": "String",
             "optional": false,
             "field": "state",
-            "description": "<p>State to search. (2 letter abbreviation)</p>"
+            "description": "<p>State to search. (2 letter abbreviation). Req with location type.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "zip",
+            "description": "<p>Zip code. Req with zip type.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "lat",
+            "description": "<p>Latitude. Req with coordinate type.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "long",
+            "description": "<p>Longitude. Req with coordinate type.</p>"
           },
           {
             "group": "Parameter",
@@ -611,7 +570,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "[\n  {\n    \"jobtitle\": \"Senior Software Developer\",\n    \"company\": \"IBM\",\n    \"city\": \"Austin\",\n    \"state\": \"TX\",\n    \"country\": \"US\",\n    \"language\": \"en\",\n    \"formattedLocation\": \"Austin, TX\",\n    \"source\": \"IBM\",\n    \"date\": \"Fri, 08 Sep 2017 03:01:34 GMT\",\n    \"snippet\": \"We are looking for <b>Software</b> Developers to join our Cloud Innovation Lab team in Austin, TX . With industry leadership in analytics, security, commerce, and...\",\n    \"url\": \"http://www.indeed.com/viewjob?jk=2fb6f6598eb121bb&qd=AHBv2aSOJz5QeLJ8HScbwBYPiZNGjz23m_pprWrYM6_QIqvTB8w9VPZxJV3B6V4zrh6KYLpBfM79FCbByGe97Rkt9i6ApQ8v0up_BH1c3Wcep6I5-twM7jC8td-9rGTG&indpubnum=7658403343281086&atk=1bra0uipja39cfrp\",\n    \"onmousedown\": \"indeed_clk(this,'5681');\",\n    \"latitude\": 30.266483,\n    \"longitude\": -97.74176,\n    \"jobkey\": \"2fb6f6598eb121bb\",\n    \"sponsored\": false,\n    \"expired\": false,\n    \"indeedApply\": false,\n    \"formattedLocationFull\": \"Austin, TX\",\n    \"formattedRelativeTime\": \"22 days ago\",\n    \"stations\": \"\"\n   },\n   ...\n]",
+          "content": "[\n   {\n       \"latitude\": null,\n       \"longitude\": null,\n       \"jobs\": [...]\n   },\n   {\n       \"latitude\": 33.277313,\n       \"longitude\": -111.88746,\n       \"jobs\": [\n           {\n               \"jobtitle\": \"Building Maintenance Engineer - First Shift\",\n               \"company\": \"CBRE\",\n               \"city\": \"Chandler\",\n               \"state\": \"AZ\",\n               \"country\": \"US\",\n               \"language\": \"en\",\n               \"formattedLocation\": \"Chandler, AZ\",\n               \"source\": \"CBRE\",\n               \"date\": \"Thu, 21 Dec 2017 05:30:22 GMT\",\n               \"snippet\": \"Contracted work includes landscaping, snow removal, remodeling, HVAC, plumbers, and cleaning. Utilizes advanced skills to perform complex preventive maintenance...\",\n               \"url\": \"http://www.indeed.com/viewjob?jk=53091387dd962a7d&qd=AHBv2aSOJz5QeLJ8HScbwNK2-_Y-B8Po8Ndci7Xy1gTc4blc9F2b1BPLA4kjCLtKl3e9F4vXNREZjAdV6uZz_x6nojn63AzuMLy1372sZMY&indpubnum=7658403343281086&atk=1c3oke17u19s92t9\",\n               \"onmousedown\": \"indeed_clk(this,'1580');\",\n               \"latitude\": 33.277313,\n               \"longitude\": -111.88746,\n               \"jobkey\": \"53091387dd962a7d\",\n               \"sponsored\": false,\n               \"expired\": false,\n               \"indeedApply\": false,\n               \"formattedLocationFull\": \"Chandler, AZ 85286\",\n               \"formattedRelativeTime\": \"23 days ago\",\n               \"stations\": \"\"\n           },\n           ...\n       ]\n     },\n   ...\n]",
           "type": "json"
         }
       ]
@@ -619,6 +578,12 @@
     "error": {
       "fields": {
         "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "InvalidSearchType",
+            "description": "<p>Search type is missing from the query.</p>"
+          },
           {
             "group": "Error 4xx",
             "optional": false,
@@ -670,129 +635,12 @@
     "groupTitle": "Jobs"
   },
   {
-    "type": "get",
-    "url": "/search/jobs/zip",
-    "title": "JobsByZip",
-    "name": "JobsByZip",
-    "group": "Jobs",
-    "description": "<p>Get jobs by supplied zip code and user preferences.</p>",
-    "header": {
-      "fields": {
-        "Header": [
-          {
-            "group": "Header",
-            "type": "String",
-            "optional": false,
-            "field": "authorization",
-            "description": "<p>Bearer token</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Header-Example:",
-          "content": "{\n    authorization: Bearer QZ3jhbfdof84GFBlSe\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "zip",
-            "description": "<p>Zip code.</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "Number",
-            "optional": false,
-            "field": "limit",
-            "description": "<p>Max number of results.</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "Number",
-            "optional": true,
-            "field": "radius",
-            "defaultValue": "25",
-            "description": "<p>Radius in miles from center of zip code.</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "[\n  {\n    \"jobtitle\": \"Senior Software Developer\",\n    \"company\": \"IBM\",\n    \"city\": \"Austin\",\n    \"state\": \"TX\",\n    \"country\": \"US\",\n    \"language\": \"en\",\n    \"formattedLocation\": \"Austin, TX\",\n    \"source\": \"IBM\",\n    \"date\": \"Fri, 08 Sep 2017 03:01:34 GMT\",\n    \"snippet\": \"We are looking for <b>Software</b> Developers to join our Cloud Innovation Lab team in Austin, TX . With industry leadership in analytics, security, commerce, and...\",\n    \"url\": \"http://www.indeed.com/viewjob?jk=2fb6f6598eb121bb&qd=AHBv2aSOJz5QeLJ8HScbwBYPiZNGjz23m_pprWrYM6_QIqvTB8w9VPZxJV3B6V4zrh6KYLpBfM79FCbByGe97Rkt9i6ApQ8v0up_BH1c3Wcep6I5-twM7jC8td-9rGTG&indpubnum=7658403343281086&atk=1bra0uipja39cfrp\",\n    \"onmousedown\": \"indeed_clk(this,'5681');\",\n    \"latitude\": 30.266483,\n    \"longitude\": -97.74176,\n    \"jobkey\": \"2fb6f6598eb121bb\",\n    \"sponsored\": false,\n    \"expired\": false,\n    \"indeedApply\": false,\n    \"formattedLocationFull\": \"Austin, TX\",\n    \"formattedRelativeTime\": \"22 days ago\",\n    \"stations\": \"\"\n   },\n   ...\n]",
-          "type": "json"
-        }
-      ]
-    },
-    "error": {
-      "fields": {
-        "Error 4xx": [
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "MissingLocation",
-            "description": "<p>zip code missing from query.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "NoJobDate",
-            "description": "<p>No max job age was found on db for this user.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "NoJobTypes",
-            "description": "<p>No job types were found on db for this user.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "TokenNotFound",
-            "description": "<p>Bearer token not found in header.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "TokenMismatch",
-            "description": "<p>Bearer token does not match.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "TokenExpired",
-            "description": "<p>Bearer token is expired.</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Error-Response:",
-          "content": "{\n  \"err\": \"MissingLocation\",\n  \"msg\": \"\"\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "version": "0.0.0",
-    "filename": "./routes/jobs.js",
-    "groupTitle": "Jobs"
-  },
-  {
     "type": "post",
-    "url": "/users/modify",
-    "title": "Modify",
+    "url": "/users/profile",
+    "title": "Modify Profile",
     "name": "Modify",
     "group": "Users",
-    "description": "<p>Modify a preference on users profile.</p> <p>MODES:</p> <p>modify: Modifies an existing non-list value.</p> <p>remove: Removes a key/value pair. If used on an list, the entire list is removed.</p> <p>listappend: Appends a value to an existing list.</p> <p>listremove: Removes a value from an existing list.</p>",
+    "description": "<p>Modify preference(s) on users profile.</p> <p>TYPES:</p> <p>Single: Make a change to a single profile value.</p> <p>Multiple: Send a JSON representation of all the values to be overwritten in the profile.</p> <p>MODES:</p> <p>modify: Modifies an existing non-list value.</p> <p>remove: Removes a key/value pair. If used on an list, the entire list is removed.</p> <p>listappend: Appends a value to an existing list.</p> <p>listremove: Removes a value from an existing list.</p>",
     "header": {
       "fields": {
         "Header": [
@@ -813,9 +661,40 @@
         }
       ]
     },
+    "examples": [
+      {
+        "title": "Example-Request(s)",
+        "content": "path-to-topia-api.com/users/profile",
+        "type": "json"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "allowedValues": [
+              "\"single\"",
+              "\"multiple\""
+            ],
+            "optional": false,
+            "field": "type",
+            "description": "<p>Type of profile change to make.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "allowedValues": [
+              "\"modify\"",
+              "\"remove\"",
+              "\"listappend\"",
+              "\"listremove\""
+            ],
+            "optional": false,
+            "field": "mode",
+            "description": "<p>Specify what operation to run. Req with type of single.</p>"
+          },
           {
             "group": "Parameter",
             "type": "String",
@@ -828,21 +707,26 @@
             "type": "String",
             "optional": false,
             "field": "value",
-            "description": "<p>Value to assign to the key. (Required for modes: modify, listappend, listremove)</p>"
+            "description": "<p>Value to assign to the key. (Required for modes: modify, listappend, listremove). Req with type of single.</p>"
           },
           {
             "group": "Parameter",
-            "type": "String",
+            "type": "Object",
             "optional": false,
-            "field": "mode",
-            "description": "<p>Specify what operation to run. Options: modify, remove, listappend, listremove</p>"
+            "field": "prefs",
+            "description": "<p>Object to overwrite user preferences. Req with type of multiple.</p>"
           }
         ]
       },
       "examples": [
         {
-          "title": "Request-Example:",
-          "content": "{\n  \"key\": \"prefs_jobs_types\",\n  \"value\": \"fulltime\",\n  \"mode\": \"listappend\"\n}",
+          "title": "Single Example:",
+          "content": "{\n  \"key\": \"prefs_jobs_types\",\n  \"value\": \"fulltime\",\n  \"mode\": \"listappend\",\n  \"type\": \"single\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "Multiple Example:",
+          "content": "{\n   \"prefs\": {\n        \"prefs_jobs_titles\": [\"Software Engineer\", \"Developer\", \"Java\"],\n        \"prefs_jobs_postedDate\": 60\n   },\n   \"type\":\"multiple\"\n}",
           "type": "json"
         }
       ]
@@ -853,6 +737,12 @@
           {
             "group": "Error 4xx",
             "optional": false,
+            "field": "InvalidModifyType",
+            "description": "<p>Modify type is missing from the query.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
             "field": "UserNotFound",
             "description": "<p>User information is not in the database.</p>"
           },
@@ -860,7 +750,7 @@
             "group": "Error 4xx",
             "optional": false,
             "field": "InvalidKey",
-            "description": "<p>Invalid key given.</p>"
+            "description": "<p>Invalid key given, either missing from body or not found on the database.</p>"
           },
           {
             "group": "Error 4xx",
@@ -919,121 +809,9 @@
     "groupTitle": "Users"
   },
   {
-    "type": "post",
-    "url": "/users/modifymulti",
-    "title": "Modify Multiple",
-    "name": "ModifyMultiple",
-    "group": "Users",
-    "description": "<p>Modify multiple preferences on users profile.</p> <p>This allows passing in an object containing some keys from a users profile. All keys within the object will overwrite the matching profile key on the database.</p> <p>To remove a key from the database, include it in the object and set it's value to null.</p> <p>NOTE: Entire arrays must be included with this method, as whatever is on the database will be overwritten. See /modify to append or remove from an array value.</p> <p>NOTE: Any timely profile updates will be updated at this point, since there was a profile change.</p>",
-    "header": {
-      "fields": {
-        "Header": [
-          {
-            "group": "Header",
-            "type": "String",
-            "optional": false,
-            "field": "authorization",
-            "description": "<p>Bearer token</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Header-Example:",
-          "content": "{\n    authorization: Bearer QZ3jhbfdof84GFBlSe\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "Object",
-            "optional": false,
-            "field": "prefs",
-            "description": "<p>Object to overwrite user preferences.</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Request-Example:",
-          "content": "{\n\n   \"prefs_jobs_titles\": [\"Software Engineer\", \"Developer\", \"Java\"],\n   \"prefs_jobs_postedDate\": 60\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "error": {
-      "fields": {
-        "Error 4xx": [
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "UserNotFound",
-            "description": "<p>User information is not in the database.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "InvalidKey",
-            "description": "<p>Invalid key given.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "InvalidMode",
-            "description": "<p>Invalid mode given.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "MissingValue",
-            "description": "<p>No value given.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "ModeError",
-            "description": "<p>Internal error.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "TokenNotFound",
-            "description": "<p>Bearer token not found in header.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "TokenMismatch",
-            "description": "<p>Bearer token does not match.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "TokenExpired",
-            "description": "<p>Bearer token is expired.</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Error-Response:",
-          "content": "{\n  \"err\": {\n     \"type\": \"UserNotFound\",\n     \"msg\": \"Explanation of failure.\"\n  }\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "version": "0.0.0",
-    "filename": "./routes/users.js",
-    "groupTitle": "Users"
-  },
-  {
     "type": "get",
     "url": "/users/profile",
-    "title": "Profile",
+    "title": "Get Profile",
     "name": "Profile",
     "group": "Users",
     "description": "<p>Get users profile from database.</p>",
@@ -1057,6 +835,13 @@
         }
       ]
     },
+    "examples": [
+      {
+        "title": "Example-Request(s)",
+        "content": "path-to-topia-api.com/users/profile\npath-to-topia-api.com/users/profile?cityarray=true",
+        "type": "json"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -1121,92 +906,11 @@
   },
   {
     "type": "post",
-    "url": "/users/removejob",
-    "title": "RemoveJob",
-    "name": "RemoveJob",
-    "group": "Users",
-    "description": "<p>Remove a saved job from the users profile.</p>",
-    "header": {
-      "fields": {
-        "Header": [
-          {
-            "group": "Header",
-            "type": "String",
-            "optional": false,
-            "field": "authorization",
-            "description": "<p>Bearer token</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Header-Example:",
-          "content": "{\n    authorization: Bearer QZ3jhbfdof84GFBlSe\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "jobkey",
-            "description": "<p>Indeed job key.</p>"
-          }
-        ]
-      }
-    },
-    "error": {
-      "fields": {
-        "Error 4xx": [
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "SavedJobNotFound",
-            "description": "<p>Job is not saved on users profile.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "TokenNotFound",
-            "description": "<p>Bearer token not found in header.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "TokenMismatch",
-            "description": "<p>Bearer token does not match.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "TokenExpired",
-            "description": "<p>Bearer token is expired.</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Error-Response:",
-          "content": "{\n  \"err\": {\n     \"type\": \"TokenNotFound\",\n     \"msg\": \"\"\n  }\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "version": "0.0.0",
-    "filename": "./routes/users.js",
-    "groupTitle": "Users"
-  },
-  {
-    "type": "post",
-    "url": "/users/savejob",
-    "title": "SaveJob",
+    "url": "/profile/jobs",
+    "title": "Save or Remove Jobs",
     "name": "SaveJob",
     "group": "Users",
-    "description": "<p>Add a saved job to the users profile.</p>",
+    "description": "<p>Add/remove a saved job to/from the users profile.</p>",
     "header": {
       "fields": {
         "Header": [
@@ -1227,6 +931,13 @@
         }
       ]
     },
+    "examples": [
+      {
+        "title": "Example-Request(s)",
+        "content": "path-to-topia-api.com/users/profile/jobs",
+        "type": "json"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -1236,13 +947,37 @@
             "optional": false,
             "field": "jobkey",
             "description": "<p>Indeed job key.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "allowedValues": [
+              "\"add\"",
+              "\"remove\""
+            ],
+            "optional": false,
+            "field": "Operation",
+            "description": "<p>to add or remove a job to/from the users profile.</p>"
           }
         ]
-      }
+      },
+      "examples": [
+        {
+          "title": "Example:",
+          "content": "{\n  \"jobkey\": \"53091387dd962a7d\",\n  \"operation\": \"add\"\n}",
+          "type": "json"
+        }
+      ]
     },
     "error": {
       "fields": {
         "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "InvalidJobsType",
+            "description": "<p>Jobs operation type is missing from the query.</p>"
+          },
           {
             "group": "Error 4xx",
             "optional": false,
@@ -1295,11 +1030,11 @@
   },
   {
     "type": "post",
-    "url": "/users/updateratings",
-    "title": "UpdateRatings",
+    "url": "/users/profile/ratings",
+    "title": "Update Ratings",
     "name": "UpdateRatings",
     "group": "Users",
-    "description": "<p>Allows front-end to update city match ratings.</p>",
+    "description": "<p>Allows front-end to update city match ratings for the current user.</p>",
     "header": {
       "fields": {
         "Header": [
@@ -1320,6 +1055,13 @@
         }
       ]
     },
+    "examples": [
+      {
+        "title": "Example-Request(s)",
+        "content": "path-to-topia-api.com/users/profile/ratings",
+        "type": "json"
+      }
+    ],
     "error": {
       "fields": {
         "Error 4xx": [
