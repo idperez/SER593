@@ -149,7 +149,7 @@
 							"",
 							"pm.test(\"Correct company returned\", function () {",
 							"    let jsonData = pm.response.json();",
-							"    pm.expect(jsonData.name).to.eql(\"ViaSat\");",
+							"    pm.expect(jsonData.name).to.eql(\"Viasat\");",
 							"});",
 							"",
 							"pm.test(\"Status code is 200\", function () {",
