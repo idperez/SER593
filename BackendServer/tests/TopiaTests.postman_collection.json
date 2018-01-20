@@ -174,7 +174,7 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/search/jobs/companyinfo?companyname=viasat",
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/jobs/companies/viasat",
 					"host": [
 						"topia-env-development",
 						"us-west-2",
@@ -182,16 +182,9 @@
 						"com"
 					],
 					"path": [
-						"search",
 						"jobs",
-						"companyinfo"
-					],
-					"query": [
-						{
-							"key": "companyname",
-							"value": "viasat",
-							"equals": true
-						}
+						"companies",
+						"viasat"
 					]
 				},
 				"description": "/search/jobs/companyinfo endpoint"
@@ -206,6 +199,9 @@
 					"script": {
 						"type": "text/javascript",
 						"exec": [
+							"const JOB_KEY = \"db283ce475405c88\";",
+							"const JOB_COMPANY = \"Smarte Carte, Inc.\"",
+							"",
 							"let schema = {",
 							"    type: \"object\",",
 							"    properties: {",
@@ -248,12 +244,12 @@
 							"",
 							"pm.test(\"Correct job returned\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.jobkey).to.eql(\"455ba8b70208e25b\");",
+							"    pm.expect(jsonData.jobkey).to.eql(JOB_KEY);",
 							"});",
 							"",
 							"pm.test(\"Correct job information returned\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.company).to.eql(\"ARM\");",
+							"    pm.expect(jsonData.company).to.eql(JOB_COMPANY);",
 							"});"
 						]
 					}
@@ -274,7 +270,7 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/search/jobs/bykey?jobkey=455ba8b70208e25b",
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/jobs/db283ce475405c88",
 					"host": [
 						"topia-env-development",
 						"us-west-2",
@@ -282,16 +278,8 @@
 						"com"
 					],
 					"path": [
-						"search",
 						"jobs",
-						"bykey"
-					],
-					"query": [
-						{
-							"key": "jobkey",
-							"value": "455ba8b70208e25b",
-							"equals": true
-						}
+						"db283ce475405c88"
 					]
 				},
 				"description": "This may fail if a job has been expired for long enough."
@@ -309,6 +297,15 @@
 							"let schema = {",
 							"    type: \"array\",",
 							"};",
+							"",
+							"let schemaLocationObj = {",
+							"    type: \"object\",",
+							"    properties: {",
+							"        \"latitude\": { type: \"number\" },",
+							"        \"longitude\": { type: \"number\" },",
+							"        \"jobs\": { type: \"array\" }",
+							"    }",
+							"}",
 							"",
 							"let schemaElem = {",
 							"    type: \"object\",",
@@ -342,13 +339,16 @@
 							"    let jsonData = pm.response.json();",
 							"    // We only care about this test if we actually got a result back",
 							"    if( jsonData.length > 0 ){",
-							"        pm.expect(tv4.validate(jsonData[0], schemaElem)).to.be.true;",
+							"        let locationObj = jsonData[0];",
+							"        pm.expect(tv4.validate(locationObj, schemaLocationObj)).to.be.true;",
+							"        pm.expect(tv4.validate(locationObj.jobs[0], schemaElem)).to.be.true;",
 							"    }",
 							"});",
 							"",
-							"pm.test('An array was returned', function() {",
+							"pm.test('A populated array was returned', function() {",
 							"    let jsonData = pm.response.json();",
 							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+							"    pm.expect(jsonData.length > 0).to.be.true",
 							"});",
 							"",
 							"pm.test(\"Status code is 200\", function () {",
@@ -374,7 +374,7 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/search/jobs/coords?lat=40.766538&long=-73.977849&limit=100&radius=20",
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/jobs?type=coordinates&lat=40.766538&long=-73.977849&limit=100&radius=20",
 					"host": [
 						"topia-env-development",
 						"us-west-2",
@@ -382,11 +382,14 @@
 						"com"
 					],
 					"path": [
-						"search",
-						"jobs",
-						"coords"
+						"jobs"
 					],
 					"query": [
+						{
+							"key": "type",
+							"value": "coordinates",
+							"equals": true
+						},
 						{
 							"key": "lat",
 							"value": "40.766538",
@@ -425,6 +428,15 @@
 							"    type: \"array\",",
 							"};",
 							"",
+							"let schemaLocationObj = {",
+							"    type: \"object\",",
+							"    properties: {",
+							"        \"latitude\": { type: \"number\" },",
+							"        \"longitude\": { type: \"number\" },",
+							"        \"jobs\": { type: \"array\" }",
+							"    }",
+							"}",
+							"",
 							"let schemaElem = {",
 							"    type: \"object\",",
 							"    properties: {",
@@ -457,18 +469,22 @@
 							"    let jsonData = pm.response.json();",
 							"    // We only care about this test if we actually got a result back",
 							"    if( jsonData.length > 0 ){",
-							"        pm.expect(tv4.validate(jsonData[0], schemaElem)).to.be.true;",
+							"        let locationObj = jsonData[0];",
+							"        pm.expect(tv4.validate(locationObj, schemaLocationObj)).to.be.true;",
+							"        pm.expect(tv4.validate(locationObj.jobs[0], schemaElem)).to.be.true;",
 							"    }",
 							"});",
 							"",
-							"pm.test('An array was returned', function() {",
+							"pm.test('A populated array was returned', function() {",
 							"    let jsonData = pm.response.json();",
 							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+							"    pm.expect(jsonData.length > 0).to.be.true",
 							"});",
 							"",
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
-							"});"
+							"});",
+							""
 						]
 					}
 				}
@@ -488,7 +504,7 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/search/jobs/zip?zip=85212&limit=200&radius=21",
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/jobs?type=zip&zip=85212&limit=200&radius=21",
 					"host": [
 						"topia-env-development",
 						"us-west-2",
@@ -496,11 +512,14 @@
 						"com"
 					],
 					"path": [
-						"search",
-						"jobs",
-						"zip"
+						"jobs"
 					],
 					"query": [
+						{
+							"key": "type",
+							"value": "zip",
+							"equals": true
+						},
 						{
 							"key": "zip",
 							"value": "85212",
@@ -534,6 +553,15 @@
 							"    type: \"array\",",
 							"};",
 							"",
+							"let schemaLocationObj = {",
+							"    type: \"object\",",
+							"    properties: {",
+							"        \"latitude\": { type: \"number\" },",
+							"        \"longitude\": { type: \"number\" },",
+							"        \"jobs\": { type: \"array\" }",
+							"    }",
+							"}",
+							"",
 							"let schemaElem = {",
 							"    type: \"object\",",
 							"    properties: {",
@@ -566,18 +594,22 @@
 							"    let jsonData = pm.response.json();",
 							"    // We only care about this test if we actually got a result back",
 							"    if( jsonData.length > 0 ){",
-							"        pm.expect(tv4.validate(jsonData[0], schemaElem)).to.be.true;",
+							"        let locationObj = jsonData[0];",
+							"        pm.expect(tv4.validate(locationObj, schemaLocationObj)).to.be.true;",
+							"        pm.expect(tv4.validate(locationObj.jobs[0], schemaElem)).to.be.true;",
 							"    }",
 							"});",
 							"",
-							"pm.test('An array was returned', function() {",
+							"pm.test('A populated array was returned', function() {",
 							"    let jsonData = pm.response.json();",
 							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+							"    pm.expect(jsonData.length > 0).to.be.true",
 							"});",
 							"",
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
-							"});"
+							"});",
+							""
 						]
 					}
 				}
@@ -597,7 +629,7 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/search/jobs/location?city=Seattle&state=WA&limit=300&radius=200",
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/jobs?type=location&city=Seattle&state=WA&limit=300&radius=200",
 					"host": [
 						"topia-env-development",
 						"us-west-2",
@@ -605,11 +637,14 @@
 						"com"
 					],
 					"path": [
-						"search",
-						"jobs",
-						"location"
+						"jobs"
 					],
 					"query": [
+						{
+							"key": "type",
+							"value": "location",
+							"equals": true
+						},
 						{
 							"key": "city",
 							"value": "Seattle",
@@ -706,11 +741,17 @@
 							"value": "455ba8b70208e25b",
 							"description": "",
 							"type": "text"
+						},
+						{
+							"key": "type",
+							"value": "add",
+							"description": "",
+							"type": "text"
 						}
 					]
 				},
 				"url": {
-					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/savejob",
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/profile/jobs",
 					"host": [
 						"topia-env-development",
 						"us-west-2",
@@ -719,7 +760,8 @@
 					],
 					"path": [
 						"users",
-						"savejob"
+						"profile",
+						"jobs"
 					]
 				},
 				"description": ""
@@ -807,11 +849,17 @@
 							"value": "455ba8b70208e25b",
 							"description": "",
 							"type": "text"
+						},
+						{
+							"key": "type",
+							"value": "remove",
+							"description": "",
+							"type": "text"
 						}
 					]
 				},
 				"url": {
-					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/removejob",
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/profile/jobs",
 					"host": [
 						"topia-env-development",
 						"us-west-2",
@@ -820,7 +868,8 @@
 					],
 					"path": [
 						"users",
-						"removejob"
+						"profile",
+						"jobs"
 					]
 				},
 				"description": ""
@@ -900,11 +949,17 @@
 							"value": "34",
 							"description": "",
 							"type": "text"
+						},
+						{
+							"key": "type",
+							"value": "single",
+							"description": "",
+							"type": "text"
 						}
 					]
 				},
 				"url": {
-					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/modify",
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/profile",
 					"host": [
 						"topia-env-development",
 						"us-west-2",
@@ -913,7 +968,7 @@
 					],
 					"path": [
 						"users",
-						"modify"
+						"profile"
 					]
 				},
 				"description": "Using the modify mode."
@@ -994,11 +1049,17 @@
 							"value": "{{prefs_jobs_postedDate}}",
 							"description": "",
 							"type": "text"
+						},
+						{
+							"key": "type",
+							"value": "single",
+							"description": "",
+							"type": "text"
 						}
 					]
 				},
 				"url": {
-					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/modify",
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/profile",
 					"host": [
 						"topia-env-development",
 						"us-west-2",
@@ -1007,7 +1068,7 @@
 					],
 					"path": [
 						"users",
-						"modify"
+						"profile"
 					]
 				},
 				"description": "Using the modify mode."
@@ -1081,11 +1142,17 @@
 							"value": "email",
 							"description": "",
 							"type": "text"
+						},
+						{
+							"key": "type",
+							"value": "single",
+							"description": "",
+							"type": "text"
 						}
 					]
 				},
 				"url": {
-					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/modify",
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/profile",
 					"host": [
 						"topia-env-development",
 						"us-west-2",
@@ -1094,7 +1161,7 @@
 					],
 					"path": [
 						"users",
-						"modify"
+						"profile"
 					]
 				},
 				"description": "Using the remove mode."
@@ -1176,11 +1243,17 @@
 							"value": "{{email}}",
 							"description": "",
 							"type": "text"
+						},
+						{
+							"key": "type",
+							"value": "single",
+							"description": "",
+							"type": "text"
 						}
 					]
 				},
 				"url": {
-					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/modify",
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/profile",
 					"host": [
 						"topia-env-development",
 						"us-west-2",
@@ -1189,7 +1262,7 @@
 					],
 					"path": [
 						"users",
-						"modify"
+						"profile"
 					]
 				},
 				"description": "Using the remove mode."
@@ -1278,11 +1351,17 @@
 							"value": "testType",
 							"description": "",
 							"type": "text"
+						},
+						{
+							"key": "type",
+							"value": "single",
+							"description": "",
+							"type": "text"
 						}
 					]
 				},
 				"url": {
-					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/modify",
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/profile",
 					"host": [
 						"topia-env-development",
 						"us-west-2",
@@ -1291,7 +1370,7 @@
 					],
 					"path": [
 						"users",
-						"modify"
+						"profile"
 					]
 				},
 				"description": "Using listappend mode."
@@ -1380,11 +1459,17 @@
 							"value": "testType",
 							"description": "",
 							"type": "text"
+						},
+						{
+							"key": "type",
+							"value": "single",
+							"description": "",
+							"type": "text"
 						}
 					]
 				},
 				"url": {
-					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/modify",
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/profile",
 					"host": [
 						"topia-env-development",
 						"us-west-2",
@@ -1393,7 +1478,7 @@
 					],
 					"path": [
 						"users",
-						"modify"
+						"profile"
 					]
 				},
 				"description": "Using listappend mode."
@@ -1411,8 +1496,11 @@
 							"",
 							"const TEST_DATE = 89;",
 							"const TEST_EMAIL = \"testEmail@email.com\";",
-							"const TEST_LAST_UPDATED = 123456;",
-							"",
+							"const TEST_JOBS = [",
+							"        \"Software Engineer\",",
+							"        \"Developer\",",
+							"        \"Java\"",
+							"    ]",
 							"",
 							"pm.sendRequest({",
 							"    url: \"topia-env-development.us-west-2.elasticbeanstalk.com/users/profile\",",
@@ -1423,11 +1511,21 @@
 							"        let jsonData = response.json();",
 							"        let date = jsonData[\"prefs_jobs_postedDate\"];",
 							"        let email = jsonData[\"email\"];",
-							"        let last_updated = jsonData[\"last_updated\"];",
+							"        let jobs = jsonData[\"prefs_jobs_titles\"];",
 							"",
-							"        pm.expect(date === 89).to.be.true;",
+							"        pm.expect(date  === TEST_DATE).to.be.true;",
 							"        pm.expect(email === TEST_EMAIL).to.be.true;",
-							"        pm.expect(last_updated === TEST_LAST_UPDATED).to.be.true;",
+							"        ",
+							"        // Compare jobs arrays",
+							"        let test_jobs = TEST_JOBS.sort();",
+							"        jobs = jobs.sort();",
+							"        let arraysSame = jobs.length === test_jobs.length ? true : false;",
+							"        for(let i = 0; i < test_jobs.length; i++){",
+							"            if ( test_jobs[i] !== jobs[i] ){",
+							"                arraysSame = false;",
+							"            }",
+							"        }",
+							"        pm.expect(arraysSame).to.be.true;",
 							"",
 							"    });",
 							"});",
@@ -1464,10 +1562,10 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"last_updated\": 123456,\n\t\"email\": \"testEmail@email.com\",\n\t\"prefs_jobs_postedDate\": 89\n}"
+					"raw": "{\n  \"prefs\":{\n    \"email\": \"testEmail@email.com\",\n    \"prefs_jobs_postedDate\": 89,\n    \"prefs_jobs_titles\": [\n          \"Software Engineer\",\n          \"Developer\",\n          \"Java\"\n      ]\n  },\n  \"type\": \"multiple\"\n}"
 				},
 				"url": {
-					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/modifymulti",
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/profile",
 					"host": [
 						"topia-env-development",
 						"us-west-2",
@@ -1476,7 +1574,7 @@
 					],
 					"path": [
 						"users",
-						"modifymulti"
+						"profile"
 					]
 				},
 				"description": "Using the modify mode."
@@ -1494,7 +1592,7 @@
 							"",
 							"const TEST_DATE = parseInt( pm.environment.get(\"prefs_jobs_postedDate\") );",
 							"const TEST_EMAIL = pm.environment.get(\"email\");",
-							"const TEST_LAST_UPDATED = parseInt( pm.environment.get(\"last_updated\") );",
+							"const TEST_JOBS = pm.environment.get(\"prefs_jobs_titles\");",
 							"",
 							"",
 							"pm.sendRequest({",
@@ -1506,12 +1604,21 @@
 							"        let jsonData = response.json();",
 							"        let date = jsonData[\"prefs_jobs_postedDate\"];",
 							"        let email = jsonData[\"email\"];",
-							"        let last_updated = jsonData[\"last_updated\"];",
+							"        let jobs = jsonData[\"prefs_jobs_titles\"];",
 							"",
 							"        pm.expect(date === TEST_DATE).to.be.true;",
 							"        pm.expect(email === TEST_EMAIL).to.be.true;",
-							"        pm.expect(last_updated === TEST_LAST_UPDATED).to.be.true;",
-							"",
+							"        ",
+							"        // Compare jobs arrays",
+							"        let test_jobs = JSON.parse(TEST_JOBS).sort();",
+							"        jobs = jobs.sort();",
+							"        let arraysSame = jobs.length === test_jobs.length ? true : false;",
+							"        for(let i = 0; i < test_jobs.length; i++){",
+							"            if ( test_jobs[i] !== jobs[i] ){",
+							"                arraysSame = false;",
+							"            }",
+							"        }",
+							"        pm.expect(arraysSame).to.be.true;",
 							"    });",
 							"});",
 							"",
@@ -1547,10 +1654,10 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"last_updated\": \"{{last_updated}}\",\n\t\"email\": \"{{email}}\",\n\t\"prefs_jobs_postedDate\": \"{{prefs_jobs_postedDate}}\"\n}"
+					"raw": "{\n\t\"prefs\":{\n\t\t\"prefs_jobs_titles\": {{prefs_jobs_titles}},\n\t\t\"email\": \"{{email}}\",\n\t\t\"prefs_jobs_postedDate\": \"{{prefs_jobs_postedDate}}\"\n\t},\n\t\"type\": \"multiple\"\n}"
 				},
 				"url": {
-					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/modifymulti",
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/profile",
 					"host": [
 						"topia-env-development",
 						"us-west-2",
@@ -1559,7 +1666,7 @@
 					],
 					"path": [
 						"users",
-						"modifymulti"
+						"profile"
 					]
 				},
 				"description": "Using the modify mode."
@@ -1575,7 +1682,7 @@
 						"type": "text/javascript",
 						"exec": [
 							"",
-							"const TEST_TITLE = \"Poker\"",
+							"const TEST_TITLE = \"Ski\"",
 							"",
 							"",
 							"pm.sendRequest({",
@@ -1624,10 +1731,10 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"prefs_jobs_titles\": [\"Poker\"]\n}"
+					"raw": "{\n\t\"prefs\":{\n\t\t\"prefs_jobs_titles\": [\"Ski\"]\n\t},\n\t\"type\": \"multiple\"\n}"
 				},
 				"url": {
-					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/modifymulti",
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/profile",
 					"host": [
 						"topia-env-development",
 						"us-west-2",
@@ -1636,7 +1743,7 @@
 					],
 					"path": [
 						"users",
-						"modifymulti"
+						"profile"
 					]
 				},
 				"description": "Using the modify mode."
@@ -1652,7 +1759,7 @@
 						"type": "text/javascript",
 						"exec": [
 							"",
-							"const TEST_CITY = \"Las Vegas\"",
+							"const TEST_CITY = \"Denver\"",
 							"",
 							"let schema = {",
 							"    type: \"object\",",
@@ -1714,7 +1821,7 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/updateratings",
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/profile/ratings",
 					"host": [
 						"topia-env-development",
 						"us-west-2",
@@ -1723,7 +1830,8 @@
 					],
 					"path": [
 						"users",
-						"updateratings"
+						"profile",
+						"ratings"
 					]
 				},
 				"description": "Using the modify mode."
@@ -1792,10 +1900,10 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"prefs_jobs_titles\": {{prefs_jobs_titles}}\n}"
+					"raw": "{\n\t\"prefs\":{\n\t\t\"prefs_jobs_titles\": {{prefs_jobs_titles}}\n\t},\n\t\"type\": \"multiple\"\n}"
 				},
 				"url": {
-					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/modifymulti",
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/profile",
 					"host": [
 						"topia-env-development",
 						"us-west-2",
@@ -1804,7 +1912,7 @@
 					],
 					"path": [
 						"users",
-						"modifymulti"
+						"profile"
 					]
 				},
 				"description": "Using the modify mode."

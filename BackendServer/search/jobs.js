@@ -1,6 +1,5 @@
 const AWS = require( 'aws-sdk' );
 AWS.config.update( { region:'us-west-2' } );
-const keys = require( '../keys/apiKeys' );
 const request = require( 'request' );
 const qs = require( 'querystring' );
 const DB_USERS = require( '../db/users' );
@@ -28,7 +27,7 @@ exports.getJobByKey = ( jobKey ) => {
             reject( 'NoJobKeyFound' );
         }
         let jobQuery = {
-            publisher: keys.INDEED_KEY, // API Key
+            publisher: process.env.KEY_INDEED, // API Key
             v: INDEED_VERSION,          // API version
             format: 'json',
             jobkeys: jobKey
@@ -45,7 +44,7 @@ exports.getJobByKey = ( jobKey ) => {
                     reject( 'JobNotFound' );
                 } else {
                     let job = jobs[0];
-                    job = sanitizeSnippets( [job] )[0];
+                    sanitizeSnippet( job );
                     resolve( job );
                 }
             }
@@ -92,7 +91,7 @@ exports.getJobsByCoord = ( userObj, lat, long, maxResults, radius ) => {
         }
 
         let baseQuery = {
-            username: keys.ZIP_USERNAME,
+            username: process.env.KEY_ZIP,
             lat: lat,
             lng: long,
             radius: radius > MAX_ZIP_RADIUS_KM ? MAX_ZIP_RADIUS_KM : radius,
@@ -148,7 +147,7 @@ function getJobsList( profile, city, state, zip, maxResults, radius = DEFAULT_RA
             typePromises.push( new Promise( ( typeResolve, typeReject ) => {
 
                 let baseQuery = {
-                    publisher: keys.INDEED_KEY,
+                    publisher: process.env.KEY_INDEED,
                     format: 'json',
                     v: INDEED_VERSION,  // API version
                     limit: RESULTS_PER_PAGE, // Number of results per call, max is 25
@@ -222,7 +221,8 @@ function getJobsList( profile, city, state, zip, maxResults, radius = DEFAULT_RA
             } else {
                 // Flatten results before sending
                 let jobsArr = [].concat.apply( [], totalResults );
-                jobsArr = sanitizeSnippets( jobsArr );
+                jobsArr = organizeResults( jobsArr );
+
                 resolve( jobsArr );
             }
         }).catch( err => {
@@ -231,14 +231,62 @@ function getJobsList( profile, city, state, zip, maxResults, radius = DEFAULT_RA
     });
 }
 
-// Helper to sanitize all the job snippets before sending
-let sanitizeSnippets = ( jobsArr ) => {
+// Helper to sanitize all job snippets and organize jobs by location
+let organizeResults = ( jobsArr ) => {
+    let emptyLocStr = "nolocation";
+    // Initial jobs object, will be converted to an array before sending
+    let locationsObj = {};
+
     for( let i = 0; i < jobsArr.length; i++ ){
-        jobsArr[i].snippet = sanitizeHTML( jobsArr[i].snippet, {
-            allowedTags: [],
-            allowedAttributes: []
-        });
+        // Sanitize the html
+        sanitizeSnippet( jobsArr[i] );
+
+        // Group by location
+        let lat = jobsArr[i].latitude;
+        let long = jobsArr[i].longitude;
+        let key = lat.toString() + long.toString();
+
+        if( lat && long ) {
+            // If the location object already exists just append the job, else make a new object
+            if( locationsObj[key] ) {
+                locationsObj[key].jobs.push( jobsArr[i] );
+            } else {
+                locationsObj[key] =
+                    {
+                        latitude: lat,
+                        longitude: long,
+                        jobs: [
+                            jobsArr[i]
+                        ]
+                    };
+            }
+        // No lat long available, add to the empty object.
+        } else {
+            if( locationsObj[emptyLocStr] ){
+                locationsObj[emptyLocStr].jobs.push( jobsArr[i] );
+            // Create new empty location object if one does not already exist
+            } else {
+                locationsObj[emptyLocStr] = {
+                    latitude: null,
+                    longitude: null,
+                    jobs:[
+                        jobsArr[i]
+                    ]
+                }
+            }
+        }
     }
-    console.log(jobsArr);
-    return jobsArr;
+
+    // Now convert object to array for sending
+    return Object.keys( locationsObj ).map( ( key ) => {
+                return locationsObj[key];
+           });
+
+};
+
+let sanitizeSnippet = ( job ) => {
+    job.snippet = sanitizeHTML( job.snippet, {
+        allowedTags: [],
+        allowedAttributes: []
+    });
 };

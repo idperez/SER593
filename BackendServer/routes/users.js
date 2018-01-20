@@ -5,9 +5,13 @@ const response = require('../responses/responses.js');
 const consts = require( "../constants" );
 const cityData = require( "../search/cityData" );
 
+const MODIFY_TYPE_SINGLE = "single";
+const MODIFY_TYPE_MULTIPLE = "multiple";
+const JOB_TYPE_ADD = "add";
+const JOB_TYPE_REMOVE = "remove";
 
 /**
- * @api {get} /users/profile Profile
+ * @api {get} /users/profile Get Profile
  * @apiName Profile
  * @apiGroup Users
  * @apiDescription Get users profile from database.
@@ -17,6 +21,10 @@ const cityData = require( "../search/cityData" );
  *      {
  *          authorization: Bearer QZ3jhbfdof84GFBlSe
  *      }
+ *
+ * @apiExample Example-Request(s)
+ *      path-to-topia-api.com/users/profile
+ *      path-to-topia-api.com/users/profile?cityarray=true
  *
  * @apiParam {Boolean} [cityarray=false] Optional - Return city match results as a sorted array by match percentage.
  * @apiParamExample {json} Request-Example:
@@ -40,23 +48,27 @@ const cityData = require( "../search/cityData" );
 router.get( '/profile',
     ( req, res ) => {
         let useCityArray = req.query.cityarray;
+        let profile = DB_PROFILES.filterProfile( res.locals.user );
 
         if( useCityArray && useCityArray === "true" ) {
-            let profile = res.locals.user;
             profile[consts.PROF_KEYS.CITY_MATCH] = DB_PROFILES.cityMatchToArray( profile[consts.PROF_KEYS.CITY_MATCH] );
-            res.send( profile );
-        } else {
-            res.send( res.locals.user );
         }
 
+        res.send( profile );
     }
 );
 
 /**
- * @api {post} /users/modify Modify
+ * @api {post} /users/profile Modify Profile
  * @apiName Modify
  * @apiGroup Users
- * @apiDescription Modify a preference on users profile.
+ * @apiDescription Modify preference(s) on users profile.
+ *
+ * TYPES:
+ *
+ * Single: Make a change to a single profile value.
+ *
+ * Multiple: Send a JSON representation of all the values to be overwritten in the profile.
  *
  * MODES:
  *
@@ -74,18 +86,33 @@ router.get( '/profile',
  *          authorization: Bearer QZ3jhbfdof84GFBlSe
  *      }
  *
+ * @apiExample Example-Request(s)
+ *      path-to-topia-api.com/users/profile
+ *
+ * @apiParam {String="single","multiple"} type Type of profile change to make.
+ * @apiParam {String="modify","remove","listappend","listremove"} mode Specify what operation to run. Req with type of single.
  * @apiParam {String} key Key to add to users job preferences.
- * @apiParam {String} value Value to assign to the key. (Required for modes: modify, listappend, listremove)
- * @apiParam {String} mode Specify what operation to run. Options: modify, remove, listappend, listremove
- * @apiParamExample {json} Request-Example:
+ * @apiParam {String} value Value to assign to the key. (Required for modes: modify, listappend, listremove). Req with type of single.
+ * @apiParamExample {json} Single Example:
  *     {
  *       "key": "prefs_jobs_types",
  *       "value": "fulltime",
- *       "mode": "listappend"
+ *       "mode": "listappend",
+ *       "type": "single"
  *     }
+ * @apiParam {Object} prefs Object to overwrite user preferences. Req with type of multiple.
+ * @apiParamExample {json} Multiple Example:
+ *      {
+ *         "prefs": {
+ *              "prefs_jobs_titles": ["Software Engineer", "Developer", "Java"],
+ *              "prefs_jobs_postedDate": 60
+ *         },
+ *         "type":"multiple"
+ *      }
  *
+ * @apiError InvalidModifyType Modify type is missing from the query.
  * @apiError UserNotFound User information is not in the database.
- * @apiError InvalidKey Invalid key given.
+ * @apiError InvalidKey Invalid key given, either missing from body or not found on the database.
  * @apiError InvalidMode Invalid mode given.
  * @apiError ElemNotFound Element not found in list.
  * @apiError MissingValue No value given.
@@ -101,93 +128,47 @@ router.get( '/profile',
  *       }
  *     }
  */
-router.post( '/modify',
+router.post( '/profile',
     ( req, res ) => {
-        let val = req.body.value;
-        try {
-            val = JSON.parse( val );
-        } catch ( err ){} // No error handling needed for this event.
-        DB_PROFILES.modifyUserItemEndpoint(
-            res.locals.user,
-            req.body.key,
-            val,
-            req.body.mode
-        ).then( data => {
-            res.send( data );
-        }).catch( err => {
-            res.send( response.errorMessage( err ) );
-        });
+
+        switch(req.body.type){
+            case MODIFY_TYPE_SINGLE:
+                let val = req.body.value;
+                try {
+                    val = JSON.parse( val );
+                } catch ( err ){} // No error handling needed for this event.
+                DB_PROFILES.modifyUserItemEndpoint(
+                    res.locals.user,
+                    req.body.key,
+                    val,
+                    req.body.mode
+                ).then( data => {
+                    res.send( data );
+                }).catch( err => {
+                    res.send( response.errorMessage( err ) );
+                });
+                break;
+            case MODIFY_TYPE_MULTIPLE:
+                DB_PROFILES.modifyUserPreferences(
+                    res.locals.user,
+                    req.body.prefs
+                ).then( data => {
+                    res.send( data );
+                }).catch( err => {
+                    res.send( response.errorMessage( err ) );
+                });
+                break;
+            default:
+                res.send( response.errorMessage( "InvalidModifyType" ) );
+        }
     }
 );
 
 /**
- * @api {post} /users/modifymulti Modify Multiple
- * @apiName ModifyMultiple
- * @apiGroup Users
- * @apiDescription Modify multiple preferences on users profile.
- *
- * This allows passing in an object containing some keys from a users profile.
- * All keys within the object will overwrite the matching profile key on the database.
- *
- * To remove a key from the database, include it in the object and set it's value to null.
- *
- * NOTE: Entire arrays must be included with this method, as whatever is on the database will
- * be overwritten. See /modify to append or remove from an array value.
- *
- * NOTE: Any timely profile updates will be updated at this point, since there was a profile change.
- *
- * @apiHeader {String} authorization Bearer token
- * @apiHeaderExample {json} Header-Example:
- *      {
- *          authorization: Bearer QZ3jhbfdof84GFBlSe
- *      }
- *
- * @apiParam {Object} prefs Object to overwrite user preferences.
- * @apiParamExample {json} Request-Example:
- *      {
- *
- *         "prefs_jobs_titles": ["Software Engineer", "Developer", "Java"],
- *         "prefs_jobs_postedDate": 60
- *      }
- *
- * @apiError UserNotFound User information is not in the database.
- * @apiError InvalidKey Invalid key given.
- * @apiError InvalidMode Invalid mode given.
- * @apiError MissingValue No value given.
- * @apiError ModeError Internal error.
- * @apiError TokenNotFound Bearer token not found in header.
- * @apiError TokenMismatch Bearer token does not match.
- * @apiError TokenExpired Bearer token is expired.
- * @apiErrorExample {json} Error-Response:
- *     {
- *       "err": {
- *          "type": "UserNotFound",
- *          "msg": "Explanation of failure."
- *       }
- *     }
- */
-router.post( '/modifymulti',
-    ( req, res ) => {
-        let val = req.body.value;
-        try {
-            val = JSON.parse( val );
-        } catch ( err ){} // No error handling needed for this event.
-        DB_PROFILES.modifyUserPreferences(
-            res.locals.user,
-            req.body
-        ).then( data => {
-            res.send( data );
-        }).catch( err => {
-            res.send( response.errorMessage( err ) );
-        });
-    }
-);
-
-/**
- * @api {post} /users/savejob SaveJob
+ * @api {post} /profile/jobs Save or Remove Jobs
  * @apiName SaveJob
  * @apiGroup Users
- * @apiDescription Add a saved job to the users profile.
+ * @apiDescription Add/remove a saved job to/from the users profile.
  *
  * @apiHeader {String} authorization Bearer token
  * @apiHeaderExample {json} Header-Example:
@@ -195,8 +176,18 @@ router.post( '/modifymulti',
  *          authorization: Bearer QZ3jhbfdof84GFBlSe
  *      }
  *
- * @apiParam {String} jobkey Indeed job key.
+ * @apiExample Example-Request(s)
+ *      path-to-topia-api.com/users/profile/jobs
  *
+ * @apiParam {String} jobkey Indeed job key.
+ * @apiParam {String="add","remove"} Operation to add or remove a job to/from the users profile.
+ * @apiParamExample {json} Example:
+ *     {
+ *       "jobkey": "53091387dd962a7d",
+ *       "operation": "add"
+ *     }
+ *
+ * @apiError InvalidJobsType Jobs operation type is missing from the query.
  * @apiError JobAlreadySaved Job is already saved on the users profile.
  * @apiError NoJobsKeysFound jobkey not found in query.
  * @apiError NoJobsFound No jobs found with the given key(s).
@@ -211,64 +202,45 @@ router.post( '/modifymulti',
  *       }
  *     }
  */
-router.post( '/savejob',
+
+router.post( '/profile/jobs',
     ( req, res ) => {
 
-        DB_PROFILES.addSavedJob( res.locals.user, req.body.jobkey ).then( success => {
-           res.send( success );
-        }).catch( err => {
-           res.send( response.errorMessage( err ) );
-        });
+        switch( req.body.type ) {
+            case JOB_TYPE_ADD:
+                DB_PROFILES.addSavedJob( res.locals.user, req.body.jobkey ).then( success => {
+                    res.send( success );
+                } ).catch( err => {
+                    res.send( response.errorMessage( err ) );
+                } );
+                break;
+            case JOB_TYPE_REMOVE:
+                DB_PROFILES.removeSavedJob( res.locals.user, req.body.jobkey ).then( success => {
+                    res.send( success );
+                }).catch( err => {
+                    res.send( response.errorMessage( err ) );
+                });
+                break;
+            default:
+                res.send( response.errorMessage( "InvalidJobsType" ) );
+        }
     }
 );
 
 /**
- * @api {post} /users/removejob RemoveJob
- * @apiName RemoveJob
- * @apiGroup Users
- * @apiDescription Remove a saved job from the users profile.
- *
- * @apiHeader {String} authorization Bearer token
- * @apiHeaderExample {json} Header-Example:
- *      {
- *          authorization: Bearer QZ3jhbfdof84GFBlSe
- *      }
- *
- * @apiParam {String} jobkey Indeed job key.
- *
- * @apiError SavedJobNotFound Job is not saved on users profile.
- * @apiError TokenNotFound Bearer token not found in header.
- * @apiError TokenMismatch Bearer token does not match.
- * @apiError TokenExpired Bearer token is expired.
- * @apiErrorExample {json} Error-Response:
- *     {
- *       "err": {
- *          "type": "TokenNotFound",
- *          "msg": ""
- *       }
- *     }
- */
-router.post( '/removejob',
-    ( req, res ) => {
-        DB_PROFILES.removeSavedJob( res.locals.user, req.body.jobkey ).then( success => {
-            res.send( success );
-        }).catch( err => {
-            res.send( response.errorMessage( err ) );
-        });
-    }
-);
-
-/**
- * @api {post} /users/updateratings UpdateRatings
+ * @api {post} /users/profile/ratings Update Ratings
  * @apiName UpdateRatings
  * @apiGroup Users
- * @apiDescription Allows front-end to update city match ratings.
+ * @apiDescription Allows front-end to update city match ratings for the current user.
  *
  * @apiHeader {String} authorization Bearer token
  * @apiHeaderExample {json} Header-Example:
  *      {
  *          authorization: Bearer QZ3jhbfdof84GFBlSe
  *      }
+ *
+ * @apiExample Example-Request(s)
+ *      path-to-topia-api.com/users/profile/ratings
  *
  * @apiError TokenNotFound Bearer token not found in header.
  * @apiError TokenMismatch Bearer token does not match.
@@ -285,7 +257,7 @@ router.post( '/removejob',
  *       }
  *     }
  */
-router.post( '/updateratings',
+router.post( '/profile/ratings',
     ( req, res ) => {
 
         cityData.updateCityRatings( res.locals.user ).then( success => {

@@ -1,5 +1,4 @@
 let jobSearch = require( './jobs.js' );
-const keys = require( '../keys/apiKeys' );
 const POPULATION_ENDPOINT = "https://api.census.gov/data/2016/pep/population";
 const request = require( 'request' );
 const DB_USERS = require( '../db/users' );
@@ -173,7 +172,7 @@ exports.grabCityPopulations = () => {
             for: "place:*",
             in: "state:*",
             POP: MIN_POP + ":" + MAX_POP,
-            key: keys.CENSUS_KEY
+            key: process.env.KEY_CENSUS
         };
 
         request( POPULATION_ENDPOINT + '?' + qs.stringify( params ), function( err, response, body ) {

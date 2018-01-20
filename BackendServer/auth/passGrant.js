@@ -1,7 +1,6 @@
 const users = require( '../db/users' );
 const response = require( "../responses/responses" );
 const tokenGen = require( "rand-token" );
-const tokenProps = require( "../keys/token" );
 const consts = require( "../constants" );
 const passwordHash = require('password-hash');
 
@@ -38,7 +37,14 @@ exports.authenticate = ( username, password ) => {
 exports.authorize = ( req, res, next ) => {
     // Grab access token from DB
     users.getUserProfileByPrimaryKey( consts.PROF_KEYS.ACCESS_TOKEN, req.token ).then( user => {
-        if( req.token === user[consts.PROF_KEYS.ACCESS_TOKEN] ) {
+        let token = user[consts.PROF_KEYS.ACCESS_TOKEN];
+
+        // Error handling in case a token was never set during registration
+        if( token === consts.TEMP_TOKEN ){
+            res.send( response.errorMessage( "TempTokenFound" ) );
+        }
+
+        if( req.token === token ) {
             if( !user[consts.PROF_KEYS.ACCESS_EXPR] || user[consts.PROF_KEYS.ACCESS_EXPR] <= Date.now() ) {
                 res.send( response.errorMessage( "TokenExpired" ) );
             } else {
@@ -100,8 +106,8 @@ let saveToken = ( userObj, token ) => {
 
 // TODO - Make sure token is not already taken somehow
 let generateToken = () => {
-    let tokenExpr = Date.now() + tokenProps.tokenExpr;
-    let token = tokenGen.generate( tokenProps.tokenSize );
+    let tokenExpr = Date.now() + process.env.TOKEN_EXPIRE;
+    let token = tokenGen.generate( process.env.TOKEN_SIZE );
     return {
         token: token,
         expr: tokenExpr

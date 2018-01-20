@@ -109,13 +109,6 @@ exports.getUserProfileByPrimaryKey = ( primKey, value ) => {
 
                             resolve( resultProfile );
 
-                            /*
-                               Check expiration time stamp for the users profile.
-                               This runs after the response, so the current call for the user profile
-                               will not have to wait for the updates.
-                            */
-                            timelyUpdates( resultProfile, DEFAULT_UPDATE_TIME );
-
 
                         } ).catch( err => reject( err ) );
 
@@ -123,6 +116,13 @@ exports.getUserProfileByPrimaryKey = ( primKey, value ) => {
                     } else {
                         resolve( resultProfile )
                     }
+
+                    /*
+                       Check expiration time stamp for the users profile.
+                       This runs after the response, so the current call for the user profile
+                       will not have to wait for the updates.
+                    */
+                    timelyUpdates( resultProfile, DEFAULT_UPDATE_TIME );
 
                 } else {
                     reject( 'NoResultsFound' );
@@ -136,6 +136,7 @@ exports.getUserProfileByPrimaryKey = ( primKey, value ) => {
 
 exports.addNewUser = ( username, password, email ) => {
     return new Promise( (resolve, reject) => {
+
         let params = {
             TableName: TABLE_NAME,
             Item: {
@@ -147,10 +148,26 @@ exports.addNewUser = ( username, password, email ) => {
                 },
                 [consts.PROF_KEYS.EMAIL]:{
                     "S": email
+                },
+                // Must be set to string for DB indexing
+                [consts.PROF_KEYS.ACCESS_TOKEN]:{
+                    "S": consts.TEMP_TOKEN
                 }
             },
             ConditionExpression: "attribute_not_exists(" + consts.PROF_KEYS.USERNAME + ")"
         };
+
+        // Set all user keys to null upon registration.
+        for( let key in consts.PROF_KEYS ){
+            if( consts.PROF_KEYS.hasOwnProperty( key ) ){
+                // Only set to null if this item is not already defined.
+                if( !params.Item.hasOwnProperty( consts.PROF_KEYS[key] ) )
+                params.Item[consts.PROF_KEYS[key]] = {
+                    "NULL": true
+                }
+            }
+        }
+
 
         ddb.putItem( params, ( err, data ) => {
             if ( err ) {
@@ -178,7 +195,7 @@ exports.modifyUserItemEndpoint = ( userObj, key, value, mode ) => {
             .then( updatedProfile => {
                 updatesOnProfileChange( updatedProfile );
             }).catch( err => { console.log( err ) });
-    }).catch( err => console.log(err));
+    }).catch( err => console.log( err ) );
 
 
     return promise;
@@ -257,7 +274,7 @@ exports.modifyUserPreferences = ( userObj, prefObj ) => {
             exports.getUserProfile( userObj[consts.PROF_KEYS.USERNAME] )
                 .then( updatedProfile => {
                     updatesOnProfileChange( updatedProfile );
-                }).catch( err => { console.log( err ) })
+                }).catch( err => { console.log( err ) } )
         }).catch( err => reject( err ) );
     });
 };
@@ -316,59 +333,72 @@ exports.cityMatchToArray = ( cityMatches ) => {
     return resArray;
 };
 
+// Filter sensitive/backend only data from the profile before a response
+// This includes passwords, access tokens, etc.
+exports.filterProfile = ( profile ) => {
+    consts.PROF_KEYS_TO_EXCLUDE.forEach( ( key ) => {
+        delete profile[key];
+    });
+    return profile;
+};
+
 
 // Add new user profile item
 let addUserItem = ( username, key, value ) => {
     return new Promise( ( resolve, reject ) =>{
-        let param = {
-            TableName: TABLE_NAME,
-            Key:{
-                [PRIMARY_KEY]: {
-                    S: username
-                }
-            },
-            ExpressionAttributeNames:{
-                "#K": key
-            },
-            ExpressionAttributeValues:{
-                ":v": {}
-            },
-            UpdateExpression: "SET #K = :v",
-        };
-        // Add key/value pair by type
-        param['ExpressionAttributeValues'][':v'] = {};
-        if( !isNaN( value ) ) {
-            param['ExpressionAttributeValues'][':v']['N'] = value.toString();
-        } else if( typeof value === 'string' ){
-            param['ExpressionAttributeValues'][':v']['S'] = value;
-        } else if( typeof value === 'object' ) {
-            if( Array.isArray( value ) ){
-                // Number array
-                if( value.every( Number ) ){
-                    param['ExpressionAttributeValues'][':v']['NS'] =
-                        value.map( String );
-                    // String array
-                } else if ( value.every( String ) ){
-                    param['ExpressionAttributeValues'][':v']['SS'] = value;
-                    // Generic list
+        if( !util.objectContains( consts.PROF_KEYS, key ) ){
+            reject( "InvalidKey" );
+        } else {
+            let param = {
+                TableName: TABLE_NAME,
+                Key: {
+                    [ PRIMARY_KEY ]: {
+                        S: username
+                    }
+                },
+                ExpressionAttributeNames: {
+                    "#K": key
+                },
+                ExpressionAttributeValues: {
+                    ":v": {}
+                },
+                UpdateExpression: "SET #K = :v",
+            };
+            // Add key/value pair by type
+            param[ 'ExpressionAttributeValues' ][ ':v' ] = {};
+            if( !isNaN( value ) ) {
+                param[ 'ExpressionAttributeValues' ][ ':v' ][ 'N' ] = value.toString();
+            } else if( typeof value === 'string' ) {
+                param[ 'ExpressionAttributeValues' ][ ':v' ][ 'S' ] = value;
+            } else if( typeof value === 'object' ) {
+                if( Array.isArray( value ) ) {
+                    // Number array
+                    if( value.every( Number ) ) {
+                        param[ 'ExpressionAttributeValues' ][ ':v' ][ 'NS' ] =
+                            value.map( String );
+                        // String array
+                    } else if( value.every( String ) ) {
+                        param[ 'ExpressionAttributeValues' ][ ':v' ][ 'SS' ] = value;
+                        // Generic list
+                    } else {
+                        param[ 'ExpressionAttributeValues' ][ ':v' ][ 'L' ] = value;
+                    }
+                    // Object
                 } else {
-                    param['ExpressionAttributeValues'][':v']['L'] = value;
+                    param[ 'ExpressionAttributeValues' ][ ':v' ][ 'M' ] = value;
                 }
-                // Object
-            } else {
-                param['ExpressionAttributeValues'][':v']['M'] = value;
+            } else if( typeof value === 'boolean' ) {
+                param[ 'ExpressionAttributeValues' ][ ':v' ][ 'BOOL' ] = value;
             }
-        } else if( typeof value === 'boolean' ) {
-            param['ExpressionAttributeValues'][':v']['BOOL'] = value;
-        }
 
-        ddb.updateItem( param, ( err, data ) => {
-            if( err ) {
-                reject( err );
-            } else {
-                resolve( data );
-            }
-        });
+            ddb.updateItem( param, ( err, data ) => {
+                if( err ) {
+                    reject( err );
+                } else {
+                    resolve( data );
+                }
+            } );
+        }
     });
 };
 
@@ -460,7 +490,9 @@ let removeUserItem = ( username, key ) => {
 };
 
 // Add job to the job DB table
-let addJob = ( jobKey ) => {
+// Exists is a boolean flag to determine if we should add the job ONLY if it exists.
+// Exists - true to update an existing job, false to add a new job.
+let addJob = ( jobKey, exists ) => {
     return new Promise( ( resolve, reject ) => {
         jobSearch.getJobByKey( jobKey ).then( job => {
 
@@ -474,7 +506,9 @@ let addJob = ( jobKey ) => {
                         "S": JSON.stringify( job )
                     }
                 },
-                ConditionExpression: "attribute_not_exists(" + PRIM_KEY_JOBS + ")"
+                ConditionExpression: exists ?
+                    "attribute_exists(" + PRIM_KEY_JOBS + ")" :
+                    "attribute_not_exists(" + PRIM_KEY_JOBS + ")"
             };
 
             ddb.putItem( params, ( err, data ) => {
@@ -486,7 +520,6 @@ let addJob = ( jobKey ) => {
             });
         });
     });
-
 };
 
 // Get saved job from the DB
@@ -520,7 +553,7 @@ let getSavedJob = ( jobKey ) => {
                     }
                 } else {
                     // If it's not on the DB, try to add it.
-                    addJob(jobKey).then( data => {
+                    addJob( jobKey, false ).then( data => {
                         resolve( data );
                     }).catch( err => reject( err ));
                 }
@@ -531,49 +564,19 @@ let getSavedJob = ( jobKey ) => {
     });
 };
 
-// Check the time stamp for when the job was last updated, if stamp expired, update it.
-let checkAndUpdateSavedJobs = ( username, savedJobs ) => {
-    let promises = [];
-
-    if( savedJobs && util.isArray( savedJobs ) ) { // If there are even any saved jobs
-        for( let i = savedJobs.length - 1; i >= 0; i-- ) {
-            if( savedJobs[i] && typeof savedJobs[i] === 'object'  ) {
-                // Update the job from indeed
-                promises.push(
-                    new Promise( ( resolveUpdate, rejectUpdate ) => {
-                        jobSearch.getJobByKey( savedJobs[i]["jobkey"] ).then( updatedJob => {
-                            resolveUpdate( updatedJob );
-                        } ).catch( err => {
-                            rejectUpdate( err );
-                        } );
-                    } )
-                );
-            } else {
-                console.log( 'InvalidSavedJobFormat: ' + savedJobs[i].toString() );
-            }
-        }
-
-        Promise.all( promises ).then( updatedJobs => {
-            // Success, update savedJobs on the DB
-            // Stringify all the jobs for storage on DB again.
-            for(let i = 0; i < updatedJobs.length; i++){
-                updatedJobs[i] = JSON.stringify( updatedJobs[i] );
-            }
-            // Store on the DB
-            addUserItem(
-                username,
-                consts.PROF_KEYS.PREFS_JOBS_SAVED,
-                updatedJobs
-            ).then( data => {
-                console.log( "Updating " + username + " saved jobs successful." )
-            }).catch( err => {
-                console.log( "Error updating " + username + " saved jobs on DB: " + err );
+// Update users saved jobs on the job table
+// If the job isn't found on indeed anymore, just log the error
+// We still want to keep the most recent job information on the job table
+let checkAndUpdateSavedJobs = ( jobs ) => {
+    if( util.isArray( jobs ) ) {
+        jobs.forEach( job => {
+            let jobKey = job[ "jobkey" ];
+            addJob( jobKey, true ).then( data => {
+                console.log( "Job " + jobKey + " updated successfully." );
+            } ).catch( err => {
+                console.log( "Job " + jobKey + " not updated: " + err );
             } );
-        } ).catch( err => {
-            console.log( "Error updating " + username + " saved jobs: " + err );
-        } )
-    } else {
-        console.log( username + " has no saved jobs." );
+        } );
     }
 };
 
@@ -589,9 +592,8 @@ let timelyUpdates = ( userObj, timeGap ) => {
         // City ratings
         updateCityRatings( userObj );
 
-        // DISABLED UNTIL AFTER SHOWCASE - Issue #137
         // Saved jobs
-        //checkAndUpdateSavedJobs( username, userObj[consts.PROF_KEYS.PREFS_JOBS_SAVED] );
+        checkAndUpdateSavedJobs( userObj[consts.PROF_KEYS.PREFS_JOBS_SAVED] );
 
         // END UPDATES
 
