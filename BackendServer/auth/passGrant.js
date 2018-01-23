@@ -10,14 +10,17 @@ exports.authenticate = ( username, password ) => {
     return new Promise(( resolve, reject ) => {
         users.getUserProfile( username ).then( userProfile => {
             if( passwordHash.verify( password, userProfile[consts.PROF_KEYS.PASSWORD] ) ) {
-                let accessToken = generateToken();
-                // Save token to user profile
-                saveToken(
-                    userProfile,
-                    accessToken
-                ).then( () =>{
-                    // Success, send the token.
-                    resolve( accessToken.token );
+                generateToken().then( accessToken => {
+                    // Save token to user profile
+                    saveToken(
+                        userProfile,
+                        accessToken
+                    ).then( () =>{
+                        // Success, send the token.
+                        resolve( accessToken.token );
+                    }).catch( err => {
+                        reject( err );
+                    });
                 }).catch( err => {
                     reject( err );
                 });
@@ -91,25 +94,42 @@ exports.revokeToken = ( userObj ) => {
 // Used to save access token to DB
 let saveToken = ( userObj, token ) => {
     return new Promise( ( resolve, reject ) => {
-        // TODO - clean up to make it one single call to database
-        let promises = [
-            users.modifyUserItem( userObj, consts.PROF_KEYS.ACCESS_TOKEN, token.token, consts.MODIFIY_PREFS_MODES.MODIFY ),
-            users.modifyUserItem( userObj, consts.PROF_KEYS.ACCESS_EXPR, token.expr, consts.MODIFIY_PREFS_MODES.MODIFY )
-        ];
-        Promise.all( promises ).then( () => {
-            resolve();
-        } ).catch( err => {
+        users.modifyUserPreferences(
+            userObj,
+            {
+              [consts.PROF_KEYS.ACCESS_TOKEN]: token.token,
+              [consts.PROF_KEYS.ACCESS_EXPR]: token.expr
+            }
+        ).then( data => {
+            resolve( data );
+        }).catch( err => {
             reject( err );
-        } )
+        });
     });
 };
 
-// TODO - Make sure token is not already taken somehow
 let generateToken = () => {
-    let tokenExpr = Date.now() + process.env.TOKEN_EXPIRE;
-    let token = tokenGen.generate( process.env.TOKEN_SIZE );
-    return {
-        token: token,
-        expr: tokenExpr
-    }
+    return new Promise( ( resolve, reject ) => {
+        let tokenExpr = Date.now() + process.env.TOKEN_EXPIRE;
+        let token = tokenGen.generate( process.env.TOKEN_SIZE );
+        users.getUserProfileByPrimaryKey(
+            consts.PROF_KEYS.ACCESS_TOKEN, token
+        ).then( user => {
+            // This is such an extremely rare case that it is okay
+            // to simply reject and let the user try logging in again.
+            reject( "TokenInUse" );
+        }).catch( err => {
+            // We want to resolve if this token has not already been generated.
+            if( err === "NoResultsFound" ){
+                resolve(
+                    {
+                        token: token,
+                        expr: tokenExpr
+                    }
+                );
+            } else {
+                reject( err );
+            }
+        });
+    });
 };
