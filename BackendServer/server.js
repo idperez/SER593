@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require( 'express' );
 const body_parser = require( 'body-parser' );
 const cookie_parser = require( 'cookie-parser' );
@@ -46,7 +47,7 @@ app.use( except(
 // Routing
 app.use( '/auth', auth );
 app.use( '/test', test ); // For development use
-app.use( '/search/jobs', jobs );
+app.use( '/jobs', jobs );
 app.use( '/users', profiles );
 
 app.listen( port );

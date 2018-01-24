@@ -1,7 +1,7 @@
 // Utility file for various helper functions
 
 exports.isArray = ( array ) => {
-    return array.constructor === Array;
+    return array && array.constructor === Array;
 };
 
 exports.emptyArray = ( array ) => {
