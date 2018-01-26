@@ -83,7 +83,7 @@ exports.register = ( username, password, email ) => {
 
 exports.revokeToken = ( userObj ) => {
     return new Promise( ( resolve, reject ) => {
-        users.modifyUserItem( userObj, consts.PROF_KEYS.ACCESS_EXPR, 0, consts.MODIFIY_PREFS_MODES.MODIFY ).then( data => {
+        users.modifyUserItem( userObj, consts.PROF_KEYS.ACCESS_EXPR, 1, consts.MODIFIY_PREFS_MODES.MODIFY ).then( data => {
             resolve( data );
         }).catch( err => {
             reject( err );
@@ -110,7 +110,7 @@ let saveToken = ( userObj, token ) => {
 
 let generateToken = () => {
     return new Promise( ( resolve, reject ) => {
-        let tokenExpr = Date.now() + process.env.TOKEN_EXPIRE;
+        let tokenExpr = Date.now() + parseInt( process.env.TOKEN_EXPIRE );
         let token = tokenGen.generate( process.env.TOKEN_SIZE );
         users.getUserProfileByPrimaryKey(
             consts.PROF_KEYS.ACCESS_TOKEN, token

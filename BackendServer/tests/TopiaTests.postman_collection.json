@@ -1682,7 +1682,7 @@
 						"type": "text/javascript",
 						"exec": [
 							"",
-							"const TEST_TITLE = \"Ski\"",
+							"const TEST_TITLE = \"blackjack\"",
 							"",
 							"",
 							"pm.sendRequest({",
@@ -1731,7 +1731,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"prefs\":{\n\t\t\"prefs_jobs_titles\": [\"Ski\"]\n\t},\n\t\"type\": \"multiple\"\n}"
+					"raw": "{\n\t\"prefs\":{\n\t\t\"prefs_jobs_titles\": [\"blackjack\"]\n\t},\n\t\"type\": \"multiple\"\n}"
 				},
 				"url": {
 					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/users/profile",
@@ -1759,7 +1759,7 @@
 						"type": "text/javascript",
 						"exec": [
 							"",
-							"const TEST_CITY = \"Denver\"",
+							"const TEST_CITY = \"Las Vegas\"",
 							"",
 							"let schema = {",
 							"    type: \"object\",",
@@ -1774,8 +1774,6 @@
 							"        let jsonData = response.json();",
 							"        let cityMatches = jsonData[\"cityMatch\"];",
 							"        ",
-							"        // Make sure Vegas is #1 here as it always should be",
-							"        // MAY fail once Atlantic City is added.",
 							"        pm.expect( cityMatches[TEST_CITY].ranking === 1 ).to.be.true;",
 							"        pm.expect( cityMatches[TEST_CITY].rating === 100.0 ).to.be.true;",
 							"    });",
@@ -1916,6 +1914,207 @@
 					]
 				},
 				"description": "Using the modify mode."
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"const CHAR_SIZE = 40;",
+							"// This can be exposed for now because it's a test.",
+							"// This value will not be the same in the final product, nor will these tests",
+							"// be public.",
+							"const EXPR_TIME = 7776000000 + 60000; // Expiration time plus one minute as a buffer",
+							"",
+							"let schema = {",
+							"    type: \"object\",",
+							"    properties: {",
+							"        \"token\": { type: \"string\" }",
+							"    }",
+							"}",
+							"",
+							"// This will need to be updated once the job table is added",
+							"pm.test('Expiration date updated', function(){",
+							"    let token = pm.response.json().token;",
+							"    pm.sendRequest({",
+							"    url: \"topia-env-development.us-west-2.elasticbeanstalk.com/users/profile\",",
+							"    method: 'GET',",
+							"    header: 'Authorization:Bearer ' + token,",
+							"    }, function (err, response) {",
+							"        let jsonData = response.json();",
+							"        let expr = jsonData.accessToken_expr;",
+							"        let currentTime = Date.now();",
+							"        pm.expect(expr <= (currentTime + EXPR_TIME)).to.be.true;",
+							"    });",
+							"});",
+							"",
+							"pm.test('Access token returned', function() {",
+							"        let jsonData = pm.response.json();",
+							"        pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+							"        pm.expect(jsonData.token.length == CHAR_SIZE).to.be.true;",
+							"});",
+							"",
+							"pm.test('No error', function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.err).to.be.undefined;",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.environment.set(\"testUserToken\", pm.response.json()[\"token\"]);"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "testUser",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "testerUser@email.com",
+							"description": "",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "password",
+							"value": "testUser123456",
+							"description": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/auth/login",
+					"host": [
+						"topia-env-development",
+						"us-west-2",
+						"elasticbeanstalk",
+						"com"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Logout",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"const EXPIRED_TIME = 1;",
+							"",
+							"// This will need to be updated once the job table is added",
+							"pm.sendRequest({",
+							"    url: \"topia-env-development.us-west-2.elasticbeanstalk.com/users/profile\",",
+							"    method: 'GET',",
+							"    header: 'Authorization:Bearer ' + pm.environment.get(\"testUserToken\"),",
+							"    }, function (err, response) {",
+							"        pm.test('Profile Expired', function(){",
+							"            let jsonData = response.json();",
+							"            pm.expect(jsonData).to.have.property(\"err\");",
+							"            pm.expect(jsonData.err.type == \"TokenExpired\").to.be.true;",
+							"        });",
+							"});",
+							"",
+							"pm.test('No error', function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.err).to.be.undefined;",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{testUserToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "testUser",
+							"description": "",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "email",
+							"value": "testerUser@email.com",
+							"description": "",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "password",
+							"value": "testUser123456",
+							"description": "",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "topia-env-development.us-west-2.elasticbeanstalk.com/auth/logout",
+					"host": [
+						"topia-env-development",
+						"us-west-2",
+						"elasticbeanstalk",
+						"com"
+					],
+					"path": [
+						"auth",
+						"logout"
+					]
+				},
+				"description": ""
 			},
 			"response": []
 		}
