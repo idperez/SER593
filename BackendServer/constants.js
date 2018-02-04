@@ -40,3 +40,37 @@ exports.JOB_PROPS = {
 // This is an invalid token, with no access.
 exports.TEMP_TOKEN = "registering";
 
+exports.HOUSING = {
+    BUY_PATH: "",
+    RENT_PATH: "/rentals",
+
+    // Begin the housing parse object
+    HOUSING_PARSE:{
+        SEARCH:{
+            LISTINGS: "leftColumn",
+            ITEM_BODY: {
+                ITEM_BODY: "propertyInformation",
+                ITEM_TEXT: "content", // Common key where the text for house info is stored
+                PRICE: "price",
+                ADDRESS:{
+                    ADDRESS_BODY: "address",
+                    STREET_BODY: "streetAddress",
+                    CITY_BODY: "addressLocality",
+                    STATE_BODY: "addressRegion",
+                    ZIP_BODY: "postalCode"
+                },
+                TYPE: "propertyType",
+                ATTRIBUTES: {
+                    ATTRIBUTES_BODY: "attributes",
+                    BEDS: "beds",
+                    BATHS: "baths"
+                },
+                DETAILS_LINK: "href"
+            },
+            PHOTO:{
+                PHOTO_OBJ: "alignForTwoPhotos",
+                PHOTO_LINK: "src"
+            }
+        }
+    }
+};
