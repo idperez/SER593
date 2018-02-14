@@ -5,9 +5,13 @@ let ps = require('prop-search');
 let nestedProperty = require("nested-property");
 let findByKey = require('find-by-key');
 const utils = require('../util');
+const qs = require( 'querystring' );
+const request = require( 'request' );
 
 const NODE_CHILDREN = "children";
 const NODE_ATTRIBUTES = "attributes";
+const LOCATION_ENDPOINT = "https://maps.googleapis.com/maps/api/geocode/json";
+const EMPTY_PHOTO = "/image/noPhotoYet.gif";
 
 // Multiple pieces of information need to be pulled from the photo object.
 let photoObj;
@@ -22,40 +26,89 @@ exports.parseHousingSearchResults = ( html ) => {
         );
 
         if( housingJson ){
-            let housingResults = [];
+            let housingPromises = [];
             housingJson = housingJson[NODE_CHILDREN];
             housingJson = removeWhitespace( housingJson );
 
             for( let i = 0; i < housingJson.length; i++ ){
-                let currentHouseBody = getHouseSearchBody( housingJson[i] );
-
-                // This should filter out ads or anything else
-                // All house results must have a house body
-                if( currentHouseBody ) {
-                    // The photo is not part of the body
-                    let photoLink = getPhotoLink( housingJson[i] );
-                    let detailsLink = getDetailsLink();
-                    let price = getPrice( currentHouseBody );
-                    let address = getAddress( currentHouseBody );
-                    let type = getType( currentHouseBody );
-                    let attributes = getHouseAttributes( currentHouseBody );
-
-                    //TESTING
-                    housingResults.push({
-                        photoLink: photoLink,
-                        detailsLink: detailsLink,
-                        price: price,
-                        address: address,
-                        type: type,
-                        attributes: attributes
-                    });
-
-                }
+                housingPromises.push( new Promise( ( resolveHouse, rejectHouse ) => {
+                    let currentHouseBody = getHouseSearchBody( housingJson[i] );
+                    // This should filter out ads or anything else
+                    // All house results must have a house body
+                    if( currentHouseBody ) {
+                        // The photo is not part of the body
+                        let photoLink = getPhotoLink( housingJson[i] );
+                        if( photoLink !== EMPTY_PHOTO ) {
+                            let detailsLink = getDetailsLink();
+                            let price = getPrice( currentHouseBody );
+                            let address = getAddress( currentHouseBody );
+                            let type = getType( currentHouseBody );
+                            let attributes = getHouseAttributes( currentHouseBody );
+                            getCoordinates(
+                                address.street,
+                                address.city,
+                                address.state
+                            ).then( coords => {
+                                resolveHouse( {
+                                    photoLink: photoLink,
+                                    detailsLink: detailsLink,
+                                    price: price,
+                                    address: address,
+                                    type: type,
+                                    attributes: attributes,
+                                    coordinates: coords
+                                } );
+                            } ).catch( err => {
+                                rejectHouse( err );
+                            } );
+                        // Empty house link
+                        } else {
+                            resolveHouse( null );
+                        }
+                    } else {
+                        resolveHouse( null );
+                    }
+                }));
             }
-            resolve( housingResults );
+            Promise.all( housingPromises ).then( houses => {
+                houses = houses.filter( ( house ) => { return house != null } );
+                resolve( houses );
+            }).catch( err => {
+                reject( err );
+            });
         } else {
             reject( "ParseError" );
         }
+    });
+};
+
+let getCoordinates = ( address, city, state ) => {
+    return new Promise( ( resolve, reject ) => {
+        let fullAddress = address + "," + city + "," + state;
+        fullAddress = fullAddress.replace( / /g, "+" );
+        let query = {
+            key: process.env.KEY_GOOGLE,
+            address: fullAddress
+        };
+
+        query = qs.stringify( query );
+
+        request( LOCATION_ENDPOINT + "?" + query, ( err, response, body ) => {
+            let lat = null;
+            let long = null;
+            if( err ) {
+                // Resolve null location values
+                console.log( "Warning: No location found for " + fullAddress );
+            } else {
+                let locObj = JSON.parse( body ).results[0].geometry.location;
+                lat = locObj.lat ? locObj.lat : null;
+                long = locObj.lng ? locObj.lng : null;
+            }
+            resolve( {
+                lat: lat,
+                long: long
+            });
+        });
     });
 };
 

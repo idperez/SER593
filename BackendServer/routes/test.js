@@ -6,6 +6,8 @@ const city = require("../search/cityData");
 const housing = require( '../search/housing' );
 const request = require( 'request' );
 const consts = require( "../constants" );
+const tr = require('tor-request');
+const resMsg = require('../responses/responses.js');
 
 
 router.get('/cityratings', ( req, res ) => {
@@ -30,9 +32,9 @@ router.get( '/housing',
         path += "/" + req.query.state +
                 "/" + req.query.city;
 
-        request( path, ( err, response, body ) => {
+        tr.request( path, ( err, response, body ) => {
             if( err ) {
-                res.send( err );
+                res.send( resMsg.errorMessage( err ) );
             } else {
                 housing.parseHousingSearchResults( body
                 ).then( searchResults => {
