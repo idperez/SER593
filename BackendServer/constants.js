@@ -15,6 +15,10 @@ exports.PROF_KEYS = {
     LAST_UPDATED: "last_updated"
 };
 
+exports.USER_TABLE_NAME = "topia_profiles";
+exports.USER_PRIMARY_KEY = exports.PROF_KEYS.USERNAME;
+
+
 // Profile keys to exclude from the profile object when sending to front-end
 // These must be defined in PROF_KEYS.
 exports.PROF_KEYS_TO_EXCLUDE = [
@@ -72,5 +76,21 @@ exports.HOUSING = {
                 PHOTO_LINK: "src"
             }
         }
+    },
+
+    DB_KEYS:{
+        ADDRESS: "Address", // Primary key
+        STREET: "street",
+        CITY: "city",
+        STATE: "state",
+        ZIP: "zip",
+        TYPE: "type",
+        FULL_BATHS: "fullBaths",
+        HALF_BATHS: "halfBaths",
+        BEDS: "beds",
+        DETAILS_LINK: "details",
+        PHOTO_LINK: "photoLink",
+        LAT: "lat",
+        LONG: "long"
     }
 };

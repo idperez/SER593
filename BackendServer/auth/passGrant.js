@@ -1,4 +1,4 @@
-const users = require( '../db/users' );
+const users = require( '../db/databaseUsers' );
 const response = require( "../responses/responses" );
 const tokenGen = require( "rand-token" );
 const consts = require( "../constants" );
@@ -83,7 +83,12 @@ exports.register = ( username, password, email ) => {
 
 exports.revokeToken = ( userObj ) => {
     return new Promise( ( resolve, reject ) => {
-        users.modifyUserItem( userObj, consts.PROF_KEYS.ACCESS_EXPR, 1, consts.MODIFIY_PREFS_MODES.MODIFY ).then( data => {
+        users.modifyUserItemEndpoint(
+            userObj,
+            consts.PROF_KEYS.ACCESS_EXPR,
+            1,
+            consts.MODIFIY_PREFS_MODES.MODIFY
+        ).then( data => {
             resolve( data );
         }).catch( err => {
             reject( err );

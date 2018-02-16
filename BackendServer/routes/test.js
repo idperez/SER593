@@ -1,7 +1,7 @@
 // Test file for development
 const express = require( 'express' );
 const router = express.Router();
-const users = require( "../db/users" );
+const users = require( "../db/databaseUsers" );
 const city = require("../search/cityData");
 const housing = require( '../search/housing' );
 const request = require( 'request' );

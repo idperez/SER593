@@ -1,4 +1,4 @@
-const DB_USERS = require( '../db/users' );
+const DB_USERS = require( '../db/databaseUsers' );
 let himalaya = require( 'himalaya' );
 const consts = require( "../constants" );
 let ps = require('prop-search');
@@ -7,11 +7,13 @@ let findByKey = require('find-by-key');
 const utils = require('../util');
 const qs = require( 'querystring' );
 const request = require( 'request' );
+const DB = require( "../db/databaseAccess" );
 
 const NODE_CHILDREN = "children";
 const NODE_ATTRIBUTES = "attributes";
 const LOCATION_ENDPOINT = "https://maps.googleapis.com/maps/api/geocode/json";
 const EMPTY_PHOTO = "/image/noPhotoYet.gif";
+const TEST_DATA_TABLE_NAME = "";
 
 // Multiple pieces of information need to be pulled from the photo object.
 let photoObj;
@@ -72,13 +74,32 @@ exports.parseHousingSearchResults = ( html ) => {
             }
             Promise.all( housingPromises ).then( houses => {
                 houses = houses.filter( ( house ) => { return house != null } );
-                resolve( houses );
+                saveHousingTestData( houses ).then( data => {
+                    resolve( houses );
+                }).catch( err => {
+                    reject( err );
+                });
             }).catch( err => {
                 reject( err );
             });
         } else {
             reject( "ParseError" );
         }
+    });
+};
+
+let saveHousingTestData = ( houses ) => {
+    return new Promise( ( resolve, reject ) => {
+        let promises = [];
+        for( let i = 0; i < houses.length; ++i ){
+            promises.push( DB.addTestHouse( houses[i] ) );
+        }
+
+        Promise.all( promises ).then( housesAdded => {
+            resolve( housesAdded );
+        }).catch( err => {
+            reject( err );
+        })
     });
 };
 

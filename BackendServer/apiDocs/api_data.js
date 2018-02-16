@@ -805,7 +805,7 @@ define({ "api": [
       ]
     },
     "version": "0.0.0",
-    "filename": "./routes/users.js",
+    "filename": "./routes/databaseUsers.js",
     "groupTitle": "Users"
   },
   {
@@ -901,7 +901,7 @@ define({ "api": [
       ]
     },
     "version": "0.0.0",
-    "filename": "./routes/users.js",
+    "filename": "./routes/databaseUsers.js",
     "groupTitle": "Users"
   },
   {
@@ -1025,7 +1025,7 @@ define({ "api": [
       ]
     },
     "version": "0.0.0",
-    "filename": "./routes/users.js",
+    "filename": "./routes/databaseUsers.js",
     "groupTitle": "Users"
   },
   {
@@ -1118,7 +1118,7 @@ define({ "api": [
       ]
     },
     "version": "0.0.0",
-    "filename": "./routes/users.js",
+    "filename": "./routes/databaseUsers.js",
     "groupTitle": "Users"
   },
   {

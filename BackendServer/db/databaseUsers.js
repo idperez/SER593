@@ -5,18 +5,17 @@ const consts = require( "../constants" );
 const util = require( "../util" );
 const jobSearch = require( "../search/jobs" );
 const INDEX_SUFFIX = "-index";
-const TABLE_NAME = 'topia_profiles';
 const TABLE_NAME_JOBS = 'jobs';
 const PRIM_KEY_JOBS = "jobkey";
 const PRIM_KEY_JOB_DETAILS = "job";
-const PRIMARY_KEY = consts.PROF_KEYS.USERNAME;
 const DEFAULT_UPDATE_TIME = 86400000; // Time to recheck saved jobs - 24 hours in ms
 const cityData = require( "../search/cityData" );
+const DB = require( "./databaseAccess" );
 
 // Get user profile from database
 // Authorize should be the only caller
 exports.getUserProfile = ( username ) => {
-    return exports.getUserProfileByPrimaryKey( PRIMARY_KEY, username );
+    return exports.getUserProfileByPrimaryKey( consts.USER_PRIMARY_KEY, username );
 };
 
 // Query table by a specific key
@@ -25,7 +24,7 @@ exports.getUserProfileByPrimaryKey = ( primKey, value ) => {
     return new Promise( ( resolve, reject ) =>{
         if( primKey && value ) {
             let params = {
-                TableName: TABLE_NAME,
+                TableName: consts.USER_TABLE_NAME,
                 ExpressionAttributeValues: {
                     ":v1": {
                         S: value.toString()
@@ -34,7 +33,7 @@ exports.getUserProfileByPrimaryKey = ( primKey, value ) => {
                 KeyConditionExpression: primKey.toString() + " = :v1",
             };
 
-            if( PRIMARY_KEY !== primKey.toString()){
+            if( consts.USER_PRIMARY_KEY !== primKey.toString()){
                 params.IndexName = primKey + INDEX_SUFFIX;
             }
 
@@ -138,7 +137,7 @@ exports.addNewUser = ( username, password, email ) => {
     return new Promise( (resolve, reject) => {
 
         let params = {
-            TableName: TABLE_NAME,
+            TableName: consts.USER_TABLE_NAME,
             Item: {
                 [consts.PROF_KEYS.USERNAME]:{
                     "S": username
@@ -187,7 +186,11 @@ exports.addNewUser = ( username, password, email ) => {
 // Endpoint entrance to modify an existing user profile key
 // This is for routing use to prevent a loop on profile change updates
 exports.modifyUserItemEndpoint = ( userObj, key, value, mode ) => {
-    let promise = exports.modifyUserItem( userObj, key, value, mode );
+    let promise = DB.modifyUserItem(
+        consts.USER_TABLE_NAME,
+        consts.USER_PRIMARY_KEY,
+        userObj[consts.PROF_KEYS.USERNAME],
+        key, value, mode );
 
     // Updates on profile change
     promise.then( ( data ) => {
@@ -197,44 +200,6 @@ exports.modifyUserItemEndpoint = ( userObj, key, value, mode ) => {
             }).catch( err => { console.log( err ) });
     }).catch( err => console.log( err ) );
 
-
-    return promise;
-};
-
-// Modify an existing user profile key
-// Internal program use
-exports.modifyUserItem = ( userObj, key, value, mode ) => {
-    let promise;
-
-    // Check parameters
-    // Key
-    if( !key ) {
-        promise = Promise.reject( 'InvalidKey' );
-        // Mode
-    } else if ( !mode || !util.objectContains( consts.MODIFIY_PREFS_MODES, mode ) ) {
-        promise = Promise.reject( 'InvalidMode' );
-        // Value
-    } else if ( !value && mode !== consts.MODIFIY_PREFS_MODES.REMOVE ) {
-        promise = Promise.reject( 'MissingValue' );
-    } else {
-
-        switch( mode ){
-            case consts.MODIFIY_PREFS_MODES.MODIFY:
-                promise = addUserItem( userObj[consts.PROF_KEYS.USERNAME], key, value );
-                break;
-            case consts.MODIFIY_PREFS_MODES.REMOVE:
-                promise = removeUserItem( userObj[consts.PROF_KEYS.USERNAME], key );
-                break;
-            case consts.MODIFIY_PREFS_MODES.LIST_APPEND:
-                promise = appendListItem( userObj[consts.PROF_KEYS.USERNAME], key, value );
-                break;
-            case consts.MODIFIY_PREFS_MODES.LIST_REMOVE:
-                promise = removeListItem( userObj, key, value );
-                break;
-            default:
-                promise = Promise.reject( 'ModeError' );
-        }
-    }
 
     return promise;
 };
@@ -257,8 +222,10 @@ exports.modifyUserPreferences = ( userObj, prefObj ) => {
                 }
 
                 promises.push(
-                    exports.modifyUserItem(
-                        userObj,
+                    DB.modifyUserItem(
+                        consts.USER_TABLE_NAME,
+                        consts.USER_PRIMARY_KEY,
+                        userObj[consts.PROF_KEYS.USERNAME],
                         key,
                         prefObj[ key ],
                         mode
@@ -288,7 +255,9 @@ exports.addSavedJob = ( userObj, jobKey ) => {
            getSavedJob( jobKey ).then( job => {
                // We're not really concerned with the return value,
                // as long as it's resolved we know everything is okay.
-               appendListItem(
+               DB.appendListItem(
+                   consts.USER_TABLE_NAME,
+                   consts.USER_PRIMARY_KEY,
                    userObj[consts.PROF_KEYS.USERNAME],
                    consts.PROF_KEYS.PREFS_JOBS_SAVED,
                    jobKey
@@ -307,8 +276,10 @@ exports.addSavedJob = ( userObj, jobKey ) => {
 exports.removeSavedJob = ( userObj, jobKey ) => {
     return new Promise( ( resolve, reject ) => {
 
-        removeListItem(
-            userObj,
+        DB.removeListItem(
+            consts.USER_TABLE_NAME,
+            consts.USER_PRIMARY_KEY,
+            userObj[consts.PROF_KEYS.USERNAME],
             consts.PROF_KEYS.PREFS_JOBS_SAVED,
             jobKey
         ).then( data => {
@@ -340,153 +311,6 @@ exports.filterProfile = ( profile ) => {
         delete profile[key];
     });
     return profile;
-};
-
-
-// Add new user profile item
-let addUserItem = ( username, key, value ) => {
-    return new Promise( ( resolve, reject ) =>{
-        if( !util.objectContains( consts.PROF_KEYS, key ) ){
-            reject( "InvalidKey" );
-        } else {
-            let param = {
-                TableName: TABLE_NAME,
-                Key: {
-                    [ PRIMARY_KEY ]: {
-                        S: username
-                    }
-                },
-                ExpressionAttributeNames: {
-                    "#K": key
-                },
-                ExpressionAttributeValues: {
-                    ":v": {}
-                },
-                UpdateExpression: "SET #K = :v",
-            };
-            // Add key/value pair by type
-            param[ 'ExpressionAttributeValues' ][ ':v' ] = {};
-            if( !isNaN( value ) ) {
-                param[ 'ExpressionAttributeValues' ][ ':v' ][ 'N' ] = value.toString();
-            } else if( typeof value === 'string' ) {
-                param[ 'ExpressionAttributeValues' ][ ':v' ][ 'S' ] = value;
-            } else if( typeof value === 'object' ) {
-                if( Array.isArray( value ) ) {
-                    // Number array
-                    if( value.every( Number ) ) {
-                        param[ 'ExpressionAttributeValues' ][ ':v' ][ 'NS' ] =
-                            value.map( String );
-                        // String array
-                    } else if( value.every( String ) ) {
-                        param[ 'ExpressionAttributeValues' ][ ':v' ][ 'SS' ] = value;
-                        // Generic list
-                    } else {
-                        param[ 'ExpressionAttributeValues' ][ ':v' ][ 'L' ] = value;
-                    }
-                    // Object
-                } else {
-                    param[ 'ExpressionAttributeValues' ][ ':v' ][ 'M' ] = value;
-                }
-            } else if( typeof value === 'boolean' ) {
-                param[ 'ExpressionAttributeValues' ][ ':v' ][ 'BOOL' ] = value;
-            }
-
-            ddb.updateItem( param, ( err, data ) => {
-                if( err ) {
-                    reject( err );
-                } else {
-                    resolve( data );
-                }
-            } );
-        }
-    });
-};
-
-// Add item to a list or set on DB
-let appendListItem = ( username, listname, value ) => {
-    return new Promise( ( resolve, reject ) => {
-
-        let param = {
-            TableName: TABLE_NAME,
-            Key:{
-                [PRIMARY_KEY]: {
-                    S: username
-                }
-            },
-            ExpressionAttributeNames:{
-                "#K": listname
-            },
-            ExpressionAttributeValues:{
-                ":v": { SS: [value.toString()] }
-            },
-            UpdateExpression: "ADD #K :v",
-        };
-        ddb.updateItem( param, ( err, data ) => {
-            if( err ) {
-                reject( err );
-            } else {
-                resolve( data );
-            }
-        });
-    });
-};
-
-// Remove item from a list or set on DB
-let removeListItem = ( userObj, listname, elemVal ) => {
-    return new Promise( ( resolve, reject ) => {
-
-        let param = {
-            TableName: TABLE_NAME,
-            Key: {
-                [PRIMARY_KEY]: {
-                    S: userObj[ consts.PROF_KEYS.USERNAME ]
-                }
-            },
-            ExpressionAttributeNames: {
-                "#K": listname
-            },
-            ExpressionAttributeValues: {
-                ":v": { SS: [ elemVal.toString() ] }
-            },
-            UpdateExpression: "DELETE #K :v",
-        };
-        ddb.updateItem( param, ( err, data ) => {
-            if( err ) {
-                reject( err );
-            } else {
-                resolve( data );
-            }
-        });
-
-    });
-};
-
-// Sets user item to null
-let removeUserItem = ( username, key ) => {
-    return new Promise( ( resolve, reject ) => {
-        let param = {
-            TableName: TABLE_NAME,
-            Key:{
-                [PRIMARY_KEY]: {
-                    S: username
-                }
-            },
-            ExpressionAttributeNames:{
-                "#K": key
-            },
-            ExpressionAttributeValues:{
-                ":v": { NULL: true }
-            },
-            UpdateExpression: "SET #K = :v",
-        };
-        ddb.updateItem( param, ( err, data ) => {
-            if( err ) {
-                reject( err );
-            } else {
-                resolve( data );
-            }
-        });
-    });
 };
 
 // Add job to the job DB table
@@ -598,8 +422,10 @@ let timelyUpdates = ( userObj, timeGap ) => {
         // END UPDATES
 
         // Update time stamp
-        exports.modifyUserItem(
-            userObj,
+        DB.modifyUserItem(
+            consts.USER_TABLE_NAME,
+            consts.USER_PRIMARY_KEY,
+            userObj[consts.PROF_KEYS.USERNAME],
             consts.PROF_KEYS.LAST_UPDATED,
             currentTime,
             consts.MODIFIY_PREFS_MODES.MODIFY
