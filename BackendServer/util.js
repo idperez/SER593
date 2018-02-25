@@ -20,3 +20,8 @@ exports.objectContains = ( obj, value ) => {
 
     return res;
 };
+
+// Miles to kilometer conversion
+exports.milesToKm = ( miles ) => {
+    return 1.6 * miles;
+};

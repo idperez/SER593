@@ -6,85 +6,43 @@ const config = new ddbGeo.GeoDataManagerConfiguration(ddb, 'GeoHousing');
 const geoTableManager = new ddbGeo.GeoDataManager(config);
 const utils = require('../util');
 const consts = require( "../constants" );
-let sleep = require('sleep');
 
-exports.getHousingByCoordinates = ( userObj, lat, long ) => {
+exports.getHousingByCoordinates = ( userObj, lat, long, radius ) => {
     return new Promise( ( resolve, reject ) => {
-        moveTable();
-        resolve("check console");
-    });
-};
+        geoTableManager.queryRadius({
+            RadiusInMeter: utils.milesToKm( parseInt( radius ) ) * 1000,
+            CenterPoint:{
+                latitude: parseFloat( lat ),
+                longitude: parseFloat( long )
+            }
+        }).then( housingResults => {
+            let cleanHousingResults = [];
+            let keys = consts.HOUSING.DB_KEYS;
+            housingResults.forEach( result => {
 
-let moveTable = () => {
-    let params = {
-        TableName: "HousingTestData"
-    };
+                // Types are allowed to be null
+                let type = result[keys.TYPE].S ? result[keys.TYPE].S : null;
 
-    let timeout = 0;
-    ddb.scan( params, ( err, data ) => {
-        let allHousing = data.Items;
-        for( let i = 0; i < allHousing.length; i++ ){
+                cleanHousingResults.push({
+                    [keys.STREET]:result[keys.STREET].S,
+                    [keys.CITY]:result[keys.CITY].S,
+                    [keys.STATE]:result[keys.STATE].S,
+                    [keys.ZIP]:result[keys.ZIP].S,
+                    [keys.PHOTO_LINK]:result[keys.PHOTO_LINK].S,
+                    [keys.DETAILS_LINK]:result[keys.DETAILS_LINK].S,
+                    [keys.PRICE]:result[keys.PRICE].S,
+                    [keys.TYPE]:type,
+                    [keys.FULL_BATHS]:parseInt( result[keys.FULL_BATHS].N ),
+                    [keys.HALF_BATHS]:parseInt(result[keys.HALF_BATHS].N ),
+                    [keys.BEDS]:parseInt( result[keys.BEDS].N ),
+                    [keys.LAT]:parseFloat( result[keys.LAT].N ),
+                    [keys.LONG]:parseFloat( result[keys.LONG].N )
+                })
+            });
 
-            let lat = allHousing[i].lat.N;
-            let long = allHousing[i].long.N;
-
-            let address = { "S" : allHousing[i].Address.S };
-            let street = { "S" : allHousing[i].street.S };
-            let city = { "S" : allHousing[i].city.S };
-            let state = { "S" : allHousing[i].state.S };
-            let zip = { "S" : allHousing[i].zip.S };
-            let beds = { "N" : allHousing[i].beds.N };
-            let details = { "S" : allHousing[i].details.S };
-            let fullBaths = { "N" : allHousing[i].fullBaths.N };
-            let halfBaths = { "N" : allHousing[i].halfBaths.N };
-            let photoLink = { "S" : allHousing[i].photoLink.S };
-            let price = { "S" : allHousing[i].price.S };
-            let purchaseType = { "S" : allHousing[i].purchaseType.S };
-            let type = { "S" : allHousing[i].type.S };
-
-            setTimeout(function() {
-            addGeoData({
-                    RangeKeyValue: { S: address.S },
-                    GeoPoint: {
-                        latitude: lat,
-                        longitude: long
-                    },
-                    PutItemInput: {
-                        Item: {
-                                [consts.HOUSING.DB_KEYS.ADDRESS]: typeof address.S === "string" ? address : {"NULL":true},
-                                [consts.HOUSING.DB_KEYS.STREET]: typeof street.S  === "string" ? street : {"NULL":true},
-                                [consts.HOUSING.DB_KEYS.CITY]: typeof city.S  === "string"  ? city : {"NULL":true},
-                                [consts.HOUSING.DB_KEYS.STATE]: typeof state.S  === "string"  ? state : {"NULL":true},
-                                [consts.HOUSING.DB_KEYS.ZIP]: typeof zip.S  === "string"  ? zip : {"NULL":true},
-                                [consts.HOUSING.DB_KEYS.TYPE]: typeof type.S  === "string" ? type : {"NULL":true},
-                                [consts.HOUSING.DB_KEYS.PRICE]: typeof price.S  === "string"  ? price : {"NULL":true},
-                                [consts.HOUSING.DB_KEYS.PHOTO_LINK]: typeof photoLink.S  === "string"  ? photoLink : {"NULL":true},
-                                [consts.HOUSING.DB_KEYS.DETAILS_LINK]: typeof details.S  === "string" ? details : {"NULL":true},
-                                [consts.HOUSING.DB_KEYS.BEDS]: typeof beds.N   === "string"  ? beds : {"NULL":true},
-                                [consts.HOUSING.DB_KEYS.HALF_BATHS]: typeof halfBaths.N  === "string"  ? halfBaths : {"NULL":true},
-                                [consts.HOUSING.DB_KEYS.FULL_BATHS]: typeof fullBaths.N   === "string"  ? fullBaths : {"NULL":true},
-                                [consts.HOUSING.DB_KEYS.LAT]:{
-                                    "N": lat
-                                },
-                                [consts.HOUSING.DB_KEYS.LONG]:{
-                                    "N": long
-                                },
-                                [consts.HOUSING.DB_KEYS.PURCHASE_TYPE]: typeof purchaseType.S  === "string"  ? purchaseType : {"NULL":true}
-                        }
-                    }
-                }
-            );
-            }, timeout );
-            timeout += 100;
-        }
-    });
-};
-
-let addGeoData = ( geoData ) => {
-    geoTableManager.putPoint( geoData ).promise()
-        .then(function() {
-            console.log("Added house: " + geoData.PutItemInput.Item[consts.HOUSING.DB_KEYS.ADDRESS].S)
+            resolve( cleanHousingResults );
         }).catch( err => {
-            console.log(err);
-    } );
+            reject( err );
+        });
+    });
 };

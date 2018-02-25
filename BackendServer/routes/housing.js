@@ -11,7 +11,16 @@ const housing = require( "../search/housing" );
 
 router.get( '/',
     ( req, res ) => {
-        housing.getHousingByCoordinates(null, null, null
+
+        let lat = req.query.lat;
+        let long = req.query.long;
+        let radiusInMiles = req.query.radius;
+
+        housing.getHousingByCoordinates(
+            null,
+            lat,
+            long,
+            radiusInMiles
         ).then( data => {
             res.send( data );
         }).catch( err => {
@@ -21,7 +30,7 @@ router.get( '/',
     }
 );
 
-// Development use only
+// Server development use only
 // Type is rent or buy
 // pages is the max page number to scrape
 // City must have a dash ( - ) in place of spaces
