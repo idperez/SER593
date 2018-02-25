@@ -5,7 +5,23 @@ const tr = require('tor-request');
 const resMsg = require('../responses/responses.js');
 const consts = require( "../constants" );
 const qs = require( 'querystring' );
+const housing = require( "../search/housing" );
 
+
+
+router.get( '/',
+    ( req, res ) => {
+        housing.getHousingByCoordinates(null, null, null
+        ).then( data => {
+            res.send( data );
+        }).catch( err => {
+            res.send( err );
+        });
+
+    }
+);
+
+// Development use only
 // Type is rent or buy
 // pages is the max page number to scrape
 // City must have a dash ( - ) in place of spaces
