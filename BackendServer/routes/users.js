@@ -4,7 +4,6 @@ const DB_PROFILES = require( '../db/databaseUsers.js' );
 const response = require('../responses/responses.js');
 const consts = require( "../constants" );
 const cityData = require( "../search/cityData" );
-const DB = require( "../db/databaseAccess" );
 
 const MODIFY_TYPE_SINGLE = "single";
 const MODIFY_TYPE_MULTIPLE = "multiple";

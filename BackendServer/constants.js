@@ -46,7 +46,9 @@ exports.TEMP_TOKEN = "registering";
 
 exports.HOUSING = {
     BUY_PATH: "",
-    RENT_PATH: "/rentals",
+    RENT_PATH: "/rentals/",
+    BUY_TYPE: "buy",
+    RENT_TYPE: "rent",
 
     // Begin the housing parse object
     HOUSING_PARSE:{
@@ -91,6 +93,8 @@ exports.HOUSING = {
         DETAILS_LINK: "details",
         PHOTO_LINK: "photoLink",
         LAT: "lat",
-        LONG: "long"
+        LONG: "long",
+        PURCHASE_TYPE: "purchaseType",
+        PRICE: "price"
     }
 };

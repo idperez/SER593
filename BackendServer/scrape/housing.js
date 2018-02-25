@@ -1,4 +1,3 @@
-const DB_USERS = require( '../db/databaseUsers' );
 let himalaya = require( 'himalaya' );
 const consts = require( "../constants" );
 let ps = require('prop-search');
@@ -13,12 +12,11 @@ const NODE_CHILDREN = "children";
 const NODE_ATTRIBUTES = "attributes";
 const LOCATION_ENDPOINT = "https://maps.googleapis.com/maps/api/geocode/json";
 const EMPTY_PHOTO = "/image/noPhotoYet.gif";
-const TEST_DATA_TABLE_NAME = "";
 
 // Multiple pieces of information need to be pulled from the photo object.
 let photoObj;
 
-exports.parseHousingSearchResults = ( html ) => {
+exports.parseHousingSearchResults = ( html, purchaseType ) => {
     return new Promise( ( resolve, reject ) => {
 
         let housingJson = himalaya.parse( html );
@@ -58,7 +56,8 @@ exports.parseHousingSearchResults = ( html ) => {
                                     address: address,
                                     type: type,
                                     attributes: attributes,
-                                    coordinates: coords
+                                    coordinates: coords,
+                                    purchaseType: purchaseType
                                 } );
                             } ).catch( err => {
                                 rejectHouse( err );
@@ -105,12 +104,15 @@ let saveHousingTestData = ( houses ) => {
 
 let getCoordinates = ( address, city, state ) => {
     return new Promise( ( resolve, reject ) => {
+        address = address.split("-")[0];
         let fullAddress = address + "," + city + "," + state;
         fullAddress = fullAddress.replace( / /g, "+" );
         let query = {
             key: process.env.KEY_GOOGLE,
             address: fullAddress
         };
+
+        console.log( "Getting coords for: " + address + city + state );
 
         query = qs.stringify( query );
 
@@ -121,9 +123,14 @@ let getCoordinates = ( address, city, state ) => {
                 // Resolve null location values
                 console.log( "Warning: No location found for " + fullAddress );
             } else {
-                let locObj = JSON.parse( body ).results[0].geometry.location;
-                lat = locObj.lat ? locObj.lat : null;
-                long = locObj.lng ? locObj.lng : null;
+                let locObj = JSON.parse( body ).results[0];
+                if( locObj ) {
+                    locObj = locObj.geometry.location;
+                    lat = locObj.lat ? locObj.lat : null;
+                    long = locObj.lng ? locObj.lng : null;
+                } else {
+                    console.log( "Warning: No location found for " + fullAddress );
+                }
             }
             resolve( {
                 lat: lat,
@@ -270,6 +277,8 @@ let getPrice = ( houseBody ) => {
             priceObj,
             consts.HOUSING.HOUSING_PARSE.SEARCH.ITEM_BODY.ITEM_TEXT
         );
+        // Remove all non-digits from the string
+        res = res.replace(/\D/g, '');
     }
 
     return res;

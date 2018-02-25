@@ -68,6 +68,9 @@ exports.addTestHouse = ( house ) => {
                 [consts.HOUSING.DB_KEYS.TYPE]:{
                     "S": house.type
                 },
+                [consts.HOUSING.DB_KEYS.PRICE]:{
+                    "S": house.price
+                },
                 [consts.HOUSING.DB_KEYS.PHOTO_LINK]:{
                     "S": house.photoLink
                 },
@@ -80,7 +83,7 @@ exports.addTestHouse = ( house ) => {
                 [consts.HOUSING.DB_KEYS.HALF_BATHS]:{
                     "N": house.attributes.halfBaths.toString()
                 },
-                [consts.HOUSING.DB_KEYS.BEDS]:{
+                [consts.HOUSING.DB_KEYS.FULL_BATHS]:{
                     "N": house.attributes.fullBaths.toString()
                 },
                 [consts.HOUSING.DB_KEYS.LAT]:{
@@ -88,7 +91,11 @@ exports.addTestHouse = ( house ) => {
                 },
                 [consts.HOUSING.DB_KEYS.LONG]:{
                     "N": house.coordinates.long.toString()
+                },
+                [consts.HOUSING.DB_KEYS.PURCHASE_TYPE]:{
+                    "S": house.purchaseType.toString()
                 }
+
 
             },
             ConditionExpression: "attribute_not_exists(" + consts.HOUSING.DB_KEYS.ADDRESS + ")"
@@ -109,8 +116,10 @@ exports.addTestHouse = ( house ) => {
         ddb.putItem( params, ( err, data ) => {
             if ( err ) {
                 // This error means that the same house was found
+                // No need to reject for this.
                 if( err.code === "ConditionalCheckFailedException" ){
-                    reject( "HouseAlreadySaved" );
+                    console.log( house.address.street + " already saved." );
+                    resolve( "HouseAlreadySaved" );
                 } else {
                     reject( err );
                 }
