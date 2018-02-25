@@ -30,6 +30,7 @@
     "rand-token": "^0.3.0",
     "request": "^2.81.0",
     "sanitize-html": "^1.16.1",
+    "sleep": "^5.1.1",
     "tor-request": "^1.0.6"
   },
   "devDependencies": {
