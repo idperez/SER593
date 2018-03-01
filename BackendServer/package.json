@@ -25,6 +25,7 @@
     "himalaya": "^1.0.0",
     "morgan": "^1.6.1",
     "nested-property": "0.0.7",
+    "node-zillow": "^1.0.1",
     "password-hash": "^1.2.2",
     "prop-search": "^1.1.8",
     "rand-token": "^0.3.0",

@@ -30,6 +30,31 @@ router.get( '/',
     }
 );
 
+router.get( '/housedetails',
+    ( req, res ) => {
+
+        let address = req.query.address;
+        let city = req.query.city;
+        let state = req.query.state;
+        // Since we have static housing search data,
+        // price needs to be carried from front end
+        // because zillow may not have it for sale
+        let price = req.query.price;
+
+        housing.getHouseDetails(
+            address,
+            city,
+            state,
+            price
+        ).then( data => {
+            res.send( data );
+        }).catch( err => {
+            res.send( err );
+        });
+
+    }
+);
+
 // Server development use only
 // Type is rent or buy
 // pages is the max page number to scrape

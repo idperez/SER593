@@ -77,6 +77,20 @@ exports.HOUSING = {
                 PHOTO_OBJ: "alignForTwoPhotos",
                 PHOTO_LINK: "src"
             }
+        },
+
+        DETAILS:{
+           INFO_HEADER: {
+               INFO_HEADER: "propertyInformationDetailsHeader",
+               PAYMENT: "estimatedPaymentValue"
+               // Square feet
+
+           },
+           LEFT_RAIL:{
+               LEFT_RAIL: "leftRail",
+               DESCRIPTION: "description",
+               PHOTO_OBJ: "largePhotoCarousel"
+           }
         }
     },
 
@@ -96,5 +110,25 @@ exports.HOUSING = {
         LONG: "long",
         PURCHASE_TYPE: "purchaseType",
         PRICE: "price"
+    },
+
+    // Key names for the zillow deep search API
+    ZILLOW_OBJ:{
+        RESPONSE: "response",
+        RESULTS: "results",
+        RESULT_ARRAY: "result",
+        BEST_RESULT_INDEX: 0,
+        PROPERTY_ID: "zpid",
+        YEAR_BUILT: "yearBuilt",
+        LOT_SIZE: "lotSizeSqFt",
+        HOUSE_SIZE: "finishedSqFt",
+        // Valuation
+        VAL_LOW: "low",
+        VAL_HIGH: "high",
+        VALUATION_AMT: "_",
+        ZEST: "zestimate",
+        VALUATION_RANGE: "valuationRange",
+        // Valuation end
+
     }
 };
