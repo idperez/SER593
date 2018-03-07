@@ -66,59 +66,80 @@ router.get( '/housedetails',
 router.post( '/scrape',
     ( req, res ) => {
 
-        let path = process.env.HOUSING_SITE;
-        let state = req.body.state;
-        let city = req.body.city;
-        let pages = req.body.pages;
+        if( process.env.DEV_USER === res.locals.user[ "accessToken_token" ] ) {
+            let pages = req.body.pages;
+            let type = req.body.type === consts.HOUSING.BUY_TYPE ?
+                consts.HOUSING.BUY_PATH :
+                consts.HOUSING.RENT_PATH;
+            let timeout = 0;
 
-        path += "/" + state +
-            "/" + city;
+            if( pages ) {
+                let promises = [];
+                for( let i = 0; i < consts.RATED_CITIES.length; ++i ){
 
-        path += req.body.type === consts.HOUSING.BUY_TYPE ?
-            consts.HOUSING.BUY_PATH :
-            consts.HOUSING.RENT_PATH;
+                    let city = consts.RATED_CITIES[i].city;
+                    let state = consts.RATED_CITIES[i].state;
+                    let path = process.env.HOUSING_SITE;
+                    path += "/" + state +
+                        "/" + city;
+                    path += type;
 
-        console.log( path );
+                    console.log( path );
 
-        if( city && state && pages ) {
-            let promises = [];
-            for( let i = 1; i <= pages; ++i ) {
+                    for( let j = 1; j <= pages; ++j ) {
 
-                let queryString = qs.stringify( {
-                    page: i
-                } );
+                        let queryString = qs.stringify( {
+                            page: j
+                        } );
 
-                promises.push(
-                    new Promise( ( pageResolve, pageReject ) => {
-                        tr.request( path + "?" + queryString, ( err, response, body ) => {
-                            if( err ) {
-                                console.log( "Error: " + err );
-                            } else {
-                                scrape.parseHousingSearchResults(
-                                    body,
-                                    req.body.type
-                                ).then( searchResults => {
-                                    pageResolve( searchResults );
-                                } ).catch( err => {
-                                    pageReject( err );
-                                } );
-                            }
-                        } )
-                    } )
+                        promises.push(
+                            new Promise( ( pageResolve, pageReject ) => {
+                                setTimeout(function() {
+
+                                    tr.request( path + "?" + queryString, ( err, response, body ) => {
+                                        if( err ) {
+                                            console.log( "Error: " + err );
+                                        } else {
+                                            scrape.parseHousingSearchResults(
+                                                body,
+                                                req.body.type
+                                            ).then( searchResults => {
+                                                pageResolve( searchResults );
+                                            } ).catch( err => {
+                                                pageReject( err );
+                                            } );
+                                        }
+                                    } )
+                                }, timeout );
+                            } )
+                        );
+                        timeout += 1000;
+                    }
+                }
+
+                Promise.all( promises ).then( pages => {
+                    res.send( pages );
+                } ).catch( err =>
+                    res.send( err )
                 );
+
+            } else {
+                res.send( resMsg.errorMessage( "MissingParams" ) );
             }
-
-            Promise.all( promises ).then( pages => {
-                res.send( pages );
-            } ).catch( err =>
-                res.send( err )
-            );
-
         } else {
-            res.send( resMsg.errorMessage( "MissingParams" ) );
+            res.send("Access Denied! Development use only.")
         }
     }
 );
 
+// ONE time use to setup table! Just a helper to setup table on AWS.
+router.post('/scrape/tablesetup', (req, res) => {
+    if( process.env.DEV_USER === res.locals.user["accessToken_token"] ) {
+        scrape.setupTable();
+        res.send("Table setup ran, see console on server");
+    } else {
+        res.send("Access Denied! Development use only.")
+    }
+});
 
 module.exports = router;

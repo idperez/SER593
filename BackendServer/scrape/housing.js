@@ -1,3 +1,6 @@
+const AWS = require( 'aws-sdk' );
+AWS.config.update( { region:'us-west-2' } );
+const ddb = new AWS.DynamoDB( { apiVersion: '2012-08-10' } );
 let himalaya = require( 'himalaya' );
 const consts = require( "../constants" );
 let ps = require('prop-search');
@@ -7,7 +10,9 @@ const utils = require('../util');
 const qs = require( 'querystring' );
 const tr = require('tor-request');
 const request = require( 'request' );
-const DB = require( "../db/databaseAccess" );
+const ddbGeo = require('dynamodb-geo');
+const config = new ddbGeo.GeoDataManagerConfiguration(ddb, 'GeoHousing');
+const geoTableManager = new ddbGeo.GeoDataManager(config);
 
 const NODE_CHILDREN = "children";
 const NODE_ATTRIBUTES = "attributes";
@@ -16,6 +21,17 @@ const EMPTY_PHOTO = "/image/noPhotoYet.gif";
 
 // Multiple pieces of information need to be pulled from the photo object.
 let photoObj;
+
+// ONE time use to create DB table for housing
+exports.setupTable = () => {
+    config.hashKeyLength = 7;
+    let createTableInput = ddbGeo.GeoTableUtil.getCreateTableRequest(config);
+    createTableInput.ProvisionedThroughput.ReadCapacityUnits = 5;
+    ddb.createTable(createTableInput).promise()
+    // Wait for it to become ready
+        .then(function () { return ddb.waitFor('tableExists', { TableName: config.tableName }).promise() })
+        .then(function () { console.log('Table created and ready!') });
+};
 
 exports.parseHousingSearchResults = ( html, purchaseType ) => {
     return new Promise( ( resolve, reject ) => {
@@ -52,6 +68,7 @@ exports.parseHousingSearchResults = ( html, purchaseType ) => {
                             ).then( coords => {
 
                                 let house = {
+                                    Address: address.street + address.city,
                                     photoLink: photoLink,
                                     detailsLink: detailsLink,
                                     price: price,
@@ -80,11 +97,11 @@ exports.parseHousingSearchResults = ( html, purchaseType ) => {
             }
             Promise.all( housingPromises ).then( houses => {
                 houses = houses.filter( ( house ) => { return house != null } );
-                //saveHousingTestData( houses ).then( data => {
+                saveHousingTestData( houses ).then( data => {
                     resolve( houses );
-               // }).catch( err => {
-                //    reject( err );
-                //});
+                }).catch( err => {
+                    reject( err );
+                });
             }).catch( err => {
                 reject( err );
             });
@@ -94,6 +111,9 @@ exports.parseHousingSearchResults = ( html, purchaseType ) => {
     });
 };
 
+// Items taken for details page:
+// Photo links
+// Description
 let getAndParseHousingDetails = ( detailsLink ) => {
     return new Promise( ( resolve, reject ) => {
         tr.request( detailsLink, ( err, response, body ) => {
@@ -121,6 +141,7 @@ let getAndParseHousingDetails = ( detailsLink ) => {
                         consts.HOUSING.HOUSING_PARSE.SEARCH.ITEM_BODY.ITEM_TEXT,
                         true // Exact match to description
                     );
+                    description = utils.isArray( description ) ? description[0].trim() : description;
 
                     photoLinks = getDOMObject(
                         leftRail,
@@ -128,9 +149,11 @@ let getAndParseHousingDetails = ( detailsLink ) => {
                     );
                     photoLinks = getAttrValuesByKey( photoLinks, "src" );
 
+                    resolve({
+                        description: description ? description : null,
+                        photoLinks: photoLinks && utils.isArray( photoLinks ) && !utils.emptyArray( photoLinks ) ? photoLinks : null
 
-
-                    resolve( photoLinks ? photoLinks : "descErr" );
+                    });
                 }
             }
         });
@@ -138,17 +161,72 @@ let getAndParseHousingDetails = ( detailsLink ) => {
 };
 
 let saveHousingTestData = ( houses ) => {
-    return new Promise( ( resolve, reject ) => {
+    return new Promise( ( resolveAllHouses, rejectAllHouses ) => {
         let promises = [];
-        for( let i = 0; i < houses.length; ++i ){
-            promises.push( DB.addTestHouse( houses[i] ) );
-        }
 
-        Promise.all( promises ).then( housesAdded => {
-            resolve( housesAdded );
-        }).catch( err => {
-            reject( err );
-        })
+        houses.forEach( house => {
+            promises.push( new Promise( ( resolve, reject ) => {
+                let lat = house.coordinates.lat;
+                let long = house.coordinates.long;
+                addGeoData( {
+                        RangeKeyValue: { "S": house.Address },
+                        GeoPoint: {
+                            latitude: lat,
+                            longitude: long
+                        },
+                        PutItemInput: {
+                            Item: {
+                                [ consts.HOUSING.DB_KEYS.ADDRESS ]: house.Address ? { "S": house.Address } : { "NULL": true },
+                                [ consts.HOUSING.DB_KEYS.STREET ]: house.address.street ? { "S": house.address.street } : { "NULL": true },
+                                [ consts.HOUSING.DB_KEYS.CITY ]: house.address.city ? { "S": house.address.city } : { "NULL": true },
+                                [ consts.HOUSING.DB_KEYS.STATE ]: house.address.state ? { "S": house.address.state } : { "NULL": true },
+                                [ consts.HOUSING.DB_KEYS.ZIP ]: house.address.zip ? { "S": house.address.zip } : { "NULL": true },
+                                [ consts.HOUSING.DB_KEYS.TYPE ]: house.type ? { "S": house.type } : { "NULL": true },
+                                [ consts.HOUSING.DB_KEYS.PRICE ]: house.price ? { "S": house.price } : { "NULL": true },
+                                [ consts.HOUSING.DB_KEYS.PHOTO_LINK ]: house.photoLink ? { "S": house.photoLink } : { "NULL": true },
+                                [ consts.HOUSING.DB_KEYS.DETAILS_LINK ]: house.detailsLink ? { "S": house.detailsLink } : { "NULL": true },
+                                [ consts.HOUSING.DB_KEYS.BEDS ]: house.attributes.bedrooms ? { "N": house.attributes.bedrooms } : { "NULL": true },
+                                [ consts.HOUSING.DB_KEYS.HALF_BATHS ]: house.attributes.halfBaths ? { "N": house.attributes.halfBaths } : { "NULL": true },
+                                [ consts.HOUSING.DB_KEYS.FULL_BATHS ]: house.attributes.fullBaths ? { "N": house.attributes.fullBaths } : { "NULL": true },
+                                [ consts.HOUSING.DB_KEYS.LAT ]: {
+                                    "N": lat.toString()
+                                },
+                                [ consts.HOUSING.DB_KEYS.LONG ]: {
+                                    "N": long.toString()
+                                },
+                                [ consts.HOUSING.DB_KEYS.PURCHASE_TYPE ]: house.purchaseType ? { "S": house.purchaseType } : { "NULL": true },
+                                [ consts.HOUSING.DB_KEYS.DETAILS_DESCRIPTION ]: house.details.description ? { "S": house.details.description } : { "NULL": true },
+                                [ consts.HOUSING.DB_KEYS.DETAILS_PHOTO_LINKS ]: house.details.photoLinks ? { "SS": house.details.photoLinks } : { "NULL": true }
+                            }
+                        }
+                    }
+                ).then( () => {
+                    resolve();
+                } ).catch( err => {
+                    reject( err );
+                } );
+            } ) );
+        } );
+
+        Promise.all( promises ).then( success => {
+            resolveAllHouses( success );
+        } ).catch( err => {
+            console.log( "FATAL: could not add houses" );
+            rejectAllHouses( err );
+        } );
+    });
+};
+
+let addGeoData = ( geoData ) => {
+    return new Promise( ( resolve, reject ) => {
+        geoTableManager.putPoint( geoData ).promise()
+            .then(function() {
+                console.log( "Added house: " + geoData.PutItemInput.Item[consts.HOUSING.DB_KEYS.ADDRESS].S );
+                resolve(  );
+            }).catch( err => {
+                console.log( "FATAL:" + err );
+                reject( err );
+        } );
     });
 };
 
@@ -226,7 +304,7 @@ let pullHouseAttributesFromStrings = ( bedStr, bathStr ) => {
     // Split at the space and take first half
     let beds = 0;
     if( bedStr ) {
-        beds = parseInt( bedStr.split( " " )[0] );
+        beds = bedStr.split( " " )[0];
     }
 
     // Baths String is currently: "1 Full, 1 Half Baths"
@@ -235,17 +313,17 @@ let pullHouseAttributesFromStrings = ( bedStr, bathStr ) => {
     let halfBaths;
     if( bathStr ) {
         let bathsArr = bathStr.split( ", " );
-        fullBaths = parseInt( bathsArr[0].split( " " )[0] );
+        fullBaths = bathsArr[0].split( " " )[0];
         halfBaths = 0;
         if( bathsArr.length > 1 ) {
-            halfBaths = parseInt( bathsArr[1].split( " " )[0] );
+            halfBaths = bathsArr[1].split( " " )[0];
         }
     }
 
     return {
-        bedrooms: beds,
-        fullBaths: fullBaths,
-        halfBaths: halfBaths
+        bedrooms: beds ? beds : "0",
+        fullBaths: fullBaths ? fullBaths : "0",
+        halfBaths: halfBaths ? halfBaths : "0"
     }
 };
 

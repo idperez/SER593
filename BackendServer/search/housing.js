@@ -52,6 +52,7 @@ exports.getHousingByCoordinates = ( userObj, lat, long, radius ) => {
 // Get house details by address
 exports.getHouseDetails = ( address, city, state, price ) => {
     return new Promise( ( resolve, reject ) => {
+        // TODO - return whole house obj from DB and append zillow results to it
         getZillowDetails( address, city, state ).then( detailsObj => {
             resolve(detailsObj);
         }).catch( err => reject( err ) );
