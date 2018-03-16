@@ -49,6 +49,8 @@ exports.HOUSING = {
     RENT_PATH: "/rentals/",
     BUY_TYPE: "buy",
     RENT_TYPE: "rent",
+    TABLE: "GeoHousing",
+    DETAILS: "details",
 
     // Begin the housing parse object
     HOUSING_PARSE:{
@@ -111,7 +113,8 @@ exports.HOUSING = {
         PURCHASE_TYPE: "purchaseType",
         PRICE: "price",
         DETAILS_DESCRIPTION: "details_Description",
-        DETAILS_PHOTO_LINKS: "details_PhotoLinks"
+        DETAILS_PHOTO_LINKS: "details_PhotoLinks",
+        RANGE_KEY: "rangeKey"
     },
 
     // Key names for the zillow deep search API
@@ -143,10 +146,10 @@ exports.RATED_CITIES = [
         {"city":"Phoenix","state":"AZ"},
         {"city":"Tucson","state":"AZ"},
         {"city":"Fresno","state":"CA"},
-        {"city":"Los Angeles","state":"CA"},
-        {"city":"San Diego","state":"CA"},
-        {"city":"San Francisco","state":"CA"},
-        {"city":"San Jose","state":"CA"},
+        {"city":"Los-Angeles","state":"CA"},
+        {"city":"San-Diego","state":"CA"},
+        {"city":"San-Francisco","state":"CA"},
+        {"city":"San-Jose","state":"CA"},
         {"city":"Denver","state":"CO"},
         {"city":"Washington","state":"DC"},
         {"city":"Jacksonville","state":"FL"},
@@ -156,22 +159,22 @@ exports.RATED_CITIES = [
         {"city":"Baltimore","state":"MD"},
         {"city":"Boston","state":"MA"},
         {"city":"Detroit","state":"MI"},
-        {"city":"Las Vegas","state":"NV"},
+        {"city":"Las-Vegas","state":"NV"},
         {"city":"Albuquerque","state":"NM"},
-        {"city":"New York","state":"NY"},
+        {"city":"New-York","state":"NY"},
         {"city":"Charlotte","state":"North Carolina"},
         {"city":"Columbus","state":"OH"},
-        {"city":"Oklahoma City","state":"OK"},
+        {"city":"Oklahoma-City","state":"OK"},
         {"city":"Portland","state":"OR"},
         {"city":"Philadelphia","state":"PA"},
         {"city":"Memphis","state":"TN"},
         {"city":"Nashville","state":"TN"},
         {"city":"Austin","state":"TX"},
         {"city":"Dallas","state":"TX"},
-        {"city":"El Paso","state":"TX"},
-        {"city":"Fort Worth","state":"TX"},
+        {"city":"El-Paso","state":"TX"},
+        {"city":"Fort-Worth","state":"TX"},
         {"city":"Houston","state":"TX"},
-        {"city":"San Antonio","state":"TX"},
+        {"city":"San-Antonio","state":"TX"},
         {"city":"Seattle","state":"WA"},
         {"city":"Milwaukee","state":"WI"}
 ];

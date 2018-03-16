@@ -11,8 +11,8 @@ const qs = require( 'querystring' );
 const tr = require('tor-request');
 const request = require( 'request' );
 const ddbGeo = require('dynamodb-geo');
-const config = new ddbGeo.GeoDataManagerConfiguration(ddb, 'GeoHousing');
-const geoTableManager = new ddbGeo.GeoDataManager(config);
+const config = new ddbGeo.GeoDataManagerConfiguration( ddb, consts.HOUSING.TABLE );
+const geoTableManager = new ddbGeo.GeoDataManager( config );
 
 const NODE_CHILDREN = "children";
 const NODE_ATTRIBUTES = "attributes";

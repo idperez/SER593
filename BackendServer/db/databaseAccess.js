@@ -3,6 +3,7 @@ AWS.config.update( { region:'us-west-2' } );
 const ddb = new AWS.DynamoDB( { apiVersion: '2012-08-10' } );
 const consts = require( "../constants" );
 const util = require( "../util" );
+const INDEX_SUFFIX = "-index";
 
 // Modify an existing user profile key
 // Internal program use
@@ -40,6 +41,91 @@ exports.modifyUserItem = ( tableName, primKey, primVal, key, value, mode ) => {
     }
 
     return promise;
+};
+
+exports.getHouse = ( rangeKey ) => {
+    return new Promise( ( resolve, reject ) => {
+        if( rangeKey ){
+            let params = {
+                TableName: consts.USER_TABLE_NAME,
+                ExpressionAttributeValues: {
+                    ":v1": {
+                        S: value.toString()
+                    }
+                },
+                KeyConditionExpression: consts.HOUSING.DB_KEYS.RANGE_KEY + " = :v1",
+                IndexName: consts.HOUSING.DB_KEYS.RANGE_KEY + INDEX_SUFFIX
+            };
+
+            ddb.query( params, ( err, data ) => {
+                if( err ) {
+                    reject( err );
+                } else if( data.Items[ 0 ] ) {
+                    if( data.Items.length > 1 ){
+                        reject( "MultipleHousesFound" );
+                    }
+                    let house = data.Items[ 0 ];
+                    house = exports.extractData( house );
+                    resolve( house );
+                } else {
+                    reject( 'NoResultsFound' );
+                }
+            } );
+        } else {
+            reject( "MissingRangeKey" )
+        }
+
+    });
+};
+
+// Extracts database data into usable JSON
+exports.extractData = ( databaseData ) => {
+    let cleanedData = {};
+    // All db items are represented as a string and nested in a sub-object
+    // with the value type. This pulls out the values, converts from string
+    // if needed, and puts them in a clean profile object.
+    for( let key in databaseData ) {
+        if( databaseData.hasOwnProperty( key ) ) {
+            let profProperty = databaseData[ key ];
+
+            // String
+            if( profProperty.hasOwnProperty( 'S' ) ) {
+                let str = profProperty.S;
+                try{
+                    str = JSON.parse( str );
+                } catch( err ){} // If it fails we assume it's a normal string
+                cleanedData[ key ] = str;
+                // Number (Int or float)
+            } else if( profProperty.hasOwnProperty( 'N' ) ) {
+                cleanedData[ key ] = parseFloat( profProperty.N );
+                // Buffer type
+            } else if( profProperty.hasOwnProperty( 'B' ) ) {
+                cleanedData[ key ] = profProperty.B;
+                // String array
+            } else if( profProperty.hasOwnProperty( 'SS' ) ) {
+                let stringSet = profProperty.SS;
+                for( let i = 0; i < stringSet.length; i++ ) {
+                    try {
+                        stringSet[i] = JSON.parse( stringSet[i] );
+                    } catch( err ){}// If it fails we assume it's a normal string
+                }
+                cleanedData[ key ] = stringSet;
+                // Number array
+            } else if( profProperty.hasOwnProperty( 'NS' ) ) {
+                cleanedData[ key ] = profProperty.NS.map( Number );
+                // Object
+            } else if( profProperty.hasOwnProperty( 'M' ) ) {
+                cleanedData[ key ] = profProperty.M;
+                // Generic list
+            } else if( profProperty.hasOwnProperty( 'L' ) ) {
+                cleanedData[ key ] = profProperty.L;
+                // Bool
+            } else if( profProperty.hasOwnProperty( 'BOOL' ) ) {
+                cleanedData[ key ] = profProperty.BOOL;
+            }
+        }
+    }
+    return cleanedData;
 };
 
 // Add new item

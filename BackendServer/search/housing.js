@@ -1,12 +1,13 @@
+const consts = require( "../constants" );
 const AWS = require( 'aws-sdk' );
 AWS.config.update( { region:'us-west-2' } );
 const ddb = new AWS.DynamoDB( { apiVersion: '2012-08-10' } );
 const ddbGeo = require('dynamodb-geo');
-const config = new ddbGeo.GeoDataManagerConfiguration(ddb, 'GeoHousing');
-const geoTableManager = new ddbGeo.GeoDataManager(config);
+const config = new ddbGeo.GeoDataManagerConfiguration( ddb, consts.HOUSING.TABLE );
+const geoTableManager = new ddbGeo.GeoDataManager( config );
 const utils = require('../util');
-const consts = require( "../constants" );
-const ZILLOW_API = require('node-zillow');
+const DB = require( "../db/databaseAccess" );
+const zillow = require('node-zillow');
 
 
 exports.getHousingByCoordinates = ( userObj, lat, long, radius ) => {
@@ -21,7 +22,6 @@ exports.getHousingByCoordinates = ( userObj, lat, long, radius ) => {
             let cleanHousingResults = [];
             let keys = consts.HOUSING.DB_KEYS;
             housingResults.forEach( result => {
-
                 // Types are allowed to be null
                 let type = result[keys.TYPE].S ? result[keys.TYPE].S : null;
 
@@ -38,7 +38,8 @@ exports.getHousingByCoordinates = ( userObj, lat, long, radius ) => {
                     [keys.HALF_BATHS]:parseInt(result[keys.HALF_BATHS].N ),
                     [keys.BEDS]:parseInt( result[keys.BEDS].N ),
                     [keys.LAT]:parseFloat( result[keys.LAT].N ),
-                    [keys.LONG]:parseFloat( result[keys.LONG].N )
+                    [keys.LONG]:parseFloat( result[keys.LONG].N ),
+                    [keys.RANGE_KEY]: result[keys.RANGE_KEY].S
                 })
             });
 
@@ -50,11 +51,17 @@ exports.getHousingByCoordinates = ( userObj, lat, long, radius ) => {
 };
 
 // Get house details by address
-exports.getHouseDetails = ( address, city, state, price ) => {
+exports.getHouseDetails = ( rangeKey ) => {
     return new Promise( ( resolve, reject ) => {
-        // TODO - return whole house obj from DB and append zillow results to it
-        getZillowDetails( address, city, state ).then( detailsObj => {
-            resolve(detailsObj);
+        DB.getHouse( rangeKey ).then( house => {
+            let address = house[consts.HOUSING.DB_KEYS.STREET];
+            let city = house[consts.HOUSING.DB_KEYS.CITY];
+            let state = house[consts.HOUSING.DB_KEYS.STATE];
+            // Combine zillow details with the original house details from DB
+            getZillowDetails( address, city, state ).then( zillowDetails => {
+                house[consts.HOUSING.DETAILS] = Object.assign( {}, house[consts.HOUSING.DETAILS], zillowDetails );
+                resolve( house ) ;
+            }).catch( err => reject( err ) );
         }).catch( err => reject( err ) );
     });
 };
@@ -63,7 +70,7 @@ exports.getHouseDetails = ( address, city, state, price ) => {
 let getZillowDetails = ( address, city, state ) => {
     return new Promise( ( resolve, reject ) => {
 
-        let zillowApi = new ZILLOW_API( process.env.KEY_ZILLOW, {} );
+        let zillowApi = new zillow( process.env.KEY_ZILLOW, {} );
 
         let params = {
             address: address.split( " " ).join( "+" ),

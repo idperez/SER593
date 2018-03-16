@@ -45,52 +45,7 @@ exports.getUserProfileByPrimaryKey = ( primKey, value ) => {
                         reject( "MultipleProfilesFound" );
                     }
                     let profile = data.Items[ 0 ];
-                    let resultProfile = {};
-
-                    // All db items are represented as a string and nested in a sub-object
-                    // with the value type. This pulls out the values, converts from string
-                    // if needed, and puts them in a clean profile object.
-                    for( let key in profile ) {
-                        if( profile.hasOwnProperty( key ) ) {
-                            let profProperty = profile[ key ];
-
-                            // String
-                            if( profProperty.hasOwnProperty( 'S' ) ) {
-                                let str = profProperty.S;
-                                try{
-                                    str = JSON.parse( str );
-                                } catch( err ){} // If it fails we assume it's a normal string
-                                resultProfile[ key ] = str;
-                                // Number (Int or float)
-                            } else if( profProperty.hasOwnProperty( 'N' ) ) {
-                                resultProfile[ key ] = parseFloat( profProperty.N );
-                                // Buffer type
-                            } else if( profProperty.hasOwnProperty( 'B' ) ) {
-                                resultProfile[ key ] = profProperty.B;
-                                // String array
-                            } else if( profProperty.hasOwnProperty( 'SS' ) ) {
-                                let stringSet = profProperty.SS;
-                                for( let i = 0; i < stringSet.length; i++ ) {
-                                    try {
-                                        stringSet[i] = JSON.parse( stringSet[i] );
-                                    } catch( err ){}// If it fails we assume it's a normal string
-                                }
-                                resultProfile[ key ] = stringSet;
-                                // Number array
-                            } else if( profProperty.hasOwnProperty( 'NS' ) ) {
-                                resultProfile[ key ] = profProperty.NS.map( Number );
-                                // Object
-                            } else if( profProperty.hasOwnProperty( 'M' ) ) {
-                                resultProfile[ key ] = profProperty.M;
-                                // Generic list
-                            } else if( profProperty.hasOwnProperty( 'L' ) ) {
-                                resultProfile[ key ] = profProperty.L;
-                                // Bool
-                            } else if( profProperty.hasOwnProperty( 'BOOL' ) ) {
-                                resultProfile[ key ] = profProperty.BOOL;
-                            }
-                        }
-                    }
+                    let resultProfile = DB.extractData( profile );
 
                     // Extra safety to make sure the user has a job key on DB
                     if( resultProfile[consts.PROF_KEYS.PREFS_JOBS_SAVED] ) {
