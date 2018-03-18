@@ -1,6 +1,6 @@
 const express = require( 'express' );
 const router = express.Router();
-const DB_PROFILES = require( '../db/users.js' );
+const DB_PROFILES = require( '../db/databaseUsers.js' );
 const response = require('../responses/responses.js');
 const consts = require( "../constants" );
 const cityData = require( "../search/cityData" );

@@ -1,8 +1,5 @@
-const AWS = require( 'aws-sdk' );
-AWS.config.update( { region:'us-west-2' } );
 const request = require( 'request' );
 const qs = require( 'querystring' );
-const DB_USERS = require( '../db/users' );
 const utils = require('../util');
 const consts = require( "../constants" );
 const sanitizeHTML = require( "sanitize-html" );

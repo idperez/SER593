@@ -8,6 +8,7 @@ const auth = require( './routes/auth' );
 const test = require( './routes/test' );
 const jobs = require( './routes/jobs' );
 const profiles = require( './routes/users' );
+const housing = require( './routes/housing' );
 const authorize = require( './auth/passGrant' ).authorize;
 
 let app = express();
@@ -49,5 +50,6 @@ app.use( '/auth', auth );
 app.use( '/test', test ); // For development use
 app.use( '/jobs', jobs );
 app.use( '/users', profiles );
+app.use( '/housing', housing );
 
 app.listen( port );

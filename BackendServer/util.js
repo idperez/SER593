@@ -20,3 +20,12 @@ exports.objectContains = ( obj, value ) => {
 
     return res;
 };
+
+exports.capitalizeFirstLetter = ( str ) => {
+    return str.charAt( 0 ).toUpperCase() + str.slice( 1 ).toLowerCase();
+};
+
+// Miles to kilometer conversion
+exports.milesToKm = ( miles ) => {
+    return 1.6 * miles;
+};

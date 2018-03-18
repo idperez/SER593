@@ -36,7 +36,7 @@ const SEARCH_TYPE_COORDS = "coordinates";
  * @apiParam {String} lat Latitude. Req with coordinate type.
  * @apiParam {String} long Longitude. Req with coordinate type.
  * @apiParam {Number} limit Max number of results.
- * @apiParam {Number} [radius=25] Radius from city center to search for jobs.
+ * @apiParam {Number} [radius=25] Radius to search for jobs.
  *
  * @apiSuccessExample {json} Success-Response:
  *  [

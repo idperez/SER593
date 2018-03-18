@@ -1,7 +1,7 @@
 let jobSearch = require( './jobs.js' );
 const POPULATION_ENDPOINT = "https://api.census.gov/data/2016/pep/population";
 const request = require( 'request' );
-const DB_USERS = require( '../db/users' );
+const DB = require( "../db/databaseAccess" );
 const consts = require( "../constants" );
 const util = require( "../util.js" );
 const qs = require( 'querystring' );
@@ -76,8 +76,10 @@ exports.updateCityRatings = ( userObj ) => {
                 ratingsStr = JSON.stringify( ratings );
 
                 // Update users profile with the new ratings
-                DB_USERS.modifyUserItem(
-                    userObj,
+                DB.modifyUserItem(
+                    consts.USER_TABLE_NAME,
+                    consts.USER_PRIMARY_KEY,
+                    userObj[consts.PROF_KEYS.USERNAME],
                     consts.PROF_KEYS.CITY_MATCH,
                     ratingsStr,
                     consts.MODIFIY_PREFS_MODES.MODIFY
