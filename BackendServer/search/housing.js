@@ -16,8 +16,8 @@ exports.getHousingByCoordinates = ( userObj, lat, long, radius ) => {
         geoTableManager.queryRadius({
             RadiusInMeter: utils.milesToKm( radius ? parseInt( radius ) : DEFAULT_RADIUS ) * 1000,
             CenterPoint:{
-                latitude: parseFloat( lat ),
-                longitude: parseFloat( long )
+                latitude: typeof lat === "string" ? parseFloat( lat ) : lat,
+                longitude: typeof lat === "string" ? parseFloat( long ) : long,
             }
         }).then( housingResults => {
             let cleanHousingResults = [];
