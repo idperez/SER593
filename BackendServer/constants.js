@@ -12,7 +12,9 @@ exports.PROF_KEYS = {
     CITY_MATCH: "cityMatch",
     ACCESS_TOKEN: "accessToken_token",
     ACCESS_EXPR: "accessToken_expr",
-    LAST_UPDATED: "last_updated"
+    LAST_UPDATED: "last_updated",
+    PREFS_HOUSE_BEDS: "prefs_house_beds",
+    PREFS_HOUSE_BATHS: "prefs_house_baths"
 };
 
 exports.USER_TABLE_NAME = "topia_profiles";

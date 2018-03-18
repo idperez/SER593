@@ -22,11 +22,13 @@ exports.getHousingByCoordinates = ( userObj, lat, long, radius ) => {
         }).then( housingResults => {
             let cleanHousingResults = [];
             let keys = consts.HOUSING.DB_KEYS;
+            let prefBeds = userObj[consts.PROF_KEYS.PREFS_HOUSE_BEDS];
+            let prefBaths = userObj[consts.PROF_KEYS.PREFS_HOUSE_BATHS];
             housingResults.forEach( result => {
                 // Types are allowed to be null
                 let type = result[keys.TYPE].S ? result[keys.TYPE].S : null;
 
-                cleanHousingResults.push({
+                let house = {
                     [keys.STREET]:result[keys.STREET].S,
                     [keys.CITY]:result[keys.CITY].S,
                     [keys.STATE]:result[keys.STATE].S,
@@ -41,7 +43,15 @@ exports.getHousingByCoordinates = ( userObj, lat, long, radius ) => {
                     [keys.LAT]:parseFloat( result[keys.LAT].N ),
                     [keys.LONG]:parseFloat( result[keys.LONG].N ),
                     [keys.RANGE_KEY]: result[keys.RANGE_KEY].S
-                })
+                };
+
+                // Filter by preference
+                if( house[keys.BEDS] >= prefBeds &&
+                    house[keys.FULL_BATHS] + house[keys.HALF_BATHS] >= prefBaths
+                ){
+
+                    cleanHousingResults.push( house );
+                }
             });
             resolve( cleanHousingResults );
         }).catch( err => {

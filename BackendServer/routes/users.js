@@ -80,6 +80,22 @@ router.get( '/profile',
  *
  * listremove: Removes a value from an existing list.
  *
+ * PROFILE ITEMS:
+ *
+ * email: String
+ *
+ * prefs_jobs_postedDate: Number
+ *
+ * prefs_jobs_saved: String[]
+ *
+ * prefs_jobs_titles: String[]
+ *
+ * prefs_jobs_types: String[]{"fulltime", "parttime", "contract", "internship", "temporary"}
+ *
+ * prefs_house_beds: Number
+ *
+ * prefs_house_baths: Number
+ *
  * @apiHeader {String} authorization Bearer token
  * @apiHeaderExample {json} Header-Example:
  *      {
