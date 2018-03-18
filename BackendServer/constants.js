@@ -115,7 +115,12 @@ exports.HOUSING = {
         PRICE: "price",
         DETAILS_DESCRIPTION: "details_Description",
         DETAILS_PHOTO_LINKS: "details_PhotoLinks",
-        RANGE_KEY: "rangeKey"
+        RANGE_KEY: "rangeKey",
+        ZILLOW_VAL_LOW: "valLow",
+        ZILLOW_VAL_HIGH: "valHigh",
+        ZILLOW_LOT_SIZE: "lotSize",
+        ZILLOW_HOUSE_SIZE: "houseSize",
+        ZILLOW_YEAR_BUILT: "yearBuilt"
     },
 
     // Key names for the zillow deep search API

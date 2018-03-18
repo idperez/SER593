@@ -260,6 +260,221 @@
   },
   {
     "type": "get",
+    "url": "/housing/details/:rangekey",
+    "title": "House Details",
+    "name": "HouseDetails",
+    "group": "Housing",
+    "description": "<p>Get more details about a specific house.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "authorization",
+            "description": "<p>Bearer token</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n    authorization: Bearer QZ3jhbfdof84GFBlSe\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Example-Request(s)",
+        "content": "path-to-topia-api.com/housing/details/0 CaddoHouston\npath-to-topia-api.com/housing/details/1022 E MONTOYA LanePhoenix",
+        "type": "json"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "rangekey",
+            "description": "<p>The range key supplied by housing search.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "\n{\n    \"Address\": \"1022 E MONTOYA LanePhoenix\",\n    \"street\": \"1022 E MONTOYA Lane\",\n    \"city\": \"Phoenix\",\n    \"state\": \"AZ\",\n    \"zip\": 85024,\n    \"type\": \"Single Family Home\",\n    \"fullBaths\": 2,\n    \"halfBaths\": 0,\n    \"beds\": 3,\n    \"detailsLink\": \"http://www.homefinder.com/AZ/Phoenix/1022-E-MONTOYA-Lane-314518307d\",\n    \"photoLink\": \"http://img4.homefinder.com/_img_/314518307/b4630c5f6a7493fe95365af3997afa22e90e15a9/200\",\n    \"lat\": 33.6723684,\n    \"long\": -112.0584192,\n    \"purchaseType\": \"buy\",\n    \"price\": 310000,\n    \"details_Description\": \"Natural light, fresh interior paint, and new carpet are a few of our favorite features at this single-story Phoenix home. Step inside and discover vaulted ceilings and a Great room. The open kitchen features a breakfast bar and overlooks the fireplace in the Living room. Travel through the back door and check out the covered patio and pool.All Opendoor homes come with a 30-day satisfaction guarantee. Terms and conditions apply.\",\n    \"details_PhotoLinks\": [\n        \"http://img1.homefinder.com/_img_/314518307/5aad30deef7b935dbc3fe5a29baf20e1de5e5ad0/592-\",\n        \"http://img1.homefinder.com/_img_/314518307/84d0380e8cc92a9d61f1c0e711939ee2912ff313/592-\",\n        \"http://img1.homefinder.com/_img_/314518307/a4c5c573abec47204bcf9797298c731f42794683/592-\",\n        \"http://img1.homefinder.com/_img_/314518307/b000d8e7092580aff054272b0fcf5035b6e262dc/592-\"\n    ],\n    \"rangeKey\": \"1022 E MONTOYA LanePhoenix\",\n    \"zillowID\": \"50181931\",\n    \"valLow\": 291868,\n    \"valHigh\": 322590,\n    \"yearBuilt\": \"1998\",\n    \"houseSize\": 1755,\n    \"lotSize\": 6688\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "MissingRangeKey",
+            "description": "<p>No range key found in request.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "InvalidHouse",
+            "description": "<p>Internal error getting house information from DB.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenNotFound",
+            "description": "<p>Bearer token not found in header.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenMismatch",
+            "description": "<p>Bearer token does not match.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenExpired",
+            "description": "<p>Bearer token is expired.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "{\n  \"err\": \"MissingRangeKey\",\n  \"msg\": \"\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "./routes/housing.js",
+    "groupTitle": "Housing"
+  },
+  {
+    "type": "get",
+    "url": "/housing",
+    "title": "House Search",
+    "name": "HouseSearch",
+    "group": "Housing",
+    "description": "<p>Get list of houses by coordinates and a range.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "authorization",
+            "description": "<p>Bearer token</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n    authorization: Bearer QZ3jhbfdof84GFBlSe\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Example-Request(s)",
+        "content": "path-to-topia-api.com/housing?long=-95.26405559&lat=29.8569348&radius=20",
+        "type": "json"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "lat",
+            "description": "<p>Latitude</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "long",
+            "description": "<p>Longitude</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": true,
+            "field": "radius",
+            "defaultValue": "25",
+            "description": "<p>Radius in miles to search for houses.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "[\n    {\n        \"street\": \"6008 Bonn Echo Lane\",\n        \"city\": \"Houston\",\n        \"state\": \"TX\",\n        \"zip\": \"77017\",\n        \"photoLink\": \"http://img5.homefinder.com/_img_/314473599/88ae472e9230f5d1a3e0572af7384ed5411b2f03/200\",\n        \"detailsLink\": \"http://www.homefinder.com/TX/Houston/6008-Bonn-Echo-Lane-314473599d\",\n        \"price\": \"359900\",\n        \"type\": \"Single Family Home\",\n        \"fullBaths\": 3,\n        \"halfBaths\": 2,\n        \"beds\": 4,\n        \"lat\": 29.6728489,\n        \"long\": -95.25548739999999,\n        \"rangeKey\": \"6008 Bonn Echo LaneHouston\"\n    },\n    ...\n]",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "MissingCoordinates",
+            "description": "<p>lat or long are missing.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenNotFound",
+            "description": "<p>Bearer token not found in header.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenMismatch",
+            "description": "<p>Bearer token does not match.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenExpired",
+            "description": "<p>Bearer token is expired.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "{\n  \"err\": \"MissingCoordinates\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "./routes/housing.js",
+    "groupTitle": "Housing"
+  },
+  {
+    "type": "get",
     "url": "/jobs/companies/:companyname",
     "title": "Company Information",
     "name": "Company",
@@ -561,7 +776,7 @@
             "optional": true,
             "field": "radius",
             "defaultValue": "25",
-            "description": "<p>Radius from city center to search for jobs.</p>"
+            "description": "<p>Radius to search for jobs.</p>"
           }
         ]
       }

@@ -8,12 +8,13 @@ const geoTableManager = new ddbGeo.GeoDataManager( config );
 const utils = require('../util');
 const DB = require( "../db/databaseAccess" );
 const zillow = require('node-zillow');
+const DEFAULT_RADIUS = 25; // miles
 
 
 exports.getHousingByCoordinates = ( userObj, lat, long, radius ) => {
     return new Promise( ( resolve, reject ) => {
         geoTableManager.queryRadius({
-            RadiusInMeter: utils.milesToKm( parseInt( radius ) ) * 1000,
+            RadiusInMeter: utils.milesToKm( radius ? parseInt( radius ) : DEFAULT_RADIUS ) * 1000,
             CenterPoint:{
                 latitude: parseFloat( lat ),
                 longitude: parseFloat( long )
@@ -42,7 +43,6 @@ exports.getHousingByCoordinates = ( userObj, lat, long, radius ) => {
                     [keys.RANGE_KEY]: result[keys.RANGE_KEY].S
                 })
             });
-
             resolve( cleanHousingResults );
         }).catch( err => {
             reject( err );
@@ -78,14 +78,32 @@ exports.getHouseDetails = ( rangeKey ) => {
                     house[ consts.HOUSING.DB_KEYS.STATE ]
                 ).then( zillowDetails => {
                     house = Object.assign( {}, house, zillowDetails );
+
+                    house[consts.HOUSING.DB_KEYS.ZILLOW_LOT_SIZE] = house[consts.HOUSING.DB_KEYS.ZILLOW_LOT_SIZE] ?
+                        parseInt( house[consts.HOUSING.DB_KEYS.ZILLOW_LOT_SIZE] ) :
+                        house[consts.HOUSING.DB_KEYS.ZILLOW_LOT_SIZE];
+
+                    house[consts.HOUSING.DB_KEYS.ZILLOW_HOUSE_SIZE] = house[consts.HOUSING.DB_KEYS.ZILLOW_HOUSE_SIZE] ?
+                        parseInt( house[consts.HOUSING.DB_KEYS.ZILLOW_HOUSE_SIZE] ) :
+                        house[consts.HOUSING.DB_KEYS.ZILLOW_HOUSE_SIZE];
+
+                    house[consts.HOUSING.DB_KEYS.ZILLOW_VAL_LOW] = house[consts.HOUSING.DB_KEYS.ZILLOW_VAL_LOW] ?
+                        parseInt( house[consts.HOUSING.DB_KEYS.ZILLOW_VAL_LOW] ) :
+                        house[consts.HOUSING.DB_KEYS.ZILLOW_VAL_LOW];
+
+                    house[consts.HOUSING.DB_KEYS.ZILLOW_VAL_HIGH] = house[consts.HOUSING.DB_KEYS.ZILLOW_VAL_HIGH] ?
+                        parseInt( house[consts.HOUSING.DB_KEYS.ZILLOW_VAL_HIGH] ) :
+                        house[consts.HOUSING.DB_KEYS.ZILLOW_VAL_HIGH];
+
                     resolve( house );
-                } ).catch(
+                } ).catch( err => {
                     // Intentional resolve
                     // We want data even if zillow craps out
-                    err => resolve( house )
-                );
+                    console.log( "Zillow API Error: " + err );
+                    resolve( house );
+                });
             } else {
-                resolve( house );
+                reject( "InvalidHouse" );
             }
         }).catch( err => reject( err ) );
     });

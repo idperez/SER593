@@ -62,7 +62,7 @@ exports.getHouse = ( rangeKey ) => {
                     reject( err );
                 } else if( data.Items[ 0 ] ) {
                     if( data.Items.length > 1 ){
-                        reject( "MultipleHousesFound" );
+                        console.log( "Warning: Multiple houses found with range key: " + rangeKey );
                     }
                     let house = data.Items[ 0 ];
                     house = exports.extractData( house );
