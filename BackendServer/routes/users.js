@@ -96,6 +96,8 @@ router.get( '/profile',
  *
  * prefs_house_baths: Number
  *
+ * prefs_house_purchaseType: String[]{"rent", "buy"}
+ *
  * @apiHeader {String} authorization Bearer token
  * @apiHeaderExample {json} Header-Example:
  *      {
