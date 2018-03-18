@@ -47,10 +47,10 @@ exports.getHouse = ( rangeKey ) => {
     return new Promise( ( resolve, reject ) => {
         if( rangeKey ){
             let params = {
-                TableName: consts.USER_TABLE_NAME,
+                TableName: consts.HOUSING.TABLE,
                 ExpressionAttributeValues: {
                     ":v1": {
-                        S: value.toString()
+                        S: rangeKey.toString()
                     }
                 },
                 KeyConditionExpression: consts.HOUSING.DB_KEYS.RANGE_KEY + " = :v1",

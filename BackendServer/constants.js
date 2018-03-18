@@ -96,6 +96,7 @@ exports.HOUSING = {
         }
     },
 
+    // These act as DB storage keys AND act as keys in the response
     DB_KEYS:{
         ADDRESS: "Address", // Primary key
         STREET: "street",

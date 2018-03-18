@@ -53,15 +53,40 @@ exports.getHousingByCoordinates = ( userObj, lat, long, radius ) => {
 // Get house details by address
 exports.getHouseDetails = ( rangeKey ) => {
     return new Promise( ( resolve, reject ) => {
-        DB.getHouse( rangeKey ).then( house => {
-            let address = house[consts.HOUSING.DB_KEYS.STREET];
+        let house = {};
+        DB.getHouse( rangeKey ).then( houseResult => {
+
+            // Filter out anything not in the DB_KEYS list
+            for( let dbKey in consts.HOUSING.DB_KEYS ){
+                if( consts.HOUSING.DB_KEYS.hasOwnProperty( dbKey ) ){
+                    let key = consts.HOUSING.DB_KEYS[dbKey];
+                    if( houseResult.hasOwnProperty( key ) ){
+                        house[key] = houseResult[key];
+                    }
+                }
+            }
+
+            let street = house[consts.HOUSING.DB_KEYS.STREET];
             let city = house[consts.HOUSING.DB_KEYS.CITY];
             let state = house[consts.HOUSING.DB_KEYS.STATE];
-            // Combine zillow details with the original house details from DB
-            getZillowDetails( address, city, state ).then( zillowDetails => {
-                house[consts.HOUSING.DETAILS] = Object.assign( {}, house[consts.HOUSING.DETAILS], zillowDetails );
-                resolve( house ) ;
-            }).catch( err => reject( err ) );
+
+            if( street && city && state ) {
+                // Combine zillow details with the original house details from DB
+                getZillowDetails(
+                    house[ consts.HOUSING.DB_KEYS.STREET ],
+                    house[ consts.HOUSING.DB_KEYS.CITY ],
+                    house[ consts.HOUSING.DB_KEYS.STATE ]
+                ).then( zillowDetails => {
+                    house = Object.assign( {}, house, zillowDetails );
+                    resolve( house );
+                } ).catch(
+                    // Intentional resolve
+                    // We want data even if zillow craps out
+                    err => resolve( house )
+                );
+            } else {
+                resolve( house );
+            }
         }).catch( err => reject( err ) );
     });
 };
