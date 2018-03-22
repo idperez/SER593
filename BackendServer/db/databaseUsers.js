@@ -245,6 +245,47 @@ exports.removeSavedJob = ( userObj, jobKey ) => {
     });
 };
 
+exports.addSavedHouse = ( userObj, rangeKey ) => {
+    return new Promise( ( resolve, reject ) => {
+        if( util.isArray( userObj[consts.PROF_KEYS.PREFS_HOUSE_SAVED] ) &&
+            userObj[consts.PROF_KEYS.PREFS_HOUSE_SAVED].includes( rangeKey ) ) {
+            reject( "HouseAlreadySaved" );
+        } else {
+            DB.getHouse( rangeKey ).then( house => {
+                // We don't care about the house data itself.
+                // This just proves it's a house for sale.
+                DB.appendListItem(
+                    consts.USER_TABLE_NAME,
+                    consts.USER_PRIMARY_KEY,
+                    userObj[ consts.PROF_KEYS.USERNAME ],
+                    consts.PROF_KEYS.PREFS_HOUSE_SAVED,
+                    rangeKey
+                ).then( data => {
+                    resolve( data );
+                } ).catch( err => {
+                    reject( err );
+                } );
+            } ).catch( err => reject( err ) );
+        }
+    });
+};
+
+exports.removeSavedHouse = ( userObj, rangeKey ) => {
+    return new Promise( ( resolve, reject ) => {
+        DB.removeListItem(
+            consts.USER_TABLE_NAME,
+            consts.USER_PRIMARY_KEY,
+            userObj[consts.PROF_KEYS.USERNAME],
+            consts.PROF_KEYS.PREFS_HOUSE_SAVED,
+            rangeKey
+        ).then( data => {
+            resolve( data );
+        }).catch( err => {
+            reject( err );
+        });
+    });
+};
+
 // Change the users city match results to an array sorted by city rank
 exports.cityMatchToArray = ( cityMatches ) => {
     let resArray = [];

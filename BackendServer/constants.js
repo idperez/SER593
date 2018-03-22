@@ -15,7 +15,8 @@ exports.PROF_KEYS = {
     LAST_UPDATED: "last_updated",
     PREFS_HOUSE_BEDS: "prefs_house_beds",
     PREFS_HOUSE_BATHS: "prefs_house_baths",
-    PREFS_HOUSE_PURCHASE_TYPE: "prefs_house_purchaseType"
+    PREFS_HOUSE_PURCHASE_TYPE: "prefs_house_purchaseType",
+    PREFS_HOUSE_SAVED: "prefs_house_saved"
 };
 
 exports.USER_TABLE_NAME = "topia_profiles";

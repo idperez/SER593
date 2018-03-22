@@ -7,8 +7,8 @@ const cityData = require( "../search/cityData" );
 
 const MODIFY_TYPE_SINGLE = "single";
 const MODIFY_TYPE_MULTIPLE = "multiple";
-const JOB_TYPE_ADD = "add";
-const JOB_TYPE_REMOVE = "remove";
+const SAVE_TYPE_ADD = "add";
+const SAVE_TYPE_REMOVE = "remove";
 
 /**
  * @api {get} /users/profile Get Profile
@@ -198,14 +198,14 @@ router.post( '/profile',
  *      path-to-topia-api.com/users/profile/jobs
  *
  * @apiParam {String} jobkey Indeed job key.
- * @apiParam {String="add","remove"} Operation to add or remove a job to/from the users profile.
+ * @apiParam {String="add","remove"} type Operation to add or remove a job to/from the users profile.
  * @apiParamExample {json} Example:
  *     {
  *       "jobkey": "53091387dd962a7d",
  *       "operation": "add"
  *     }
  *
- * @apiError InvalidJobsType Jobs operation type is missing from the query.
+ * @apiError InvalidSaveType Save operation type is missing from the query.
  * @apiError JobAlreadySaved Job is already saved on the users profile.
  * @apiError NoJobsKeysFound jobkey not found in query.
  * @apiError NoJobsFound No jobs found with the given key(s).
@@ -225,14 +225,14 @@ router.post( '/profile/jobs',
     ( req, res ) => {
 
         switch( req.body.type ) {
-            case JOB_TYPE_ADD:
+            case SAVE_TYPE_ADD:
                 DB_PROFILES.addSavedJob( res.locals.user, req.body.jobkey ).then( success => {
                     res.send( success );
                 } ).catch( err => {
                     res.send( response.errorMessage( err ) );
                 } );
                 break;
-            case JOB_TYPE_REMOVE:
+            case SAVE_TYPE_REMOVE:
                 DB_PROFILES.removeSavedJob( res.locals.user, req.body.jobkey ).then( success => {
                     res.send( success );
                 }).catch( err => {
@@ -240,7 +240,74 @@ router.post( '/profile/jobs',
                 });
                 break;
             default:
-                res.send( response.errorMessage( "InvalidJobsType" ) );
+                res.send( response.errorMessage( "InvalidSaveType" ) );
+        }
+    }
+);
+
+/**
+ * @api {post} /profile/houses Save or Remove Houses
+ * @apiName SaveHouse
+ * @apiGroup Users
+ * @apiDescription Add/remove a saved house to/from the users profile.
+ *
+ * @apiHeader {String} authorization Bearer token
+ * @apiHeaderExample {json} Header-Example:
+ *      {
+ *          authorization: Bearer QZ3jhbfdof84GFBlSe
+ *      }
+ *
+ * @apiExample Example-Request(s)
+ *      path-to-topia-api.com/users/profile/houses
+ *
+ * @apiParam {String} rangekey House range key.
+ * @apiParam {String="add","remove"} type Operation to add or remove a house to/from the users profile.
+ * @apiParamExample {json} Example:
+ *     {
+ *       "rangeKey": "0 Del Norte DriveHouston",
+ *       "operation": "add"
+ *     }
+ *
+ * @apiError InvalidSaveType Save operation type is missing from the query.
+ * @apiError HouseAlreadySaved House is already saved on the users profile.
+ * @apiError MissingRangeKey rangeKey not found in query.
+ * @apiError NoResultsFound No house found with the given range key.
+ * @apiError TokenNotFound Bearer token not found in header.
+ * @apiError TokenMismatch Bearer token does not match.
+ * @apiError TokenExpired Bearer token is expired.
+ * @apiErrorExample {json} Error-Response:
+ *     {
+ *       "err": {
+ *          "type": "TokenNotFound",
+ *          "msg": ""
+ *       }
+ *     }
+ */
+
+router.post( '/profile/houses',
+    ( req, res ) => {
+
+        switch( req.body.type ) {
+            case SAVE_TYPE_ADD:
+                DB_PROFILES.addSavedHouse(
+                    res.locals.user, req.body.rangekey
+                ).then( done => {
+                    res.send( done );
+                }).catch( err => {
+                    res.send( response.errorMessage( err ) );
+                });
+                break;
+            case SAVE_TYPE_REMOVE:
+                DB_PROFILES.removeSavedHouse(
+                    res.locals.user, req.body.rangekey
+                ).then( done => {
+                    res.send( done );
+                }).catch( err => {
+                    res.send( response.errorMessage( err ) );
+                });
+                break;
+            default:
+                res.send( response.errorMessage( "InvalidSaveType" ) );
         }
     }
 );
