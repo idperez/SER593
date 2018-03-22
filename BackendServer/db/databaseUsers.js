@@ -47,29 +47,29 @@ exports.getUserProfileByPrimaryKey = ( primKey, value ) => {
                     let profile = data.Items[ 0 ];
                     let resultProfile = DB.extractData( profile );
 
-                    // Extra safety to make sure the user has a job key on DB
+                    let jobProms = [];
+                    let houseProms = [];
                     if( resultProfile[consts.PROF_KEYS.PREFS_JOBS_SAVED] ) {
                         // Get saved jobs from the job table
-                        let jobProms = [];
                         let jobKeys = resultProfile[ consts.PROF_KEYS.PREFS_JOBS_SAVED ];
                         jobKeys.forEach( jobKey => {
-                            jobProms.push(
-                                getSavedJob( jobKey )
-                            );
+                            jobProms.push( getSavedJob( jobKey ) );
                         } );
-                        Promise.all( jobProms ).then( jobs => {
-
-                            resultProfile[ consts.PROF_KEYS.PREFS_JOBS_SAVED ] = jobs;
-
-                            resolve( resultProfile );
-
-
-                        } ).catch( err => reject( err ) );
-
-                    // If they don't have a saved jobs key, just send what's available.
-                    } else {
-                        resolve( resultProfile )
                     }
+                    if( resultProfile[consts.PROF_KEYS.PREFS_HOUSE_SAVED] ){
+                        let rangeKeys = resultProfile[consts.PROF_KEYS.PREFS_HOUSE_SAVED];
+                        rangeKeys.forEach( rangeKey => {
+                            houseProms.push( DB.getHouse( rangeKey ) );
+                        });
+                    }
+
+                    Promise.all( jobProms ).then( jobs => {
+                        resultProfile[ consts.PROF_KEYS.PREFS_JOBS_SAVED ] = jobs;
+                        Promise.all( houseProms ).then( houses => {
+                            resultProfile[consts.PROF_KEYS.PREFS_HOUSE_SAVED] = houses;
+                            resolve( resultProfile );
+                        });
+                    } ).catch( err => reject( err ) );
 
                     /*
                        Check expiration time stamp for the users profile.
@@ -81,7 +81,7 @@ exports.getUserProfileByPrimaryKey = ( primKey, value ) => {
                 } else {
                     reject( 'NoResultsFound' );
                 }
-            } );
+            });
         } else {
             reject( "MissingParams" )
         }
