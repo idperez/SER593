@@ -1,4 +1,5 @@
-let jobSearch = require( './jobs.js' );
+const jobSearch = require( './jobs.js' );
+const housing = require( "../search/housing" );
 const POPULATION_ENDPOINT = "https://api.census.gov/data/2016/pep/population";
 const request = require( 'request' );
 const DB = require( "../db/databaseAccess" );
@@ -9,15 +10,15 @@ const CITY_NAME_POS = 1;     // Position of city name string in the population a
 const CITY_POP_POS = 0;      // Position of the city population in the population array
 const MAX_POP = "999999999"; // Maximum population city to get city percentage match for.
 const MIN_POP = "500000";    // Minimum population city to get city percentage match for.
-let LOCATION_NAME_DELIMITERS = [
+const LOCATION_NAME_DELIMITERS = [
     " city",        // An extra "city" word is added to all the city names.
     " (balance)",   // Some locations have a balance here instead of city
     "-",            // Remove shared name with nearby smaller towns
     "/"             // Remove shared name with nearby smaller towns
 ] ;
 const CITY_STATE_SEPARATOR = ", ";
-
-const RADIUS = 0;  // Radius for the city job search in miles.
+const JOB_RADIUS = 0;       // Radius for the city job search in miles.
+const HOUSING_RADIUS = 30;  // Radius for the housing search in miles.
 
 exports.updateCityRatings = ( userObj ) => {
     return new Promise( ( resolve, reject ) => {
@@ -104,62 +105,77 @@ exports.getCityStats = ( userObj ) => {
 
         exports.grabCityPopulations().then( cities => {
 
-            let promises = [];
-
+            let jobPromises = [];
+            let housePromises = [];
             for( let key in cities ){
                 if( cities.hasOwnProperty( key ) ){
-                    promises.push(
+                    jobPromises.push(
                         jobSearch.getJobsByCityState(
                             userObj,
                             cities[key]["city"],
                             cities[key]["state"],
                             1,       // Just 1 job is needed since we only need job count
-                            RADIUS,  // radius
+                            JOB_RADIUS,  // radius
                             true     // Job number
                         )
 
                     );
+                    housePromises.push(
+                        housing.getHousingByCoordinates(
+                            userObj,
+                            cities[key]["lat"],
+                            cities[key]["long"],
+                            HOUSING_RADIUS
+                        )
+
+                    )
+
                 }
             }
 
-            Promise.all( promises ).then( jobs => {
+            Promise.all( housePromises ).then( houses => {
+                Promise.all( jobPromises ).then( jobs => {
 
-                // This part of the algorithm gives us an upper bound
-                // for the ratios, this max will essentially be a 100% city match
-                // in terms of jobs. Reverse applies to minRatio.
-                let maxRatio = 0;
-                let minRatio = 1;
+                    // This part of the algorithm gives us an upper bound
+                    // for the ratios, this max will essentially be a 100% city match
+                    // in terms of jobs. Reverse applies to minRatio.
+                    let maxRatio = 0;
+                    let minRatio = 1;
 
-                // Merge population and job count
-                for( let i = 0; i < jobs.length; i++ ){
-                    let city = jobs[i].city;
-                    if( !cities[city] ){
-                        reject( "MissingCityData" );
-                    } else {
-                        cities[city].jobNum = jobs[i].jobNum;
+                    // Merge population and job count
+                    for( let i = 0; i < jobs.length; i++ ) {
+                        let city = jobs[ i ].city;
+                        if( !cities[ city ] ) {
+                            reject( "MissingCityData" );
+                        } else {
+                            cities[city].jobNum = jobs[i].jobNum;
+                            cities[city].houseNum = houses.length;
 
-                        // Since we are already looping here,
-                        // lets add the ratio part of the algorithm to each city.
-                        let ratio = getCityRatio( cities[city] );
+                            // Since we are already looping here,
+                            // lets add the ratio part of the algorithm to each city.
+                            let ratio = getCityRatio( cities[ city ] );
 
-                        // Handle the extremely rare case of more jobs than population
-                        ratio = ratio > 1 ? 1 : ratio;
+                            // Handle the extremely rare case of more jobs than population
+                            ratio = ratio > 1 ? 1 : ratio;
 
-                        cities[city].ratio = ratio;
+                            cities[ city ].ratio = ratio;
 
-                        // Set a new min/max
-                        minRatio = minRatio > ratio ? ratio : minRatio;
-                        maxRatio = maxRatio < ratio ? ratio : maxRatio;
+                            // Set a new min/max
+                            minRatio = minRatio > ratio ? ratio : minRatio;
+                            maxRatio = maxRatio < ratio ? ratio : maxRatio;
+                        }
                     }
-                }
 
-                if( minRatio > maxRatio ){
-                    reject( "ErrorSettingRatio" );
-                }
+                    if( minRatio > maxRatio ) {
+                        reject( "ErrorSettingRatio" );
+                    }
 
-                resolve( { cities: cities, min: minRatio, max: maxRatio } );
+                    resolve( { cities: cities, min: minRatio, max: maxRatio } );
 
-            }).catch(err => {
+                } ).catch( err => {
+                    reject( err );
+                } );
+            }).catch( err => {
                 reject( err );
             });
         });
@@ -187,6 +203,7 @@ exports.grabCityPopulations = () => {
                 let cityMatchJSON = {};
 
                 body = JSON.parse( body );
+                let coordPromises = [];
                 for( let i = 1; i < body.length; i++ ){
                     let location = body[i][CITY_NAME_POS];
                     let splitLoc = location.split( CITY_STATE_SEPARATOR );
@@ -205,6 +222,13 @@ exports.grabCityPopulations = () => {
                     }
 
                     if( city && state ) {
+                        coordPromises.push(
+                            util.getCoordinates(
+                                "",     // Empty to get city center
+                                city,
+                                state
+                            )
+                        );
                         cityMatchJSON[ city ] = { // Use city name as the key
                             city: city,
                             state: state,
@@ -214,14 +238,26 @@ exports.grabCityPopulations = () => {
 
                 }
 
-                resolve(cityMatchJSON);
+                Promise.all( coordPromises ).then( cities => {
+                    for( let i = 0; i < cities.length; i++ ){
+                        let currentCity = cities[i].city;
+                        if( currentCity && cityMatchJSON.hasOwnProperty( currentCity ) ) {
+                            cityMatchJSON[currentCity].lat = cities[i].lat;
+                            cityMatchJSON[currentCity].long = cities[i].long;
+                        } else {
+                            reject( "InvalidCity" + currentCity );
+                        }
+                    }
+                    resolve(cityMatchJSON);
+                }).catch( err => reject( err ) );
+
             }
         });
     });
 };
 
-// Algorithm step #1: Get the ratio between jon count and population.
-// param cityObj - the city object with jobNum and population.
+// Algorithm step #1: Get the ratio between job/house count and population.
+// param cityObj - the city object with jobNum, houseNum and population.
 let getCityRatio = ( cityObj ) => {
-    return cityObj.jobNum / cityObj.population;
+    return util.average( [cityObj.jobNum, cityObj.houseNum]) / cityObj.population;
 };

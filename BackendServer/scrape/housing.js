@@ -16,7 +16,6 @@ const geoTableManager = new ddbGeo.GeoDataManager( config );
 
 const NODE_CHILDREN = "children";
 const NODE_ATTRIBUTES = "attributes";
-const LOCATION_ENDPOINT = "https://maps.googleapis.com/maps/api/geocode/json";
 const EMPTY_PHOTO = "/image/noPhotoYet.gif";
 
 // Multiple pieces of information need to be pulled from the photo object.
@@ -61,7 +60,7 @@ exports.parseHousingSearchResults = ( html, purchaseType ) => {
                             let address = getAddress( currentHouseBody );
                             let type = getType( currentHouseBody );
                             let attributes = getHouseAttributes( currentHouseBody );
-                            getCoordinates(
+                            utils.getCoordinates(
                                 address.street,
                                 address.city,
                                 address.state
@@ -227,44 +226,6 @@ let addGeoData = ( geoData ) => {
                 console.log( "FATAL:" + err );
                 reject( err );
         } );
-    });
-};
-
-let getCoordinates = ( address, city, state ) => {
-    return new Promise( ( resolve, reject ) => {
-        address = address.split("-")[0];
-        let fullAddress = address + "," + city + "," + state;
-        fullAddress = fullAddress.replace( / /g, "+" );
-        let query = {
-            key: process.env.KEY_GOOGLE,
-            address: fullAddress
-        };
-
-        console.log( "Getting coords for: " + address + city + state );
-
-        query = qs.stringify( query );
-
-        request( LOCATION_ENDPOINT + "?" + query, ( err, response, body ) => {
-            let lat = null;
-            let long = null;
-            if( err ) {
-                // Resolve null location values
-                console.log( "Warning: No location found for " + fullAddress );
-            } else {
-                let locObj = JSON.parse( body ).results[0];
-                if( locObj ) {
-                    locObj = locObj.geometry.location;
-                    lat = locObj.lat ? locObj.lat : null;
-                    long = locObj.lng ? locObj.lng : null;
-                } else {
-                    console.log( "Warning: No location found for " + fullAddress );
-                }
-            }
-            resolve( {
-                lat: lat,
-                long: long
-            });
-        });
     });
 };
 

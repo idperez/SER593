@@ -855,7 +855,7 @@
     "title": "Modify Profile",
     "name": "Modify",
     "group": "Users",
-    "description": "<p>Modify preference(s) on users profile.</p> <p>TYPES:</p> <p>Single: Make a change to a single profile value.</p> <p>Multiple: Send a JSON representation of all the values to be overwritten in the profile.</p> <p>MODES:</p> <p>modify: Modifies an existing non-list value.</p> <p>remove: Removes a key/value pair. If used on an list, the entire list is removed.</p> <p>listappend: Appends a value to an existing list.</p> <p>listremove: Removes a value from an existing list.</p>",
+    "description": "<p>Modify preference(s) on users profile.</p> <p>TYPES:</p> <p>Single: Make a change to a single profile value.</p> <p>Multiple: Send a JSON representation of all the values to be overwritten in the profile.</p> <p>MODES:</p> <p>modify: Modifies an existing non-list value.</p> <p>remove: Removes a key/value pair. If used on an list, the entire list is removed.</p> <p>listappend: Appends a value to an existing list.</p> <p>listremove: Removes a value from an existing list.</p> <p>PROFILE ITEMS:</p> <p>email: String</p> <p>prefs_jobs_postedDate: Number</p> <p>prefs_jobs_saved: String[]</p> <p>prefs_jobs_titles: String[]</p> <p>prefs_jobs_types: String[]{&quot;fulltime&quot;, &quot;parttime&quot;, &quot;contract&quot;, &quot;internship&quot;, &quot;temporary&quot;}</p> <p>prefs_house_beds: Number</p> <p>prefs_house_baths: Number</p> <p>prefs_house_purchaseType: String[]{&quot;rent&quot;, &quot;buy&quot;}</p>",
     "header": {
       "fields": {
         "Header": [
