@@ -1121,6 +1121,130 @@ define({ "api": [
   },
   {
     "type": "post",
+    "url": "/profile/houses",
+    "title": "Save or Remove Houses",
+    "name": "SaveHouse",
+    "group": "Users",
+    "description": "<p>Add/remove a saved house to/from the users profile.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "authorization",
+            "description": "<p>Bearer token</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n    authorization: Bearer QZ3jhbfdof84GFBlSe\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Example-Request(s)",
+        "content": "path-to-topia-api.com/users/profile/houses",
+        "type": "json"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "rangekey",
+            "description": "<p>House range key.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "allowedValues": [
+              "\"add\"",
+              "\"remove\""
+            ],
+            "optional": false,
+            "field": "type",
+            "description": "<p>Operation to add or remove a house to/from the users profile.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Example:",
+          "content": "{\n  \"rangeKey\": \"0 Del Norte DriveHouston\",\n  \"operation\": \"add\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "InvalidSaveType",
+            "description": "<p>Save operation type is missing from the query.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "HouseAlreadySaved",
+            "description": "<p>House is already saved on the users profile.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "MissingRangeKey",
+            "description": "<p>rangeKey not found in query.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NoResultsFound",
+            "description": "<p>No house found with the given range key.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenNotFound",
+            "description": "<p>Bearer token not found in header.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenMismatch",
+            "description": "<p>Bearer token does not match.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenExpired",
+            "description": "<p>Bearer token is expired.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "{\n  \"err\": {\n     \"type\": \"TokenNotFound\",\n     \"msg\": \"\"\n  }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "./routes/users.js",
+    "groupTitle": "Users"
+  },
+  {
+    "type": "post",
     "url": "/profile/jobs",
     "title": "Save or Remove Jobs",
     "name": "SaveJob",
@@ -1171,8 +1295,8 @@ define({ "api": [
               "\"remove\""
             ],
             "optional": false,
-            "field": "Operation",
-            "description": "<p>to add or remove a job to/from the users profile.</p>"
+            "field": "type",
+            "description": "<p>Operation to add or remove a job to/from the users profile.</p>"
           }
         ]
       },
@@ -1190,8 +1314,8 @@ define({ "api": [
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "InvalidJobsType",
-            "description": "<p>Jobs operation type is missing from the query.</p>"
+            "field": "InvalidSaveType",
+            "description": "<p>Save operation type is missing from the query.</p>"
           },
           {
             "group": "Error 4xx",

@@ -1,7 +1,7 @@
 const express = require( 'express' );
 const router = express.Router();
 const scrape = require( '../scrape/housing' );
-const tr = require('tor-request');
+const tr = null; // require('tor-request');
 const resMsg = require('../responses/responses.js');
 const consts = require( "../constants" );
 const qs = require( 'querystring' );
@@ -175,7 +175,7 @@ router.get( '/details/:rangekey(*)',
 router.post( '/scrape',
     ( req, res ) => {
 
-        if( process.env.DEV_USER === res.locals.user[ "accessToken_token" ] ) {
+        if( tr && process.env.DEV_USER === res.locals.user[ "accessToken_token" ] ) {
             let pages = req.body.pages;
             let type = req.body.type === consts.HOUSING.BUY_TYPE ?
                 consts.HOUSING.BUY_PATH :
