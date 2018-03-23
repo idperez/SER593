@@ -30,8 +30,7 @@
     "prop-search": "^1.1.8",
     "rand-token": "^0.3.0",
     "request": "^2.81.0",
-    "sanitize-html": "^1.16.1",
-    "tor-request": "^1.0.6"
+    "sanitize-html": "^1.16.1"
   },
   "devDependencies": {
     "apidoc": "^0.17.6"

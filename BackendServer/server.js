@@ -14,7 +14,7 @@ const authorize = require( './auth/passGrant' ).authorize;
 let app = express();
 
 app.get( '/', ( req, res ) => {
-        res.send( "Hello!" );
+        res.send( "topia" );
     }
 );
 
