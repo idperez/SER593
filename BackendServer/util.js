@@ -83,3 +83,9 @@ exports.getCoordinates = ( address, city, state ) => {
         });
     });
 };
+
+exports.allPromisesSkipErrors = ( promises ) => {
+    return Promise.all(
+        promises.map(p => p.catch(err => null))
+    )
+};

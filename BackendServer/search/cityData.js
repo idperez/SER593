@@ -130,7 +130,7 @@ exports.getCityStats = ( userObj ) => {
                 }
             }
 
-            Promise.all( housePromises ).then( houses => {
+            util.allPromisesSkipErrors( housePromises ).then( houses => {
                 Promise.all( jobPromises ).then( jobs => {
                     // This part of the algorithm gives us an upper bound
                     // for the ratios, this max will essentially be a 100% city match
