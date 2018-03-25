@@ -104,7 +104,6 @@ exports.getCityStats = ( userObj ) => {
     return new Promise( ( resolve, reject ) => {
 
         exports.grabCityPopulations().then( cities => {
-
             let jobPromises = [];
             let housePromises = [];
             for( let key in cities ){
@@ -127,15 +126,12 @@ exports.getCityStats = ( userObj ) => {
                             cities[key]["long"],
                             HOUSING_RADIUS
                         )
-
                     )
-
                 }
             }
 
             Promise.all( housePromises ).then( houses => {
                 Promise.all( jobPromises ).then( jobs => {
-
                     // This part of the algorithm gives us an upper bound
                     // for the ratios, this max will essentially be a 100% city match
                     // in terms of jobs. Reverse applies to minRatio.

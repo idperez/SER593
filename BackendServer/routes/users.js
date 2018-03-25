@@ -9,6 +9,7 @@ const MODIFY_TYPE_SINGLE = "single";
 const MODIFY_TYPE_MULTIPLE = "multiple";
 const SAVE_TYPE_ADD = "add";
 const SAVE_TYPE_REMOVE = "remove";
+const CITY_RATING_TIMEOUT = 300000; // 5min in ms
 
 /**
  * @api {get} /users/profile Get Profile
@@ -344,7 +345,9 @@ router.post( '/profile/houses',
  */
 router.post( '/profile/ratings',
     ( req, res ) => {
-
+        // City rating does job and house searches on every single city, which takes lots of time.
+        // This keeps the connection open longer.
+        res.connection.setTimeout( CITY_RATING_TIMEOUT );
         cityData.updateCityRatings( res.locals.user ).then( success => {
             res.send( success );
         }).catch( err => {
