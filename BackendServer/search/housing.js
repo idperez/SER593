@@ -1,11 +1,11 @@
 const consts = require( "../constants" );
+const utils = require('../util');
 const AWS = require( 'aws-sdk' );
 AWS.config.update( { region:'us-west-2' } );
 const ddb = new AWS.DynamoDB( { apiVersion: '2012-08-10' } );
 const ddbGeo = require('dynamodb-geo');
 const config = new ddbGeo.GeoDataManagerConfiguration( ddb, consts.HOUSING.TABLE );
 const geoTableManager = new ddbGeo.GeoDataManager( config );
-const utils = require('../util');
 const DB = require( "../db/databaseAccess" );
 const zillow = require('node-zillow');
 const DEFAULT_RADIUS = 25; // miles
