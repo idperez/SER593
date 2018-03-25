@@ -13,53 +13,58 @@ const DEFAULT_RADIUS = 25; // miles
 
 exports.getHousingByCoordinates = ( userObj, lat, long, radius ) => {
     return new Promise( ( resolve, reject ) => {
-        geoTableManager.queryRadius({
-            RadiusInMeter: utils.milesToKm( radius ? parseInt( radius ) : DEFAULT_RADIUS ) * 1000,
-            CenterPoint:{
-                latitude: typeof lat === "string" ? parseFloat( lat ) : lat,
-                longitude: typeof lat === "string" ? parseFloat( long ) : long,
-            }
-        }).then( housingResults => {
-            let cleanHousingResults = [];
-            let keys = consts.HOUSING.DB_KEYS;
-            let prefBeds = userObj[consts.PROF_KEYS.PREFS_HOUSE_BEDS];
-            let prefBaths = userObj[consts.PROF_KEYS.PREFS_HOUSE_BATHS];
-            let purchaseTypes = userObj[consts.PROF_KEYS.PREFS_HOUSE_PURCHASE_TYPE];
 
-            housingResults.forEach( result => {
-                // Types are allowed to be null
-                let type = result[keys.TYPE].S ? result[keys.TYPE].S : null;
-
-                let house = {
-                    [keys.STREET]:result[keys.STREET].S,
-                    [keys.CITY]:result[keys.CITY].S,
-                    [keys.STATE]:result[keys.STATE].S,
-                    [keys.ZIP]:result[keys.ZIP].S,
-                    [keys.PHOTO_LINK]:result[keys.PHOTO_LINK].S,
-                    [keys.DETAILS_LINK]:result[keys.DETAILS_LINK].S,
-                    [keys.PRICE]:result[keys.PRICE].S,
-                    [keys.TYPE]:type,
-                    [keys.FULL_BATHS]:parseInt( result[keys.FULL_BATHS].N ),
-                    [keys.HALF_BATHS]:parseInt(result[keys.HALF_BATHS].N ),
-                    [keys.BEDS]:parseInt( result[keys.BEDS].N ),
-                    [keys.LAT]:parseFloat( result[keys.LAT].N ),
-                    [keys.LONG]:parseFloat( result[keys.LONG].N ),
-                    [keys.RANGE_KEY]: result[keys.RANGE_KEY].S,
-                    [keys.PURCHASE_TYPE]: result[keys.PURCHASE_TYPE].S
-                };
-
-                // Filter by preference
-                if( house[keys.BEDS] >= prefBeds &&
-                    house[keys.FULL_BATHS] + house[keys.HALF_BATHS] >= prefBaths &&
-                    purchaseTypes.includes( house[keys.PURCHASE_TYPE] )
-                ){
-                    cleanHousingResults.push( house );
+        if( lat && long ) {
+            geoTableManager.queryRadius( {
+                RadiusInMeter: utils.milesToKm( radius ? parseInt( radius ) : DEFAULT_RADIUS ) * 1000,
+                CenterPoint: {
+                    latitude: typeof lat === "string" ? parseFloat( lat ) : lat,
+                    longitude: typeof long === "string" ? parseFloat( long ) : long,
                 }
-            });
-            resolve( cleanHousingResults );
-        }).catch( err => {
-            reject( err );
-        });
+            } ).then( housingResults => {
+                let cleanHousingResults = [];
+                let keys = consts.HOUSING.DB_KEYS;
+                let prefBeds = userObj[ consts.PROF_KEYS.PREFS_HOUSE_BEDS ];
+                let prefBaths = userObj[ consts.PROF_KEYS.PREFS_HOUSE_BATHS ];
+                let purchaseTypes = userObj[ consts.PROF_KEYS.PREFS_HOUSE_PURCHASE_TYPE ];
+
+                housingResults.forEach( result => {
+                    // Types are allowed to be null
+                    let type = result[ keys.TYPE ].S ? result[ keys.TYPE ].S : null;
+
+                    let house = {
+                        [ keys.STREET ]: result[ keys.STREET ].S,
+                        [ keys.CITY ]: result[ keys.CITY ].S,
+                        [ keys.STATE ]: result[ keys.STATE ].S,
+                        [ keys.ZIP ]: result[ keys.ZIP ].S,
+                        [ keys.PHOTO_LINK ]: result[ keys.PHOTO_LINK ].S,
+                        [ keys.DETAILS_LINK ]: result[ keys.DETAILS_LINK ].S,
+                        [ keys.PRICE ]: result[ keys.PRICE ].S,
+                        [ keys.TYPE ]: type,
+                        [ keys.FULL_BATHS ]: parseInt( result[ keys.FULL_BATHS ].N ),
+                        [ keys.HALF_BATHS ]: parseInt( result[ keys.HALF_BATHS ].N ),
+                        [ keys.BEDS ]: parseInt( result[ keys.BEDS ].N ),
+                        [ keys.LAT ]: parseFloat( result[ keys.LAT ].N ),
+                        [ keys.LONG ]: parseFloat( result[ keys.LONG ].N ),
+                        [ keys.RANGE_KEY ]: result[ keys.RANGE_KEY ].S,
+                        [ keys.PURCHASE_TYPE ]: result[ keys.PURCHASE_TYPE ].S
+                    };
+
+                    // Filter by preference
+                    if( house[ keys.BEDS ] >= prefBeds &&
+                        house[ keys.FULL_BATHS ] + house[ keys.HALF_BATHS ] >= prefBaths &&
+                        purchaseTypes.includes( house[ keys.PURCHASE_TYPE ] )
+                    ) {
+                        cleanHousingResults.push( house );
+                    }
+                } );
+                resolve( cleanHousingResults );
+            } ).catch( err => {
+                reject( err );
+            } );
+        } else {
+            reject( "MissingCoordinates" );
+        }
     });
 };
 
