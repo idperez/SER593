@@ -850,6 +850,138 @@ define({ "api": [
     "groupTitle": "Jobs"
   },
   {
+    "type": "get",
+    "url": "/thingstodo",
+    "title": "Things To Do Search",
+    "name": "ThingsToDoSearch",
+    "group": "ThingsToDo",
+    "description": "<p>Get list of things to do by coordinates or city/state.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "authorization",
+            "description": "<p>Bearer token</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n    authorization: Bearer QZ3jhbfdof84GFBlSe\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Example-Request(s)",
+        "content": "path-to-topia-api.com/thingstodo?term=fish tacos&city=San Diego&state=California&radius=5\npath-to-topia-api.com/term=pizza&lat=33.218390&long=-111.767775&radius=5",
+        "type": "json"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "lat",
+            "description": "<p>Latitude. Required when city/state are not provided</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "long",
+            "description": "<p>Longitude. Required when city/state are not provided.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "city",
+            "description": "<p>City to search. Required when lat/long are not provided.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "state",
+            "description": "<p>state to search. Required when lat/long are not provided.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": true,
+            "field": "radius",
+            "defaultValue": "25",
+            "description": "<p>Radius in miles to search for things to do.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "\n {\n \"businesses\": [\n {\n     \"id\": \"oscars-mexican-seafood-san-diego-6\",\n     \"name\": \"Oscar's Mexican Seafood\",\n     \"image_url\": \"https://s3-media3.fl.yelpcdn.com/bphoto/YT2brlhILpPZgIlxJEZ9SA/o.jpg\",\n     \"is_closed\": false,\n     \"url\": \"https://www.yelp.com/biz/oscars-mexican-seafood-san-diego-6?adjust_creative=z4rq50TEkyGgxdcoaC1u2g&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=z4rq50TEkyGgxdcoaC1u2g\",\n     \"review_count\": 1247,\n     \"categories\": [\n         {\n             \"alias\": \"seafood\",\n             \"title\": \"Seafood\"\n         },\n         {\n             \"alias\": \"mexican\",\n             \"title\": \"Mexican\"\n         }\n     ],\n     \"rating\": 4,\n     \"coordinates\": {\n         \"latitude\": 32.7486014556313,\n         \"longitude\": -117.15913947605\n     },\n     \"transactions\": [\n         \"delivery\",\n         \"pickup\"\n     ],\n     \"price\": \"$\",\n     \"location\": {\n         \"address1\": \"646 University Ave\",\n         \"address2\": \"\",\n         \"address3\": \"\",\n         \"city\": \"San Diego\",\n         \"zip_code\": \"92103\",\n         \"country\": \"US\",\n         \"state\": \"CA\",\n         \"display_address\": [\n             \"646 University Ave\",\n             \"San Diego, CA 92103\"\n         ]\n     },\n     \"phone\": \"+16197983550\",\n     \"display_phone\": \"(619) 798-3550\",\n     \"distance\": 4690.501461512596\n },\n ...\n ],\n \"total\": 332,\n \"region\": {\n    \"center\": {\n        \"longitude\": -117.154083252,\n        \"latitude\": 32.7905693945\n    }\n }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "SearchLocationMissing",
+            "description": "<p>lat/long or city/state missing from query.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "InvalidSearchType",
+            "description": "<p>Internal error.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenNotFound",
+            "description": "<p>Bearer token not found in header.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenMismatch",
+            "description": "<p>Bearer token does not match.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenExpired",
+            "description": "<p>Bearer token is expired.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "{\n  \"err\": \"MissingCoordinates\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "./routes/thingsToDo.js",
+    "groupTitle": "ThingsToDo"
+  },
+  {
     "type": "post",
     "url": "/users/profile",
     "title": "Modify Profile",
