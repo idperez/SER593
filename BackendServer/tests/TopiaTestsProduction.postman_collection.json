@@ -1649,7 +1649,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "35b3cdd7-ab75-4e3e-9278-84946ccc0985",
+						"id": "0d764c84-4c9a-4925-b037-54f8c49ce2b7",
 						"type": "text/javascript",
 						"exec": [
 							"",
@@ -1696,11 +1696,6 @@
 							"pm.test('No error', function() {",
 							"    let jsonData = pm.response.json();",
 							"    pm.expect(jsonData.err).to.be.undefined;",
-							"});",
-							"",
-							"pm.test('An object was returned', function() {",
-							"    let jsonData = pm.response.json();",
-							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
 							"});",
 							"",
 							"pm.test(\"Status code is 200\", function () {",

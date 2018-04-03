@@ -1633,7 +1633,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9b45aeb0-0571-45a3-bdc5-0a2aa0d90f24",
+						"id": "657c3e9f-e838-499f-be75-0f5007a2391a",
 						"type": "text/javascript",
 						"exec": [
 							"",
@@ -1685,21 +1685,7 @@
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});",
-							"",
-							"// Following tests will test current city match request",
-							"pm.test('No error', function() {",
-							"    let jsonData = pm.response.json();",
-							"    pm.expect(jsonData.err).to.be.undefined;",
-							"});",
-							"",
-							"pm.test('An object was returned', function() {",
-							"    let jsonData = pm.response.json();",
-							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
-							"});",
-							"",
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});"
+							""
 						]
 					}
 				}
