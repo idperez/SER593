@@ -1373,7 +1373,7 @@
     "title": "Update Ratings",
     "name": "UpdateRatings",
     "group": "Users",
-    "description": "<p>Allows front-end to update city match ratings for the current user.</p>",
+    "description": "<p>Allows front-end to update city match ratings for the current user.</p> <p>Note: Update is not immediate.</p>",
     "header": {
       "fields": {
         "Header": [
@@ -1407,44 +1407,8 @@
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "TokenNotFound",
-            "description": "<p>Bearer token not found in header.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "TokenMismatch",
-            "description": "<p>Bearer token does not match.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "TokenExpired",
-            "description": "<p>Bearer token is expired.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "NoCitiesInObject",
-            "description": "<p>Internal error.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "RatioError",
-            "description": "<p>Internal error.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "MissingCityData",
-            "description": "<p>Internal error.</p>"
-          },
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "ErrorSettingRatio",
-            "description": "<p>Internal error.</p>"
+            "field": "CityMatchFailed",
+            "description": "<p>Internal error. See console logs.</p>"
           }
         ]
       },

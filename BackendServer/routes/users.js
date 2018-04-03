@@ -319,6 +319,8 @@ router.post( '/profile/houses',
  * @apiGroup Users
  * @apiDescription Allows front-end to update city match ratings for the current user.
  *
+ * Note: Update is not immediate.
+ *
  * @apiHeader {String} authorization Bearer token
  * @apiHeaderExample {json} Header-Example:
  *      {
@@ -328,13 +330,7 @@ router.post( '/profile/houses',
  * @apiExample Example-Request(s)
  *      path-to-topia-api.com/users/profile/ratings
  *
- * @apiError TokenNotFound Bearer token not found in header.
- * @apiError TokenMismatch Bearer token does not match.
- * @apiError TokenExpired Bearer token is expired.
- * @apiError NoCitiesInObject Internal error.
- * @apiError RatioError Internal error.
- * @apiError MissingCityData Internal error.
- * @apiError ErrorSettingRatio Internal error.
+ * @apiError CityMatchFailed Internal error. See console logs.
  * @apiErrorExample {json} Error-Response:
  *     {
  *       "err": {
@@ -349,10 +345,16 @@ router.post( '/profile/ratings',
         // This keeps the connection open longer.
         res.connection.setTimeout( CITY_RATING_TIMEOUT );
         cityData.updateCityRatings( res.locals.user ).then( success => {
-            res.send( success );
+            console.log( "City match successfully updated for " + res.locals.user[consts.PROF_KEYS.USERNAME] );
         }).catch( err => {
-            res.send( response.errorMessage( err ) );
+            res.send( response.errorMessage(
+                {
+                    code: "CityMatchFailed",
+                    msg: "City match failed for " + res.locals.user[consts.PROF_KEYS.USERNAME] + ": " + err
+                }
+            ));
         });
+        res.send({});
     }
 );
 
