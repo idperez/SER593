@@ -56,6 +56,7 @@ exports.getUserProfileByPrimaryKey = ( primKey, value ) => {
 
                     let jobProms = [];
                     let houseProms = [];
+                    let thingProms = [];
                     if( resultProfile[consts.PROF_KEYS.PREFS_JOBS_SAVED] ) {
                         // Get saved jobs from the job table
                         let jobKeys = resultProfile[ consts.PROF_KEYS.PREFS_JOBS_SAVED ];
@@ -74,11 +75,27 @@ exports.getUserProfileByPrimaryKey = ( primKey, value ) => {
                         });
                     }
 
+                    if( resultProfile[consts.PROF_KEYS.PREFS_THINGS_SAVED] ) {
+                        // Get saved things from the things to do table
+                        let thingsIds = resultProfile[ consts.PROF_KEYS.PREFS_THINGS_SAVED ];
+                        thingsIds.forEach( thingId => {
+                            thingProms.push( getSavedItem(
+                                PRIM_KEY_THING,
+                                thingId,
+                                TABLE_NAME_THINGS
+                            ));
+                        } );
+                    }
+
+                    // Get all saved things from all tables
                     Promise.all( jobProms ).then( jobs => {
                         resultProfile[ consts.PROF_KEYS.PREFS_JOBS_SAVED ] = jobs;
                         Promise.all( houseProms ).then( houses => {
                             resultProfile[consts.PROF_KEYS.PREFS_HOUSE_SAVED] = houses;
-                            resolve( resultProfile );
+                            Promise.all( thingProms ).then( things => {
+                                resultProfile[consts.PROF_KEYS.PREFS_THINGS_SAVED] = things;
+                                resolve( resultProfile );
+                            });
                         });
                     } ).catch( err => reject( err ) );
 
