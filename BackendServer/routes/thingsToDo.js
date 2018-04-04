@@ -76,13 +76,10 @@ const thingsToDo = require( '../search/thingsToDo' );
  },
  ...
  ],
- "total": 332,
- "region": {
-    "center": {
-        "longitude": -117.154083252,
-        "latitude": 32.7905693945
-    }
- }
+ "total": 332
+ "terms": [
+       "fish tacos"
+    ]
 }
  *
  * @apiError SearchLocationMissing lat/long or city/state missing from query.
@@ -100,7 +97,6 @@ router.get('/', (req, res) => {
     if( req.query.lat && req.query.long ) {
         thingsToDo.getThingsToDoByCoordinates(
             res.locals.user,
-            req.query.term,
             req.query.lat,
             req.query.long,
             req.query.radius
@@ -110,7 +106,6 @@ router.get('/', (req, res) => {
     } else if( req.query.city && req.query.state ) {
         thingsToDo.getThingsToDoByLocation(
             res.locals.user,
-            req.query.term,
             req.query.city,
             req.query.state,
             req.query.radius
