@@ -209,7 +209,8 @@ router.post( '/profile',
  *     }
  *
  * @apiError InvalidSaveType Save operation type is missing from the query.
- * @apiError JobAlreadySaved Job is already saved on the users profile.
+ * @apiError ItemAlreadySaved Job is already saved on the users profile.
+ * @apiError JobNotFound Job not found from job source.
  * @apiError NoJobsKeysFound jobkey not found in query.
  * @apiError NoJobsFound No jobs found with the given key(s).
  * @apiError TokenNotFound Bearer token not found in header.
@@ -229,14 +230,21 @@ router.post( '/profile/jobs',
 
         switch( req.body.type ) {
             case SAVE_TYPE_ADD:
-                DB_PROFILES.addSavedJob( res.locals.user, req.body.jobkey ).then( success => {
+                DB_PROFILES.addSavedJob(
+                    res.locals.user,
+                    req.body.jobkey
+                ).then( success => {
                     res.send( success );
                 } ).catch( err => {
                     res.send( response.errorMessage( err ) );
                 } );
                 break;
             case SAVE_TYPE_REMOVE:
-                DB_PROFILES.removeSavedJob( res.locals.user, req.body.jobkey ).then( success => {
+                DB_PROFILES.removeSavedItem(
+                    res.locals.user,
+                    consts.PROF_KEYS.PREFS_JOBS_SAVED,
+                    req.body.jobkey
+                ).then( success => {
                     res.send( success );
                 }).catch( err => {
                     res.send( response.errorMessage( err ) );
@@ -305,6 +313,74 @@ router.post( '/profile/houses',
                     res.locals.user, req.body.rangekey
                 ).then( done => {
                     res.send( done );
+                }).catch( err => {
+                    res.send( response.errorMessage( err ) );
+                });
+                break;
+            default:
+                res.send( response.errorMessage( "InvalidSaveType" ) );
+        }
+    }
+);
+
+
+/**
+ * @api {post} /profile/things Save or Remove Things
+ * @apiName SaveThing
+ * @apiGroup Users
+ * @apiDescription Add/remove a saved thing to do to/from the users profile.
+ *
+ * @apiHeader {String} authorization Bearer token
+ * @apiHeaderExample {json} Header-Example:
+ *      {
+ *          authorization: Bearer QZ3jhbfdof84GFBlSe
+ *      }
+ *
+ * @apiExample Example-Request(s)
+ *      path-to-topia-api.com/users/profile/things
+ *
+ * @apiParam {String} id Business id.
+ * @apiParam {String="add","remove"} type Operation to add or remove a thing to/from the users profile.
+ * @apiParamExample {json} Example:
+ *     {
+ *       "id": "oscars-mexican-seafood-san-diego-6",
+ *       "operation": "add"
+ *     }
+ *
+ * @apiError InvalidSaveType Save operation type is missing from the query.
+ * @apiError ItemAlreadySaved Item is already saved on the users profile.
+ * @apiError InvalidTable Internal error.
+ * @apiError TokenNotFound Bearer token not found in header.
+ * @apiError TokenMismatch Bearer token does not match.
+ * @apiError TokenExpired Bearer token is expired.
+ * @apiErrorExample {json} Error-Response:
+ *     {
+ *       "err": {
+ *          "type": "TokenNotFound",
+ *          "msg": ""
+ *       }
+ *     }
+ */
+router.post( '/profile/things',
+    ( req, res ) => {
+        switch( req.body.type ) {
+            case SAVE_TYPE_ADD:
+                DB_PROFILES.addSavedThingToDo(
+                    res.locals.user,
+                    req.body.id
+                ).then( success => {
+                    res.send( success );
+                } ).catch( err => {
+                    res.send( response.errorMessage( err ) );
+                } );
+                break;
+            case SAVE_TYPE_REMOVE:
+                DB_PROFILES.removeSavedItem(
+                    res.locals.user,
+                    consts.PROF_KEYS.PREFS_THINGS_SAVED,
+                    req.body.id
+                ).then( success => {
+                    res.send( success );
                 }).catch( err => {
                     res.send( response.errorMessage( err ) );
                 });

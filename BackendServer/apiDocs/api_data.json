@@ -879,7 +879,7 @@
     "examples": [
       {
         "title": "Example-Request(s)",
-        "content": "path-to-topia-api.com/thingstodo?term=fish tacos&city=San Diego&state=California&radius=5\npath-to-topia-api.com/term=pizza&lat=33.218390&long=-111.767775&radius=5",
+        "content": "path-to-topia-api.com/thingstodo?city=San+Diego&state=CA&radius=5\npath-to-topia-api.com/lat=33.218390&long=-111.767775&radius=5",
         "type": "json"
       }
     ],
@@ -928,7 +928,7 @@
     "success": {
       "examples": [
         {
-          "title": "Success-Response:",
+          "title": "Success-Response for fish tacos:",
           "content": "\n {\n \"businesses\": [\n {\n     \"id\": \"oscars-mexican-seafood-san-diego-6\",\n     \"name\": \"Oscar's Mexican Seafood\",\n     \"image_url\": \"https://s3-media3.fl.yelpcdn.com/bphoto/YT2brlhILpPZgIlxJEZ9SA/o.jpg\",\n     \"is_closed\": false,\n     \"url\": \"https://www.yelp.com/biz/oscars-mexican-seafood-san-diego-6?adjust_creative=z4rq50TEkyGgxdcoaC1u2g&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=z4rq50TEkyGgxdcoaC1u2g\",\n     \"review_count\": 1247,\n     \"categories\": [\n         {\n             \"alias\": \"seafood\",\n             \"title\": \"Seafood\"\n         },\n         {\n             \"alias\": \"mexican\",\n             \"title\": \"Mexican\"\n         }\n     ],\n     \"rating\": 4,\n     \"coordinates\": {\n         \"latitude\": 32.7486014556313,\n         \"longitude\": -117.15913947605\n     },\n     \"transactions\": [\n         \"delivery\",\n         \"pickup\"\n     ],\n     \"price\": \"$\",\n     \"location\": {\n         \"address1\": \"646 University Ave\",\n         \"address2\": \"\",\n         \"address3\": \"\",\n         \"city\": \"San Diego\",\n         \"zip_code\": \"92103\",\n         \"country\": \"US\",\n         \"state\": \"CA\",\n         \"display_address\": [\n             \"646 University Ave\",\n             \"San Diego, CA 92103\"\n         ]\n     },\n     \"phone\": \"+16197983550\",\n     \"display_phone\": \"(619) 798-3550\",\n     \"distance\": 4690.501461512596\n },\n ...\n ],\n \"total\": 332\n \"terms\": [\n       \"fish tacos\"\n    ]\n}",
           "type": "json"
         }
@@ -1452,8 +1452,14 @@
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "JobAlreadySaved",
+            "field": "ItemAlreadySaved",
             "description": "<p>Job is already saved on the users profile.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "JobNotFound",
+            "description": "<p>Job not found from job source.</p>"
           },
           {
             "group": "Error 4xx",
@@ -1466,6 +1472,124 @@
             "optional": false,
             "field": "NoJobsFound",
             "description": "<p>No jobs found with the given key(s).</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenNotFound",
+            "description": "<p>Bearer token not found in header.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenMismatch",
+            "description": "<p>Bearer token does not match.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "TokenExpired",
+            "description": "<p>Bearer token is expired.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "{\n  \"err\": {\n     \"type\": \"TokenNotFound\",\n     \"msg\": \"\"\n  }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "./routes/users.js",
+    "groupTitle": "Users"
+  },
+  {
+    "type": "post",
+    "url": "/profile/things",
+    "title": "Save or Remove Things",
+    "name": "SaveThing",
+    "group": "Users",
+    "description": "<p>Add/remove a saved thing to do to/from the users profile.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "authorization",
+            "description": "<p>Bearer token</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n    authorization: Bearer QZ3jhbfdof84GFBlSe\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Example-Request(s)",
+        "content": "path-to-topia-api.com/users/profile/things",
+        "type": "json"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Business id.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "allowedValues": [
+              "\"add\"",
+              "\"remove\""
+            ],
+            "optional": false,
+            "field": "type",
+            "description": "<p>Operation to add or remove a thing to/from the users profile.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Example:",
+          "content": "{\n  \"id\": \"oscars-mexican-seafood-san-diego-6\",\n  \"operation\": \"add\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "InvalidSaveType",
+            "description": "<p>Save operation type is missing from the query.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ItemAlreadySaved",
+            "description": "<p>Item is already saved on the users profile.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "InvalidTable",
+            "description": "<p>Internal error.</p>"
           },
           {
             "group": "Error 4xx",

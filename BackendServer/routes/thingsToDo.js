@@ -17,8 +17,8 @@ const thingsToDo = require( '../search/thingsToDo' );
  *      }
  *
  * @apiExample Example-Request(s)
- *      path-to-topia-api.com/thingstodo?term=fish tacos&city=San Diego&state=California&radius=5
- *      path-to-topia-api.com/term=pizza&lat=33.218390&long=-111.767775&radius=5
+ *      path-to-topia-api.com/thingstodo?city=San+Diego&state=CA&radius=5
+ *      path-to-topia-api.com/lat=33.218390&long=-111.767775&radius=5
  *
  * @apiParam {String} lat Latitude. Required when city/state are not provided
  * @apiParam {String} long Longitude. Required when city/state are not provided.
@@ -26,7 +26,7 @@ const thingsToDo = require( '../search/thingsToDo' );
  * @apiParam {String} state state to search. Required when lat/long are not provided.
  * @apiParam {Number} [radius=25] Radius in miles to search for things to do.
  *
- * @apiSuccessExample {json} Success-Response:
+ * @apiSuccessExample {json} Success-Response for fish tacos:
  *
  {
  "businesses": [

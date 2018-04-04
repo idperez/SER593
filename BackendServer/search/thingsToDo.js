@@ -3,6 +3,7 @@ const utils = require('../util');
 const request = require( 'request' );
 const qs = require( 'querystring' );
 const YELP_ENDPOINT = "https://api.yelp.com/v3/businesses/search";
+const YELP_ID_ENDPOINT = "https://api.yelp.com/v3/businesses";
 const DEFAULT_RADIUS = 25; // In miles
 const SEARCH_BY_COORD = "coordinates";
 const SEARCH_BY_LOC = "location";
@@ -15,13 +16,30 @@ exports.getThingsToDoByLocation = ( userObj, city, state, radius ) => {
     return getThingsToDo( userObj, SEARCH_BY_LOC, { city: city, state: state }, radius );
 };
 
+exports.getThingToDoById = ( id ) => {
+    return new Promise( ( resolve, reject ) => {
+        request({
+            uri: YELP_ID_ENDPOINT + "/" + id,
+            headers:{
+                Authorization: "Bearer " + process.env.KEY_YELP
+            }
+        }, function( err, response, body ) {
+            if( err ){
+                reject( err );
+            } else {
+                resolve( JSON.parse( body ) );
+            }
+        });
+    })
+};
+
 // searchType is either coordinates or location
 // searchItem {lat, long} for coordinates and {city, state} for location
 let getThingsToDo = ( userObj, searchType, searchItems, radiusMiles ) => {
     return new Promise( ( resolve, reject ) => {
 
         let promises = [];
-        let terms = userObj[consts.PROF_KEYS.PREFS_LIFE_TITLES];
+        let terms = userObj[consts.PROF_KEYS.PREFS_THINGS_TITLES];
         let radius = utils.milesToKm( radiusMiles ? radiusMiles : DEFAULT_RADIUS ) * 1000;
 
         terms.forEach( term => {
@@ -57,7 +75,7 @@ let getThingsToDo = ( userObj, searchType, searchItems, radiusMiles ) => {
                         qReject( err );
                     } else {
                         body = JSON.parse( body );
-                        body["terms"] = userObj[consts.PROF_KEYS.PREFS_LIFE_TITLES];
+                        body["terms"] = userObj[consts.PROF_KEYS.PREFS_THINGS_TITLES];
                         qResolve( body );
                     }
                 });

@@ -4,10 +4,17 @@ const ddb = new AWS.DynamoDB( { apiVersion: '2012-08-10' } );
 const consts = require( "../constants" );
 const util = require( "../util" );
 const jobSearch = require( "../search/jobs" );
+const thingSearch = require( "../search/thingsToDo" );
 const INDEX_SUFFIX = "-index";
 const TABLE_NAME_JOBS = 'jobs';
+const TABLE_NAME_THINGS = "things_to_do";
 const PRIM_KEY_JOBS = "jobkey";
-const PRIM_KEY_JOB_DETAILS = "job";
+const JOB_ID_KEY = "jobkey";
+const THING_ID_KEY = "id";
+// The key for which a saved item is associated with on it's table
+// For example, all job details are saved under a savedItem key.
+const KEY_SAVED_ITEM = "savedItem";
+const PRIM_KEY_THING = "id";
 const DEFAULT_UPDATE_TIME = 86400000; // Time to recheck saved jobs - 24 hours in ms
 const cityData = require( "../search/cityData" );
 const DB = require( "./databaseAccess" );
@@ -53,7 +60,11 @@ exports.getUserProfileByPrimaryKey = ( primKey, value ) => {
                         // Get saved jobs from the job table
                         let jobKeys = resultProfile[ consts.PROF_KEYS.PREFS_JOBS_SAVED ];
                         jobKeys.forEach( jobKey => {
-                            jobProms.push( getSavedJob( jobKey ) );
+                            jobProms.push( getSavedItem(
+                                PRIM_KEY_JOBS,
+                                jobKey,
+                                TABLE_NAME_JOBS
+                            ));
                         } );
                     }
                     if( resultProfile[consts.PROF_KEYS.PREFS_HOUSE_SAVED] ){
@@ -202,41 +213,34 @@ exports.modifyUserPreferences = ( userObj, prefObj ) => {
 };
 
 exports.addSavedJob = ( userObj, jobKey ) => {
-    return new Promise( ( resolve, reject ) => {
-       if( userObj[consts.PROF_KEYS.PREFS_JOBS_SAVED].includes( jobKey ) ){
-           reject( 'JobAlreadySaved' );
-       } else {
-           // Hit indeed for job info
-           getSavedJob( jobKey ).then( job => {
-               // We're not really concerned with the return value,
-               // as long as it's resolved we know everything is okay.
-               DB.appendListItem(
-                   consts.USER_TABLE_NAME,
-                   consts.USER_PRIMARY_KEY,
-                   userObj[consts.PROF_KEYS.USERNAME],
-                   consts.PROF_KEYS.PREFS_JOBS_SAVED,
-                   jobKey
-               ).then( data => {
-                   resolve( data );
-               }).catch( err => {
-                   reject( err );
-               });
-           }).catch( err => {
-               reject( err );
-           });
-       }
-    });
+    return addSavedItem(
+        userObj,
+        consts.PROF_KEYS.PREFS_JOBS_SAVED,
+        PRIM_KEY_JOBS,
+        jobKey,
+        TABLE_NAME_JOBS
+    );
 };
 
-exports.removeSavedJob = ( userObj, jobKey ) => {
+exports.addSavedThingToDo = ( userObj, id ) => {
+    return addSavedItem(
+        userObj,
+        consts.PROF_KEYS.PREFS_THINGS_SAVED,
+        PRIM_KEY_THING,
+        id,
+        TABLE_NAME_THINGS
+    );
+};
+
+exports.removeSavedItem = ( userObj, key, value ) => {
     return new Promise( ( resolve, reject ) => {
 
         DB.removeListItem(
             consts.USER_TABLE_NAME,
             consts.USER_PRIMARY_KEY,
             userObj[consts.PROF_KEYS.USERNAME],
-            consts.PROF_KEYS.PREFS_JOBS_SAVED,
-            jobKey
+            key,
+            value
         ).then( data => {
             resolve( data );
         }).catch( err => {
@@ -309,52 +313,99 @@ exports.filterProfile = ( profile ) => {
     return profile;
 };
 
-// Add job to the job DB table
+
+let addSavedItem = ( userObj, itemKey, primKey, value, tableName ) => {
+    return new Promise( ( resolve, reject ) => {
+        if( userObj[consts.PROF_KEYS.PREFS_JOBS_SAVED].includes( value ) ){
+            reject( 'ItemAlreadySaved' );
+        } else {
+            getSavedItem( primKey, value, tableName ).then( item => {
+                // We're not really concerned with the return value,
+                // as long as it's resolved we know everything is okay.
+                DB.appendListItem(
+                    consts.USER_TABLE_NAME,
+                    consts.USER_PRIMARY_KEY,
+                    userObj[consts.PROF_KEYS.USERNAME],
+                    itemKey,
+                    value
+                ).then( data => {
+                    resolve( data );
+                }).catch( err => {
+                    reject( err );
+                });
+            }).catch( err => {
+                reject( err );
+            });
+        }
+    });
+};
+
+// Add new thing to do
 // Exists is a boolean flag to determine if we should add the job ONLY if it exists.
 // Exists - true to update an existing job, false to add a new job.
-let addJob = ( jobKey, exists ) => {
+let addSavedThingToSavedTable = ( primKey, value, tableName, exists ) => {
     return new Promise( ( resolve, reject ) => {
-        jobSearch.getJobByKey( jobKey ).then( job => {
+        thingSearch.getThingToDoById( value ).then( thing => {
+            addSavedItemToSavedTable( primKey, value, thing, tableName, exists  ).then( done => {
+                resolve( done );
+            }).catch( err => reject( err ));
+        }).catch( err => reject( err ));
+    });
+};
 
-            let params = {
-                TableName: TABLE_NAME_JOBS,
-                Item: {
-                    [PRIM_KEY_JOBS]: {
-                        "S": jobKey
-                    },
-                    [PRIM_KEY_JOB_DETAILS]: {
-                        "S": JSON.stringify( job )
-                    }
+// Add new job
+// Exists is a boolean flag to determine if we should add the job ONLY if it exists.
+// Exists - true to update an existing job, false to add a new job.
+let addSavedJobToSavedTable = ( primKey, value, tableName, exists ) => {
+    return new Promise( ( resolve, reject ) => {
+        jobSearch.getJobByKey( value ).then( job => {
+            addSavedItemToSavedTable( primKey, value, job, tableName, exists  ).then( done => {
+                resolve( done );
+            }).catch( err => reject( err ));
+        }).catch( err => reject( err ));
+    });
+};
+
+// Helper for adding saved items to their respective tables
+let addSavedItemToSavedTable = ( primKey, value, itemData, tableName, exists ) => {
+    return new Promise( ( resolve, reject ) => {
+        let params = {
+            TableName: tableName,
+            Item: {
+                [primKey]: {
+                    "S": value
                 },
-                ConditionExpression: exists ?
-                    "attribute_exists(" + PRIM_KEY_JOBS + ")" :
-                    "attribute_not_exists(" + PRIM_KEY_JOBS + ")"
-            };
-
-            ddb.putItem( params, ( err, data ) => {
-                if( err ) {
-                    reject( err );
-                } else {
-                    resolve( data );
+                [KEY_SAVED_ITEM]: {
+                    "S": JSON.stringify( itemData )
                 }
-            });
+            },
+            ConditionExpression: exists ?
+                "attribute_exists(" + primKey + ")" :
+                "attribute_not_exists(" + primKey + ")"
+        };
+
+        ddb.putItem( params, ( err, data ) => {
+            if( err ) {
+                reject( err );
+            } else {
+                resolve( data );
+            }
         });
     });
 };
 
-// Get saved job from the DB
-let getSavedJob = ( jobKey ) => {
+// Get saved item from the DB
+let getSavedItem = ( primKey, value, tableName ) => {
     return new Promise( ( resolve, reject ) =>{
-
-        if( jobKey ) {
+        if( value && primKey ) {
             let params = {
-                TableName: TABLE_NAME_JOBS,
+                TableName: tableName,
                 ExpressionAttributeValues: {
                     ":v1": {
-                        S: jobKey
+                        S: value
                     }
                 },
-                KeyConditionExpression: PRIM_KEY_JOBS + " = :v1",
+                KeyConditionExpression: primKey + " = :v1",
             };
 
             ddb.query( params, ( err, data ) => {
@@ -362,20 +413,29 @@ let getSavedJob = ( jobKey ) => {
                     reject( err );
                 } else if( data.Items[ 0 ] ) {
                     if( data.Items.length > 1 ){
-                        reject( "MultipleJobsFound" );
+                        reject( "MultipleItemsFound" );
                     }
-                    let job = data.Items[ 0 ];
-                    job = job[PRIM_KEY_JOB_DETAILS].S; // Get the job value back
+                    let savedItem = data.Items[ 0 ];
+                    savedItem = savedItem[KEY_SAVED_ITEM].S; // Get the value back
                     try{
-                        resolve( JSON.parse( job ) );
+                        resolve( JSON.parse( savedItem ) );
                     } catch( err ){
                         reject( err );
                     }
                 } else {
                     // If it's not on the DB, try to add it.
-                    addJob( jobKey, false ).then( data => {
-                        resolve( data );
-                    }).catch( err => reject( err ));
+                    // Job
+                    if( tableName === TABLE_NAME_JOBS ) {
+                        addSavedJobToSavedTable( primKey, value, tableName, false ).then( data => {
+                            resolve( data );
+                        } ).catch( err => reject( err ) );
+                    } else if( tableName === TABLE_NAME_THINGS ){
+                        addSavedThingToSavedTable( primKey, value, tableName, false ).then( data => {
+                            resolve( data );
+                        } ).catch( err => reject( err ) );
+                    } else {
+                        reject( "InvalidTable" );
+                    }
                 }
             } );
         } else {
