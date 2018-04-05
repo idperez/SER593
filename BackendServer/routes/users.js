@@ -37,7 +37,7 @@ const CITY_RATING_TIMEOUT = 300000; // 5min in ms
  *
  * {
     "prefs_jobs_postedDate": 30,
-    "accessToken_expr": 2508121556207,
+    "last_updated": 1508121556207,
     "prefs_jobs_titles": [
         "software"
     ],
