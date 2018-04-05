@@ -360,10 +360,10 @@ let addSavedItem = ( userObj, itemKey, primKey, value, tableName ) => {
 // Add new thing to do
 // Exists is a boolean flag to determine if we should add the job ONLY if it exists.
 // Exists - true to update an existing job, false to add a new job.
-let addSavedThingToSavedTable = ( primKey, value, tableName, exists ) => {
+let addSavedThingToSavedTable = ( value, exists ) => {
     return new Promise( ( resolve, reject ) => {
         thingSearch.getThingToDoById( value ).then( thing => {
-            addSavedItemToSavedTable( primKey, value, thing, tableName, exists  ).then( done => {
+            addSavedItemToSavedTable( PRIM_KEY_THING, value, thing, TABLE_NAME_THINGS, exists  ).then( done => {
                 resolve( done );
             }).catch( err => reject( err ));
         }).catch( err => reject( err ));
@@ -373,10 +373,10 @@ let addSavedThingToSavedTable = ( primKey, value, tableName, exists ) => {
 // Add new job
 // Exists is a boolean flag to determine if we should add the job ONLY if it exists.
 // Exists - true to update an existing job, false to add a new job.
-let addSavedJobToSavedTable = ( primKey, value, tableName, exists ) => {
+let addSavedJobToSavedTable = ( value, exists ) => {
     return new Promise( ( resolve, reject ) => {
         jobSearch.getJobByKey( value ).then( job => {
-            addSavedItemToSavedTable( primKey, value, job, tableName, exists  ).then( done => {
+            addSavedItemToSavedTable( PRIM_KEY_JOBS, value, job, TABLE_NAME_JOBS, exists  ).then( done => {
                 resolve( done );
             }).catch( err => reject( err ));
         }).catch( err => reject( err ));
@@ -443,11 +443,11 @@ let getSavedItem = ( primKey, value, tableName ) => {
                     // If it's not on the DB, try to add it.
                     // Job
                     if( tableName === TABLE_NAME_JOBS ) {
-                        addSavedJobToSavedTable( primKey, value, tableName, false ).then( data => {
+                        addSavedJobToSavedTable( value, false ).then( data => {
                             resolve( data );
                         } ).catch( err => reject( err ) );
                     } else if( tableName === TABLE_NAME_THINGS ){
-                        addSavedThingToSavedTable( primKey, value, tableName, false ).then( data => {
+                        addSavedThingToSavedTable( value, false ).then( data => {
                             resolve( data );
                         } ).catch( err => reject( err ) );
                     } else {
@@ -468,7 +468,7 @@ let checkAndUpdateSavedJobs = ( jobs ) => {
     if( util.isArray( jobs ) ) {
         jobs.forEach( job => {
             let jobKey = job[ "jobkey" ];
-            addJob( jobKey, true ).then( data => {
+            addSavedJobToSavedTable( jobKey, true ).then( data => {
                 console.log( "Job " + jobKey + " updated successfully." );
             } ).catch( err => {
                 console.log( "Job " + jobKey + " not updated: " + err );

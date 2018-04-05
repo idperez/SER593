@@ -30,7 +30,7 @@ exports.USER_PRIMARY_KEY = exports.PROF_KEYS.USERNAME;
 exports.PROF_KEYS_TO_EXCLUDE = [
     exports.PROF_KEYS.PASSWORD,
     exports.PROF_KEYS.ACCESS_TOKEN,
-    exports.PROF_KEYS.LAST_UPDATED
+    exports.PROF_KEYS.ACCESS_EXPR
 ];
 
 // Modes for modifying a user preference
