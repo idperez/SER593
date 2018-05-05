@@ -24,6 +24,10 @@ exports.PROF_KEYS = {
 exports.USER_TABLE_NAME = "topia_profiles";
 exports.USER_PRIMARY_KEY = exports.PROF_KEYS.USERNAME;
 
+exports.CONFIG_TABLE_NAME = "config";
+exports.CONFIG_PRIMARY_KEY = "configKey";
+exports.CONFIG_VALUE_KEY = "configVal";
+
 
 // Profile keys to exclude from the profile object when sending to front-end
 // These must be defined in PROF_KEYS.
@@ -38,7 +42,8 @@ exports.MODIFIY_PREFS_MODES = {
     MODIFY: "modify",           // Modify an existing DB value
     REMOVE: "remove",           // Remove an existing DB value
     LIST_APPEND: "listappend",  // Append value to a DB list
-    LIST_REMOVE: "listremove"   // Remove value from a DB list
+    LIST_REMOVE: "listremove",  // Remove value from a DB list
+    EMPTY_LIST: "emptylist"     // Create an empty list ready to be appended
 };
 
 // Saved job properties in addition to the ones on indeed
@@ -190,3 +195,15 @@ exports.RATED_CITIES = [
         {"city":"Seattle","state":"WA"},
         {"city":"Milwaukee","state":"WI"}
 ];
+
+exports.UPDATE_PERIOD = 7; // In days
+exports.BEST_MATCH_RESULTS_MAX = 10; // Top 10 jobs, houses, or things to do
+exports.DEFAULT_RADIUS = 25; // Miles
+
+// 42 total job titles allowed
+exports.JOB_TITLES = [
+    "Software"
+];
+
+// AWS does not allow ampty sets, so we must use a value to denote an empty set for the first element
+exports.emptySetValue = "-";

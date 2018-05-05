@@ -77,7 +77,7 @@ exports.updateCityRatings = ( userObj ) => {
                 ratingsStr = JSON.stringify( ratings );
 
                 // Update users profile with the new ratings
-                DB.modifyUserItem(
+                DB.modifyDBItem(
                     consts.USER_TABLE_NAME,
                     consts.USER_PRIMARY_KEY,
                     userObj[consts.PROF_KEYS.USERNAME],
@@ -219,7 +219,7 @@ exports.grabCityPopulations = () => {
 
                     if( city && state ) {
                         coordPromises.push(
-                            util.getCoordinates(
+                            util.getCoordinatesByAddress(
                                 "",     // Empty to get city center
                                 city,
                                 state

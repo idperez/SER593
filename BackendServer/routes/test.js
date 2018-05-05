@@ -2,6 +2,7 @@
 const express = require( 'express' );
 const router = express.Router();
 const city = require("../search/cityData");
+const jobCache = require( "../data_caching/jobCaching" );
 
 
 router.get('/cityratings', ( req, res ) => {
@@ -11,6 +12,13 @@ router.get('/cityratings', ( req, res ) => {
         res.send( err );
     })
 });
+
+router.get('/cachejobs', ( req, res ) => {
+    jobCache.storeNextJobSet().then( updated => {
+        res.send( "Check DB" );
+    }).catch( err => res.send( err ) );
+});
+
 
 
 module.exports = router;

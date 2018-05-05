@@ -38,7 +38,8 @@ exports.average = ( numArr ) => {
     return numArr.reduce( ( a, b ) => { return a + b } ) / numArr.length;
 };
 
-exports.getCoordinates = ( address, city, state ) => {
+// Use google geocaching API to get coordinates
+exports.getCoordinatesByAddress = ( address, city, state ) => {
     return new Promise( ( resolve, reject ) => {
 
         let fullAddress;
@@ -81,6 +82,13 @@ exports.getCoordinates = ( address, city, state ) => {
                 city: city
             });
         });
+    });
+};
+
+// Get location of a business as coordinates
+exports.getCoordinatesOfCompany = ( companyName ) => {
+    return new Promise( ( resolve, reject ) => {
+        resolve("some coords here");
     });
 };
 

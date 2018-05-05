@@ -5,9 +5,8 @@ const consts = require( "../constants" );
 const util = require( "../util" );
 const INDEX_SUFFIX = "-index";
 
-// Modify an existing user profile key
-// Internal program use
-exports.modifyUserItem = ( tableName, primKey, primVal, key, value, mode ) => {
+// Modify an existing DB table item
+exports.modifyDBItem = ( tableName, primKey, primVal, key, value, mode ) => {
     let promise;
 
     // Check parameters
@@ -17,9 +16,6 @@ exports.modifyUserItem = ( tableName, primKey, primVal, key, value, mode ) => {
         // Mode
     } else if ( !mode || !util.objectContains( consts.MODIFIY_PREFS_MODES, mode ) ) {
         promise = Promise.reject( 'InvalidMode' );
-        // Value
-    } else if ( !value && mode !== consts.MODIFIY_PREFS_MODES.REMOVE ) {
-        promise = Promise.reject( 'MissingValue' );
     } else {
 
         switch( mode ){
@@ -34,6 +30,9 @@ exports.modifyUserItem = ( tableName, primKey, primVal, key, value, mode ) => {
                 break;
             case consts.MODIFIY_PREFS_MODES.LIST_REMOVE:
                 promise = exports.removeListItem( tableName, primKey, primVal, key, value );
+                break;
+            case consts.MODIFIY_PREFS_MODES.EMPTY_LIST:
+                promise = addItem( tableName, primKey, primVal, key, [consts.emptySetValue] );
                 break;
             default:
                 promise = Promise.reject( 'ModeError' );
@@ -78,6 +77,39 @@ exports.getHouse = ( rangeKey ) => {
     });
 };
 
+exports.getPrimaryItem = ( tableName, primKey, primVal ) => {
+    return new Promise( ( resolve, reject ) => {
+        if( tableName && primKey && primVal ) {
+            let params = {
+                TableName: tableName,
+                ExpressionAttributeValues: {
+                    ":v1": {
+                        S: primVal
+                    }
+                },
+                KeyConditionExpression: primKey + " = :v1",
+            };
+
+            ddb.query( params, ( err, data ) => {
+                if( err ) {
+                    reject( err );
+                } else if( data.Items[ 0 ] ) {
+                    if( data.Items.length > 1 ) {
+                        console.log( "Warning: Multiple items found with primary value: " + primVal );
+                    }
+                    let item = data.Items[ 0 ];
+                    item = exports.extractData( item );
+                    resolve( item );
+                } else {
+                    reject( 'NoResultsFound' );
+                }
+            } );
+        } else {
+            reject( "Missing param" );
+        }
+    });
+};
+
 // Extracts database data into usable JSON
 exports.extractData = ( databaseData ) => {
     let cleanedData = {};
@@ -105,9 +137,11 @@ exports.extractData = ( databaseData ) => {
             } else if( profProperty.hasOwnProperty( 'SS' ) ) {
                 let stringSet = profProperty.SS;
                 for( let i = 0; i < stringSet.length; i++ ) {
-                    try {
-                        stringSet[i] = JSON.parse( stringSet[i] );
-                    } catch( err ){}// If it fails we assume it's a normal string
+                    if( stringSet[i] !== consts.emptySetValue ) {
+                        try {
+                            stringSet[ i ] = JSON.parse( stringSet[ i ] );
+                        } catch( err ) {}// If it fails we assume it's a normal string
+                    }
                 }
                 cleanedData[ key ] = stringSet;
                 // Number array
@@ -131,59 +165,55 @@ exports.extractData = ( databaseData ) => {
 // Add new item
 let addItem = ( tableName, primKey, primValue, key, value ) => {
     return new Promise( ( resolve, reject ) =>{
-        if( !util.objectContains( consts.PROF_KEYS, key ) ){
-            reject( "InvalidKey" );
-        } else {
-            let param = {
-                TableName: tableName,
-                Key: {
-                    [ primKey ]: {
-                        S: primValue
-                    }
-                },
-                ExpressionAttributeNames: {
-                    "#K": key
-                },
-                ExpressionAttributeValues: {
-                    ":v": {}
-                },
-                UpdateExpression: "SET #K = :v",
-            };
-            // Add key/value pair by type
-            param[ 'ExpressionAttributeValues' ][ ':v' ] = {};
-            if( !isNaN( value ) ) {
-                param[ 'ExpressionAttributeValues' ][ ':v' ][ 'N' ] = value.toString();
-            } else if( typeof value === 'string' ) {
-                param[ 'ExpressionAttributeValues' ][ ':v' ][ 'S' ] = value;
-            } else if( typeof value === 'object' ) {
-                if( Array.isArray( value ) ) {
-                    // Number array
-                    if( value.every( Number ) ) {
-                        param[ 'ExpressionAttributeValues' ][ ':v' ][ 'NS' ] =
-                            value.map( String );
-                        // String array
-                    } else if( value.every( String ) ) {
-                        param[ 'ExpressionAttributeValues' ][ ':v' ][ 'SS' ] = value;
-                        // Generic list
-                    } else {
-                        param[ 'ExpressionAttributeValues' ][ ':v' ][ 'L' ] = value;
-                    }
-                    // Object
-                } else {
-                    param[ 'ExpressionAttributeValues' ][ ':v' ][ 'M' ] = value;
+        let param = {
+            TableName: tableName,
+            Key: {
+                [ primKey ]: {
+                    S: primValue
                 }
-            } else if( typeof value === 'boolean' ) {
-                param[ 'ExpressionAttributeValues' ][ ':v' ][ 'BOOL' ] = value;
+            },
+            ExpressionAttributeNames: {
+                "#K": key
+            },
+            ExpressionAttributeValues: {
+                ":v": {}
+            },
+            UpdateExpression: "SET #K = :v",
+        };
+        // Add key/value pair by type
+        param[ 'ExpressionAttributeValues' ][ ':v' ] = {};
+        if( !isNaN( value ) ) {
+            param[ 'ExpressionAttributeValues' ][ ':v' ][ 'N' ] = value.toString();
+        } else if( typeof value === 'string' ) {
+            param[ 'ExpressionAttributeValues' ][ ':v' ][ 'S' ] = value;
+        } else if( typeof value === 'object' ) {
+            if( Array.isArray( value ) ) {
+                // Number array
+                if( value.every( Number ) ) {
+                    param[ 'ExpressionAttributeValues' ][ ':v' ][ 'NS' ] =
+                        value.map( String );
+                    // String array
+                } else if( value.every( String ) ) {
+                    param[ 'ExpressionAttributeValues' ][ ':v' ][ 'SS' ] = value;
+                    // Generic list
+                } else {
+                    param[ 'ExpressionAttributeValues' ][ ':v' ][ 'L' ] = value;
+                }
+                // Object
+            } else {
+                param[ 'ExpressionAttributeValues' ][ ':v' ][ 'M' ] = value;
             }
-
-            ddb.updateItem( param, ( err, data ) => {
-                if( err ) {
-                    reject( err );
-                } else {
-                    resolve( data );
-                }
-            } );
+        } else if( typeof value === 'boolean' ) {
+            param[ 'ExpressionAttributeValues' ][ ':v' ][ 'BOOL' ] = value;
         }
+
+        ddb.updateItem( param, ( err, data ) => {
+            if( err ) {
+                reject( err );
+            } else {
+                resolve( data );
+            }
+        } );
     });
 };
 
