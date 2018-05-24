@@ -60,7 +60,7 @@ exports.parseHousingSearchResults = ( html, purchaseType ) => {
                             let address = getAddress( currentHouseBody );
                             let type = getType( currentHouseBody );
                             let attributes = getHouseAttributes( currentHouseBody );
-                            utils.getCoordinates(
+                            utils.getCoordinatesByAddress(
                                 address.street,
                                 address.city,
                                 address.state

@@ -150,7 +150,6 @@ exports.addNewUser = ( username, password, email ) => {
             }
         }
 
-
         ddb.putItem( params, ( err, data ) => {
             if ( err ) {
                 // This error means that the same username was found
@@ -169,7 +168,7 @@ exports.addNewUser = ( username, password, email ) => {
 // Endpoint entrance to modify an existing user profile key
 // This is for routing use to prevent a loop on profile change updates
 exports.modifyUserItemEndpoint = ( userObj, key, value, mode ) => {
-    let promise = DB.modifyUserItem(
+    let promise = DB.modifyDBItem(
         consts.USER_TABLE_NAME,
         consts.USER_PRIMARY_KEY,
         userObj[consts.PROF_KEYS.USERNAME],
@@ -205,7 +204,7 @@ exports.modifyUserPreferences = ( userObj, prefObj ) => {
                 }
 
                 promises.push(
-                    DB.modifyUserItem(
+                    DB.modifyDBItem(
                         consts.USER_TABLE_NAME,
                         consts.USER_PRIMARY_KEY,
                         userObj[consts.PROF_KEYS.USERNAME],
@@ -495,7 +494,7 @@ let timelyUpdates = ( userObj, timeGap ) => {
         // END UPDATES
 
         // Update time stamp
-        DB.modifyUserItem(
+        DB.modifyDBItem(
             consts.USER_TABLE_NAME,
             consts.USER_PRIMARY_KEY,
             userObj[consts.PROF_KEYS.USERNAME],
